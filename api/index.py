@@ -8,7 +8,6 @@ from supabase import create_client, Client
 
 app = FastAPI(title="VMO Clarity API")
 
-# CORS for frontend
 ALLOWED_ORIGINS = os.getenv("ALLOWED_ORIGINS", "https://vmoclarityarqsurya.vercel.app").split(",")
 
 app.add_middleware(
@@ -18,7 +17,6 @@ app.add_middleware(
     allow_headers=["Content-Type", "Authorization"],
 )
 
-# Supabase client
 supabase_url = os.getenv("SUPABASE_URL")
 supabase_key = os.getenv("SUPABASE_KEY")
 
@@ -27,7 +25,6 @@ if not supabase_url or not supabase_key:
 
 supabase: Client = create_client(supabase_url, supabase_key)
 
-# Models
 class ProjectCreate(BaseModel):
     project_code: str
     project_name: str
@@ -60,71 +57,72 @@ class BenefitUpdate(BaseModel):
     status: str
 
 @app.get("/")
+@app.get("/api")
 def root():
     return {"message": "VMO Clarity API", "version": "1.0.0"}
 
-@app.get("/projects")
+@app.get("/api/projects")
 def get_projects():
     result = supabase.table("projects").select("*").execute()
     return {"projects": result.data}
 
-@app.post("/projects")
+@app.post("/api/projects")
 def create_project(project: ProjectCreate):
     result = supabase.table("projects").insert(project.dict()).execute()
     return {"message": "Project created", "data": result.data[0]}
 
-@app.put("/projects/{project_id}")
+@app.put("/api/projects/{project_id}")
 def update_project(project_id: str, update: ProjectUpdate):
     data = {k: v for k, v in update.dict().items() if v is not None}
     result = supabase.table("projects").update(data).eq("project_id", project_id).execute()
     return {"message": "Project updated", "data": result.data[0]}
 
-@app.delete("/projects/{project_id}")
+@app.delete("/api/projects/{project_id}")
 def delete_project(project_id: str):
     supabase.table("projects").delete().eq("project_id", project_id).execute()
     return {"message": "Project deleted"}
 
-@app.get("/ridac")
+@app.get("/api/ridac")
 def get_ridac():
     result = supabase.table("ridac").select("*").execute()
     return {"ridac": result.data}
 
-@app.post("/ridac")
+@app.post("/api/ridac")
 def create_ridac(item: RIDACCreate):
     result = supabase.table("ridac").insert(item.dict()).execute()
     return {"message": "RIDAC item created", "data": result.data[0]}
 
-@app.put("/ridac/{ridac_id}")
+@app.put("/api/ridac/{ridac_id}")
 def update_ridac(ridac_id: str, item: RIDACCreate):
     result = supabase.table("ridac").update(item.dict()).eq("ridac_id", ridac_id).execute()
     return {"message": "RIDAC updated", "data": result.data[0]}
 
-@app.delete("/ridac/{ridac_id}")
+@app.delete("/api/ridac/{ridac_id}")
 def delete_ridac(ridac_id: str):
     supabase.table("ridac").delete().eq("ridac_id", ridac_id).execute()
     return {"message": "RIDAC item deleted"}
 
-@app.get("/benefits")
+@app.get("/api/benefits")
 def get_benefits():
     result = supabase.table("benefits").select("*").execute()
     return {"benefits": result.data}
 
-@app.patch("/benefits/{benefit_id}")
+@app.patch("/api/benefits/{benefit_id}")
 def update_benefit(benefit_id: str, update: BenefitUpdate):
     result = supabase.table("benefits").update(update.dict()).eq("benefit_id", benefit_id).execute()
     return {"message": "Benefit updated", "data": result.data[0]}
 
-@app.get("/demands")
+@app.get("/api/demands")
 def get_demands():
     result = supabase.table("demands").select("*").execute()
     return {"demands": result.data}
 
-@app.post("/demands")
+@app.post("/api/demands")
 def create_demand(demand: dict):
     result = supabase.table("demands").insert(demand).execute()
     return {"message": "Demand created", "data": result.data[0]}
 
-@app.get("/dashboard/stats")
+@app.get("/api/dashboard/stats")
 def get_stats():
     projects = supabase.table("projects").select("*").execute().data
     total = len(projects)
