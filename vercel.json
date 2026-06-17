@@ -24,10 +24,5 @@
       "src": "/(.*)",
       "dest": "/public/$1"
     }
-  ],
-  "env": {
-    "SUPABASE_URL": "$SUPABASE_URL",
-    "SUPABASE_KEY": "$SUPABASE_KEY",
-    "ALLOWED_ORIGINS": "$ALLOWED_ORIGINS"
-  }
+  ]
 }
