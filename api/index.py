@@ -9,7 +9,7 @@ from supabase import create_client, Client
 app = FastAPI(title="VMO Clarity API")
 
 # CORS for frontend
-ALLOWED_ORIGINS = os.getenv("ALLOWED_ORIGINS", "*").split(",")
+ALLOWED_ORIGINS = os.getenv("ALLOWED_ORIGINS", "https://vmoclarityarqsurya.vercel.app").split(",")
 
 app.add_middleware(
     CORSMiddleware,
