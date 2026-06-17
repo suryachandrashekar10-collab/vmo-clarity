@@ -21,6 +21,10 @@ app.add_middleware(
 # Supabase client
 supabase_url = os.getenv("SUPABASE_URL")
 supabase_key = os.getenv("SUPABASE_KEY")
+
+if not supabase_url or not supabase_key:
+    raise RuntimeError(f"Missing env vars: SUPABASE_URL={'set' if supabase_url else 'MISSING'}, SUPABASE_KEY={'set' if supabase_key else 'MISSING'}")
+
 supabase: Client = create_client(supabase_url, supabase_key)
 
 # Models
