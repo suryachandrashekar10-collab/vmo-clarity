@@ -1,0 +1,781 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VMO Clarity | Value Management Office Control Tower</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * { font-family: 'Inter', sans-serif; }
+        .gradient-bg { background: linear-gradient(135deg, #1e3a5f 0%, #0d2137 100%); }
+        .hover-lift { transition: transform 0.2s, box-shadow 0.2s; }
+        .hover-lift:hover { transform: translateY(-2px); box-shadow: 0 10px 40px rgba(0,0,0,0.1); }
+        .sidebar-item { transition: all 0.2s; cursor: pointer; }
+        .sidebar-item:hover { background: rgba(255,255,255,0.1); }
+        .sidebar-item.active { background: rgba(255,255,255,0.15); border-left: 3px solid #3b82f6; }
+        .modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 50; align-items: center; justify-content: center; }
+        .modal.active { display: flex; }
+        .modal-content { background: white; border-radius: 12px; width: 90%; max-width: 700px; max-height: 90vh; overflow-y: auto; }
+        .toast { position: fixed; bottom: 20px; right: 20px; padding: 12px 20px; border-radius: 8px; color: white; font-weight: 500; z-index: 100; transform: translateX(400px); transition: transform 0.3s; }
+        .toast.show { transform: translateX(0); }
+        .toast-success { background: #22c55e; }
+        .toast-error { background: #ef4444; }
+        .status-green { background: #dcfce7; color: #166534; }
+        .status-amber { background: #fef3c7; color: #92400e; }
+        .status-red { background: #fee2e2; color: #991b1b; }
+        .btn-primary { background: #3b82f6; color: white; padding: 8px 16px; border-radius: 6px; font-weight: 500; cursor: pointer; transition: all 0.2s; border: none; }
+        .btn-primary:hover { background: #2563eb; }
+        .btn-success { background: #22c55e; color: white; padding: 8px 16px; border-radius: 6px; font-weight: 500; cursor: pointer; border: none; }
+        .btn-success:hover { background: #16a34a; }
+        .btn-danger { background: #ef4444; color: white; padding: 8px 16px; border-radius: 6px; font-weight: 500; cursor: pointer; border: none; }
+        .btn-danger:hover { background: #dc2626; }
+        .form-group { margin-bottom: 16px; }
+        .form-label { display: block; font-size: 14px; font-weight: 500; color: #374151; margin-bottom: 4px; }
+        .form-input { width: 100%; padding: 8px 12px; border: 1px solid #d1d5db; border-radius: 6px; font-size: 14px; }
+        .form-input:focus { outline: none; border-color: #3b82f6; box-shadow: 0 0 0 3px rgba(59,130,246,0.1); }
+        .form-select { width: 100%; padding: 8px 12px; border: 1px solid #d1d5db; border-radius: 6px; font-size: 14px; background: white; }
+        .form-textarea { width: 100%; padding: 8px 12px; border: 1px solid #d1d5db; border-radius: 6px; font-size: 14px; min-height: 80px; resize: vertical; }
+        .chart-container { position: relative; height: 300px; }
+        .metric-card { background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%); }
+        .action-btn { padding: 4px 8px; border-radius: 4px; font-size: 12px; cursor: pointer; border: none; margin-right: 4px; }
+        .edit-btn { background: #dbeafe; color: #1e40af; }
+        .delete-btn { background: #fee2e2; color: #991b1b; }
+        .risk-high { border-left: 4px solid #ef4444; }
+        .risk-medium { border-left: 4px solid #f59e0b; }
+        .risk-low { border-left: 4px solid #22c55e; }
+    </style>
+</head>
+<body class="bg-gray-100">
+    <div id="toast" class="toast"></div>
+    <div id="modal" class="modal">
+        <div class="modal-content" id="modal-body"></div>
+    </div>
+
+    <div class="flex h-screen">
+        <aside class="w-64 gradient-bg text-white flex flex-col">
+            <div class="p-6 border-b border-white/10">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 bg-blue-500 rounded-lg flex items-center justify-center">
+                        <i class="fas fa-tower-broadcast text-white"></i>
+                    </div>
+                    <div>
+                        <h1 class="font-bold text-lg">VMO Clarity</h1>
+                        <p class="text-xs text-blue-200">Value Management Office</p>
+                    </div>
+                </div>
+            </div>
+            <nav class="flex-1 py-4">
+                <div class="sidebar-item active flex items-center gap-3 px-6 py-3 text-sm" onclick="showSection('executive', this)">
+                    <i class="fas fa-chart-line w-5"></i><span>Executive Dashboard</span>
+                </div>
+                <div class="sidebar-item flex items-center gap-3 px-6 py-3 text-sm" onclick="showSection('projects', this)">
+                    <i class="fas fa-folder-tree w-5"></i><span>Projects</span>
+                </div>
+                <div class="sidebar-item flex items-center gap-3 px-6 py-3 text-sm" onclick="showSection('demand', this)">
+                    <i class="fas fa-door-open w-5"></i><span>Demand Intake</span>
+                </div>
+                <div class="sidebar-item flex items-center gap-3 px-6 py-3 text-sm" onclick="showSection('ridac', this)">
+                    <i class="fas fa-shield-halved w-5"></i><span>RIDAC Hub</span>
+                </div>
+                <div class="sidebar-item flex items-center gap-3 px-6 py-3 text-sm" onclick="showSection('value', this)">
+                    <i class="fas fa-gem w-5"></i><span>Value Realisation</span>
+                </div>
+            </nav>
+            <div class="p-4 border-t border-white/10">
+                <div class="bg-white/10 rounded-lg p-3">
+                    <p class="text-xs text-blue-200">Arqiva Demo</p>
+                    <p class="text-xs">Built for Senior Planning & Value Management Specialist</p>
+                </div>
+            </div>
+        </aside>
+
+        <main class="flex-1 overflow-y-auto">
+            <header class="bg-white border-b px-8 py-4 flex items-center justify-between sticky top-0 z-10">
+                <div class="flex items-center gap-4">
+                    <h2 id="page-title" class="text-xl font-semibold text-gray-800">Executive Dashboard</h2>
+                    <span id="connection-status" class="px-3 py-1 bg-green-100 text-green-700 rounded-full text-xs font-medium">Live Data</span>
+                </div>
+                <div class="flex items-center gap-4">
+                    <button onclick="openCreateProjectModal()" class="btn-primary flex items-center gap-2">
+                        <i class="fas fa-plus"></i> New Project
+                    </button>
+                    <div class="text-right">
+                        <p class="text-sm font-medium text-gray-800">Nicola Thapan</p>
+                        <p class="text-xs text-gray-500">Head of VMO</p>
+                    </div>
+                    <div class="w-10 h-10 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center text-white font-bold">NT</div>
+                </div>
+            </header>
+
+            <div class="p-8">
+                <section id="executive" class="section-content">
+                    <div class="grid grid-cols-4 gap-6 mb-8">
+                        <div class="metric-card rounded-xl p-6 hover-lift">
+                            <div class="flex items-center justify-between mb-4">
+                                <div class="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center"><i class="fas fa-rocket text-blue-600 text-xl"></i></div>
+                                <span class="text-xs text-green-600 font-medium">Live</span>
+                            </div>
+                            <p class="text-3xl font-bold text-gray-800" id="total-projects">--</p>
+                            <p class="text-sm text-gray-500">Active Initiatives</p>
+                            <div class="mt-3 flex gap-2" id="status-badges"></div>
+                        </div>
+                        <div class="metric-card rounded-xl p-6 hover-lift">
+                            <div class="flex items-center justify-between mb-4">
+                                <div class="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center"><i class="fas fa-pound-sign text-purple-600 text-xl"></i></div>
+                            </div>
+                            <p class="text-3xl font-bold text-gray-800" id="total-budget">--</p>
+                            <p class="text-sm text-gray-500">Total Investment</p>
+                        </div>
+                        <div class="metric-card rounded-xl p-6 hover-lift">
+                            <div class="flex items-center justify-between mb-4">
+                                <div class="w-12 h-12 bg-red-100 rounded-lg flex items-center justify-center"><i class="fas fa-exclamation-triangle text-red-600 text-xl"></i></div>
+                            </div>
+                            <p class="text-3xl font-bold text-gray-800" id="at-risk">--</p>
+                            <p class="text-sm text-gray-500">At Risk Projects</p>
+                        </div>
+                        <div class="metric-card rounded-xl p-6 hover-lift">
+                            <div class="flex items-center justify-between mb-4">
+                                <div class="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center"><i class="fas fa-gem text-green-600 text-xl"></i></div>
+                            </div>
+                            <p class="text-3xl font-bold text-gray-800" id="variance">--</p>
+                            <p class="text-sm text-gray-500">Budget Variance</p>
+                        </div>
+                    </div>
+                    <div class="bg-white rounded-xl p-6 shadow-sm mb-8">
+                        <h3 class="font-semibold text-gray-800 mb-4">Portfolio Health</h3>
+                        <div class="chart-container"><canvas id="portfolioChart"></canvas></div>
+                    </div>
+                </section>
+
+                <section id="projects" class="section-content hidden">
+                    <div class="bg-white rounded-xl shadow-sm overflow-hidden">
+                        <div class="px-6 py-4 border-b flex items-center justify-between">
+                            <h3 class="font-semibold text-gray-800">Project Management</h3>
+                            <div class="flex gap-2">
+                                <button onclick="openCreateProjectModal()" class="btn-primary"><i class="fas fa-plus mr-1"></i> Add Project</button>
+                                <select id="filter-status" onchange="loadProjects()" class="form-select w-32">
+                                    <option value="all">All Status</option>
+                                    <option value="Green">Green</option>
+                                    <option value="Amber">Amber</option>
+                                    <option value="Red">Red</option>
+                                </select>
+                            </div>
+                        </div>
+                        <table class="w-full">
+                            <thead class="bg-gray-50">
+                                <tr>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Project</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Manager</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Status</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Budget</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="projects-table-body" class="divide-y divide-gray-100"></tbody>
+                        </table>
+                    </div>
+                </section>
+
+                <section id="demand" class="section-content hidden">
+                    <div class="grid grid-cols-2 gap-6">
+                        <div class="bg-white rounded-xl p-6 shadow-sm">
+                            <h3 class="font-semibold text-gray-800 mb-4">Submit New Demand</h3>
+                            <form id="demand-form" onsubmit="submitDemand(event)">
+                                <div class="form-group">
+                                    <label class="form-label">Demand Title</label>
+                                    <input type="text" id="demand-title" class="form-input" required placeholder="e.g., Smart Meter Upgrade">
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label">Business Area</label>
+                                    <select id="demand-area" class="form-select">
+                                        <option>Smart Utilities Networks</option>
+                                        <option>Media & Broadcast</option>
+                                        <option>Enablement & Corporate</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label">Expected Benefit (£)</label>
+                                    <input type="number" id="demand-benefit" class="form-input" required placeholder="5000000">
+                                </div>
+                                <div class="grid grid-cols-2 gap-4">
+                                    <div class="form-group">
+                                        <label class="form-label">Strategic Alignment (0-10)</label>
+                                        <input type="range" id="demand-alignment" min="0" max="10" value="5" class="w-full" oninput="updateDemandScore()">
+                                        <span id="alignment-value" class="text-sm text-gray-600">5</span>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="form-label">Regulatory Score (0-10)</label>
+                                        <input type="range" id="demand-regulatory" min="0" max="10" value="5" class="w-full" oninput="updateDemandScore()">
+                                        <span id="regulatory-value" class="text-sm text-gray-600">5</span>
+                                    </div>
+                                </div>
+                                <div class="grid grid-cols-2 gap-4">
+                                    <div class="form-group">
+                                        <label class="form-label">Feasibility (0-10)</label>
+                                        <input type="range" id="demand-feasibility" min="0" max="10" value="5" class="w-full" oninput="updateDemandScore()">
+                                        <span id="feasibility-value" class="text-sm text-gray-600">5</span>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="form-label">Commercial (0-10)</label>
+                                        <input type="range" id="demand-commercial" min="0" max="10" value="5" class="w-full" oninput="updateDemandScore()">
+                                        <span id="commercial-value" class="text-sm text-gray-600">5</span>
+                                    </div>
+                                </div>
+                                <div class="p-4 bg-blue-50 rounded-lg mb-4">
+                                    <p class="text-sm font-medium text-blue-800">Calculated VMO Score: <span id="vmo-score" class="text-xl">5.00</span></p>
+                                    <p class="text-xs text-blue-600">Formula: (Alignment×0.30) + (Regulatory×0.25) + (Feasibility×0.20) + (Commercial×0.25)</p>
+                                </div>
+                                <button type="submit" class="btn-primary w-full"><i class="fas fa-paper-plane mr-2"></i>Submit Demand</button>
+                            </form>
+                        </div>
+                        <div class="bg-white rounded-xl p-6 shadow-sm">
+                            <h3 class="font-semibold text-gray-800 mb-4">Demand Pipeline</h3>
+                            <div id="demand-pipeline" class="space-y-3"></div>
+                        </div>
+                    </div>
+                </section>
+
+                <section id="ridac" class="section-content hidden">
+                    <div class="mb-6">
+                        <div class="flex gap-4">
+                            <button onclick="filterRIDAC('all')" class="px-4 py-2 bg-gray-100 rounded-lg text-sm font-medium">All</button>
+                            <button onclick="filterRIDAC('Risk')" class="px-4 py-2 bg-red-100 text-red-700 rounded-lg text-sm font-medium">Risks</button>
+                            <button onclick="filterRIDAC('Issue')" class="px-4 py-2 bg-orange-100 text-orange-700 rounded-lg text-sm font-medium">Issues</button>
+                            <button onclick="filterRIDAC('Decision')" class="px-4 py-2 bg-blue-100 text-blue-700 rounded-lg text-sm font-medium">Decisions</button>
+                            <button onclick="filterRIDAC('Action')" class="px-4 py-2 bg-green-100 text-green-700 rounded-lg text-sm font-medium">Actions</button>
+                            <button onclick="filterRIDAC('Change')" class="px-4 py-2 bg-purple-100 text-purple-700 rounded-lg text-sm font-medium">Changes</button>
+                            <button onclick="openCreateRIDACModal()" class="btn-primary ml-auto"><i class="fas fa-plus mr-1"></i> Add RIDAC</button>
+                        </div>
+                    </div>
+                    <div id="ridac-container" class="grid grid-cols-1 gap-4"></div>
+                </section>
+
+                <section id="value" class="section-content hidden">
+                    <div class="bg-white rounded-xl shadow-sm overflow-hidden">
+                        <div class="px-6 py-4 border-b">
+                            <h3 class="font-semibold text-gray-800">Benefit Realisation Tracker</h3>
+                        </div>
+                        <div class="p-6">
+                            <div id="benefits-list" class="space-y-4"></div>
+                        </div>
+                    </div>
+                </section>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        // API Configuration - UPDATE THIS AFTER DEPLOYMENT
+        const API_BASE = window.location.origin.includes('localhost') 
+            ? 'http://localhost:8000' 
+            : window.location.origin + '/api';
+
+        let charts = {};
+
+        function showToast(message, type = 'success') {
+            const toast = document.getElementById('toast');
+            toast.textContent = message;
+            toast.className = `toast toast-${type}`;
+            toast.classList.add('show');
+            setTimeout(() => toast.classList.remove('show'), 3000);
+        }
+
+        function formatCurrency(value) {
+            if (!value) return '£0';
+            if (value >= 1000000) return '£' + (value / 1000000).toFixed(1) + 'M';
+            if (value >= 1000) return '£' + (value / 1000).toFixed(0) + 'K';
+            return '£' + value;
+        }
+
+        function getStatusBadge(status) {
+            const classes = { 'Green': 'status-green', 'Amber': 'status-amber', 'Red': 'status-red' };
+            return `<span class="px-2 py-1 ${classes[status] || 'bg-gray-100'} rounded-full text-xs font-medium">${status}</span>`;
+        }
+
+        // Navigation
+        function showSection(sectionId, element) {
+            document.querySelectorAll('.section-content').forEach(s => s.classList.add('hidden'));
+            document.getElementById(sectionId).classList.remove('hidden');
+            document.querySelectorAll('.sidebar-item').forEach(s => s.classList.remove('active'));
+            if (element) element.classList.add('active');
+
+            const titles = {
+                'executive': 'Executive Dashboard', 'projects': 'Project Management',
+                'demand': 'Demand Intake', 'ridac': 'RIDAC Hub', 'value': 'Value Realisation'
+            };
+            document.getElementById('page-title').textContent = titles[sectionId];
+
+            if (sectionId === 'executive') loadDashboardStats();
+            if (sectionId === 'projects') loadProjects();
+            if (sectionId === 'demand') loadDemands();
+            if (sectionId === 'ridac') loadRIDAC('all');
+            if (sectionId === 'value') loadBenefits();
+        }
+
+        // API Calls
+        async function apiCall(endpoint, method = 'GET', body = null) {
+            try {
+                const options = {
+                    method,
+                    headers: { 'Content-Type': 'application/json' }
+                };
+                if (body) options.body = JSON.stringify(body);
+
+                const response = await fetch(`${API_BASE}${endpoint}`, options);
+                if (!response.ok) throw new Error(`HTTP ${response.status}`);
+                return await response.json();
+            } catch (error) {
+                console.error('API Error:', error);
+                showToast('Error connecting to server. Using demo mode.', 'error');
+                return null;
+            }
+        }
+
+        // Dashboard Stats
+        async function loadDashboardStats() {
+            const data = await apiCall('/dashboard/stats');
+            if (!data) return;
+
+            document.getElementById('total-projects').textContent = data.total_projects || 0;
+            document.getElementById('total-budget').textContent = formatCurrency(data.total_budget);
+            document.getElementById('at-risk').textContent = (data.amber || 0) + (data.red || 0);
+            document.getElementById('variance').textContent = formatCurrency(data.variance);
+
+            const badges = document.getElementById('status-badges');
+            badges.innerHTML = `
+                <span class="px-2 py-1 bg-green-100 text-green-700 rounded text-xs">${data.green || 0} Green</span>
+                <span class="px-2 py-1 bg-amber-100 text-amber-700 rounded text-xs">${data.amber || 0} Amber</span>
+                <span class="px-2 py-1 bg-red-100 text-red-700 rounded text-xs">${data.red || 0} Red</span>
+            `;
+
+            initPortfolioChart(data.green || 0, data.amber || 0, data.red || 0);
+        }
+
+        function initPortfolioChart(green, amber, red) {
+            if (charts.portfolio) charts.portfolio.destroy();
+            const ctx = document.getElementById('portfolioChart').getContext('2d');
+            charts.portfolio = new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Green', 'Amber', 'Red'],
+                    datasets: [{ data: [green, amber, red], backgroundColor: ['#22c55e', '#f59e0b', '#ef4444'], borderWidth: 0 }]
+                },
+                options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom' } } }
+            });
+        }
+
+        // Projects CRUD
+        async function loadProjects() {
+            const filter = document.getElementById('filter-status').value;
+            const data = await apiCall('/projects');
+            if (!data || !data.projects) return;
+
+            let projects = data.projects;
+            if (filter !== 'all') projects = projects.filter(p => p.status === filter);
+
+            const tbody = document.getElementById('projects-table-body');
+            tbody.innerHTML = projects.map(p => `
+                <tr class="hover:bg-gray-50">
+                    <td class="px-6 py-4">
+                        <p class="font-medium text-gray-800">${p.project_code}</p>
+                        <p class="text-xs text-gray-500">${p.project_name}</p>
+                    </td>
+                    <td class="px-6 py-4 text-sm">${p.delivery_manager}</td>
+                    <td class="px-6 py-4">${getStatusBadge(p.status)}</td>
+                    <td class="px-6 py-4 text-sm">${formatCurrency(p.budget)}</td>
+                    <td class="px-6 py-4">
+                        <button onclick="editProject('${p.project_id}')" class="action-btn edit-btn">Edit</button>
+                        <button onclick="deleteProject('${p.project_id}')" class="action-btn delete-btn">Delete</button>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        async function editProject(id) {
+            const data = await apiCall(`/projects/${id}`);
+            if (!data || !data.project) return;
+            const p = data.project;
+
+            const modal = document.getElementById('modal');
+            const body = document.getElementById('modal-body');
+            body.innerHTML = `
+                <div class="p-6">
+                    <div class="flex items-center justify-between mb-4">
+                        <h3 class="text-lg font-semibold text-gray-800">Edit Project: ${p.project_code}</h3>
+                        <button onclick="closeModal()" class="text-gray-400 hover:text-gray-600"><i class="fas fa-times"></i></button>
+                    </div>
+                    <form onsubmit="updateProject(event, '${id}')">
+                        <div class="form-group">
+                            <label class="form-label">Project Name</label>
+                            <input type="text" id="edit-name" class="form-input" value="${p.project_name}">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Delivery Manager</label>
+                            <input type="text" id="edit-manager" class="form-input" value="${p.delivery_manager}">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Status</label>
+                            <select id="edit-status" class="form-select">
+                                <option ${p.status === 'Green' ? 'selected' : ''}>Green</option>
+                                <option ${p.status === 'Amber' ? 'selected' : ''}>Amber</option>
+                                <option ${p.status === 'Red' ? 'selected' : ''}>Red</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">RAG Reason</label>
+                            <textarea id="edit-rag" class="form-textarea">${p.rag_reason || ''}</textarea>
+                        </div>
+                        <div class="flex gap-3 mt-6">
+                            <button type="submit" class="btn-success"><i class="fas fa-check mr-2"></i>Save</button>
+                            <button type="button" onclick="closeModal()" class="btn-primary bg-gray-500">Cancel</button>
+                        </div>
+                    </form>
+                </div>
+            `;
+            modal.classList.add('active');
+        }
+
+        async function updateProject(e, id) {
+            e.preventDefault();
+            const data = {
+                project_name: document.getElementById('edit-name').value,
+                delivery_manager: document.getElementById('edit-manager').value,
+                status: document.getElementById('edit-status').value,
+                rag_reason: document.getElementById('edit-rag').value
+            };
+            await apiCall(`/projects/${id}`, 'PUT', data);
+            closeModal();
+            loadProjects();
+            showToast('Project updated!');
+        }
+
+        async function deleteProject(id) {
+            if (!confirm('Delete this project?')) return;
+            await apiCall(`/projects/${id}`, 'DELETE');
+            loadProjects();
+            showToast('Project deleted', 'error');
+        }
+
+        function openCreateProjectModal() {
+            const modal = document.getElementById('modal');
+            const body = document.getElementById('modal-body');
+            body.innerHTML = `
+                <div class="p-6">
+                    <div class="flex items-center justify-between mb-4">
+                        <h3 class="text-lg font-semibold text-gray-800">Create New Project</h3>
+                        <button onclick="closeModal()" class="text-gray-400 hover:text-gray-600"><i class="fas fa-times"></i></button>
+                    </div>
+                    <form onsubmit="createProject(event)">
+                        <div class="grid grid-cols-2 gap-4">
+                            <div class="form-group">
+                                <label class="form-label">Project Code</label>
+                                <input type="text" id="new-code" class="form-input" required placeholder="PRJ-XXX">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Project Name</label>
+                                <input type="text" id="new-name" class="form-input" required>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Delivery Manager</label>
+                            <input type="text" id="new-manager" class="form-input" required>
+                        </div>
+                        <div class="grid grid-cols-2 gap-4">
+                            <div class="form-group">
+                                <label class="form-label">Status</label>
+                                <select id="new-status" class="form-select">
+                                    <option>Green</option><option>Amber</option><option>Red</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Budget (£)</label>
+                                <input type="number" id="new-budget" class="form-input" required>
+                            </div>
+                        </div>
+                        <div class="flex gap-3 mt-6">
+                            <button type="submit" class="btn-success"><i class="fas fa-check mr-2"></i>Create</button>
+                            <button type="button" onclick="closeModal()" class="btn-primary bg-gray-500">Cancel</button>
+                        </div>
+                    </form>
+                </div>
+            `;
+            modal.classList.add('active');
+        }
+
+        async function createProject(e) {
+            e.preventDefault();
+            const data = {
+                project_code: document.getElementById('new-code').value,
+                project_name: document.getElementById('new-name').value,
+                delivery_manager: document.getElementById('new-manager').value,
+                status: document.getElementById('new-status').value,
+                budget: parseFloat(document.getElementById('new-budget').value),
+                expected_benefit: 0
+            };
+            await apiCall('/projects', 'POST', data);
+            closeModal();
+            loadProjects();
+            showToast('Project created!');
+        }
+
+        // Demand Intake
+        function updateDemandScore() {
+            const a = parseFloat(document.getElementById('demand-alignment').value);
+            const r = parseFloat(document.getElementById('demand-regulatory').value);
+            const f = parseFloat(document.getElementById('demand-feasibility').value);
+            const c = parseFloat(document.getElementById('demand-commercial').value);
+            document.getElementById('alignment-value').textContent = a;
+            document.getElementById('regulatory-value').textContent = r;
+            document.getElementById('feasibility-value').textContent = f;
+            document.getElementById('commercial-value').textContent = c;
+            document.getElementById('vmo-score').textContent = ((a*0.30)+(r*0.25)+(f*0.20)+(c*0.25)).toFixed(2);
+        }
+
+        async function submitDemand(e) {
+            e.preventDefault();
+            const a = parseFloat(document.getElementById('demand-alignment').value);
+            const r = parseFloat(document.getElementById('demand-regulatory').value);
+            const f = parseFloat(document.getElementById('demand-feasibility').value);
+            const c = parseFloat(document.getElementById('demand-commercial').value);
+            const data = {
+                demand_code: 'D' + Date.now(),
+                title: document.getElementById('demand-title').value,
+                business_area: document.getElementById('demand-area').value,
+                expected_benefit: parseFloat(document.getElementById('demand-benefit').value),
+                strategic_alignment: a, regulatory_score: r, feasibility_score: f, commercial_score: c,
+                vmo_score: ((a*0.30)+(r*0.25)+(f*0.20)+(c*0.25)), stage: 'Draft'
+            };
+            await apiCall('/demands', 'POST', data);
+            document.getElementById('demand-form').reset();
+            updateDemandScore();
+            loadDemands();
+            showToast('Demand submitted!');
+        }
+
+        async function loadDemands() {
+            const data = await apiCall('/demands');
+            if (!data || !data.demands) return;
+
+            const container = document.getElementById('demand-pipeline');
+            container.innerHTML = data.demands.map(d => `
+                <div class="border rounded-lg p-4 hover-lift">
+                    <div class="flex items-start justify-between">
+                        <div>
+                            <div class="flex items-center gap-2 mb-1">
+                                <span class="px-2 py-1 ${d.stage === 'Approved' ? 'bg-green-100 text-green-700' : d.stage === 'Screening' ? 'bg-amber-100 text-amber-700' : 'bg-gray-100 text-gray-700'} rounded text-xs">${d.stage}</span>
+                                <span class="px-2 py-1 bg-blue-100 text-blue-700 rounded text-xs">${d.business_area}</span>
+                            </div>
+                            <h4 class="font-medium text-gray-800">${d.title}</h4>
+                            <p class="text-xs text-gray-500">Benefit: ${formatCurrency(d.expected_benefit)}</p>
+                        </div>
+                        <div class="text-right">
+                            <p class="text-2xl font-bold text-blue-600">${d.vmo_score ? d.vmo_score.toFixed(2) : '0.00'}</p>
+                            <p class="text-xs text-gray-500">VMO Score</p>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // RIDAC
+        async function loadRIDAC(filter = 'all') {
+            const data = await apiCall('/ridac');
+            if (!data || !data.ridac) return;
+
+            let items = data.ridac;
+            if (filter !== 'all') items = items.filter(r => r.type === filter);
+
+            const container = document.getElementById('ridac-container');
+            container.innerHTML = items.map(r => {
+                const border = r.impact === 'Critical' || r.impact === 'High' ? 'risk-high' : r.impact === 'Medium' ? 'risk-medium' : 'risk-low';
+                const colors = { 'Risk': 'bg-red-100 text-red-700', 'Issue': 'bg-orange-100 text-orange-700', 'Decision': 'bg-blue-100 text-blue-700', 'Action': 'bg-green-100 text-green-700', 'Change': 'bg-purple-100 text-purple-700' };
+                return `
+                    <div class="bg-white rounded-xl p-6 shadow-sm ${border}">
+                        <div class="flex items-start justify-between">
+                            <div class="flex-1">
+                                <div class="flex items-center gap-2 mb-2">
+                                    <span class="px-2 py-1 ${colors[r.type]} rounded text-xs font-bold">${r.type.toUpperCase()}</span>
+                                    <span class="px-2 py-1 bg-gray-100 rounded text-xs">${r.ridac_code}</span>
+                                </div>
+                                <h4 class="font-medium text-gray-800">${r.title}</h4>
+                                <p class="text-sm text-gray-500 mt-1">Owner: ${r.owner} | Target: ${r.target_date || 'TBD'}</p>
+                                <p class="text-sm text-gray-600 mt-2">${r.description}</p>
+                                <div class="mt-3 p-3 bg-gray-50 rounded-lg">
+                                    <p class="text-sm font-medium text-gray-700">Action Required:</p>
+                                    <p class="text-sm text-gray-600">${r.action_required}</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function filterRIDAC(type) {
+            loadRIDAC(type);
+        }
+
+        function openCreateRIDACModal() {
+            const modal = document.getElementById('modal');
+            const body = document.getElementById('modal-body');
+            body.innerHTML = `
+                <div class="p-6">
+                    <div class="flex items-center justify-between mb-4">
+                        <h3 class="text-lg font-semibold text-gray-800">Add RIDAC Item</h3>
+                        <button onclick="closeModal()" class="text-gray-400 hover:text-gray-600"><i class="fas fa-times"></i></button>
+                    </div>
+                    <form onsubmit="createRIDAC(event)">
+                        <div class="grid grid-cols-2 gap-4">
+                            <div class="form-group">
+                                <label class="form-label">Type</label>
+                                <select id="new-ridac-type" class="form-select">
+                                    <option>Risk</option><option>Issue</option><option>Decision</option><option>Action</option><option>Change</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Code</label>
+                                <input type="text" id="new-ridac-code" class="form-input" placeholder="R001">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Title</label>
+                            <input type="text" id="new-ridac-title" class="form-input" required>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Description</label>
+                            <textarea id="new-ridac-desc" class="form-textarea" required></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Owner</label>
+                            <input type="text" id="new-ridac-owner" class="form-input" required>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Action Required</label>
+                            <textarea id="new-ridac-action" class="form-textarea" required></textarea>
+                        </div>
+                        <div class="flex gap-3 mt-6">
+                            <button type="submit" class="btn-success"><i class="fas fa-check mr-2"></i>Add</button>
+                            <button type="button" onclick="closeModal()" class="btn-primary bg-gray-500">Cancel</button>
+                        </div>
+                    </form>
+                </div>
+            `;
+            modal.classList.add('active');
+        }
+
+        async function createRIDAC(e) {
+            e.preventDefault();
+            const data = {
+                ridac_code: document.getElementById('new-ridac-code').value,
+                type: document.getElementById('new-ridac-type').value,
+                title: document.getElementById('new-ridac-title').value,
+                description: document.getElementById('new-ridac-desc').value,
+                owner: document.getElementById('new-ridac-owner').value,
+                action_required: document.getElementById('new-ridac-action').value,
+                impact: 'Medium', status: 'Active'
+            };
+            await apiCall('/ridac', 'POST', data);
+            closeModal();
+            loadRIDAC('all');
+            showToast('RIDAC item added!');
+        }
+
+        // Benefits
+        async function loadBenefits() {
+            const data = await apiCall('/benefits');
+            if (!data || !data.benefits) return;
+
+            const container = document.getElementById('benefits-list');
+            container.innerHTML = data.benefits.map(b => {
+                const pct = b.expected_value > 0 ? (b.realised_value / b.expected_value * 100) : 0;
+                return `
+                    <div class="border rounded-lg p-4">
+                        <div class="flex items-start justify-between">
+                            <div class="flex-1">
+                                <div class="flex items-center gap-2 mb-1">
+                                    <span class="px-2 py-1 bg-blue-100 text-blue-700 rounded text-xs">${b.benefit_type}</span>
+                                    <span class="px-2 py-1 ${b.status === 'On Track' ? 'bg-green-100 text-green-700' : 'bg-amber-100 text-amber-700'} rounded text-xs">${b.status}</span>
+                                </div>
+                                <h4 class="font-medium text-gray-800">${b.benefit_name}</h4>
+                                <div class="mt-2">
+                                    <div class="flex justify-between text-xs mb-1">
+                                        <span>Realisation: ${pct.toFixed(1)}%</span>
+                                        <span>${formatCurrency(b.realised_value)} / ${formatCurrency(b.expected_value)}</span>
+                                    </div>
+                                    <div class="w-full bg-gray-200 rounded-full h-2">
+                                        <div class="bg-green-500 h-2 rounded-full" style="width:${Math.min(pct, 100)}%"></div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="ml-4">
+                                <button onclick="editBenefit('${b.benefit_id}')" class="action-btn edit-btn">Update</button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        async function editBenefit(id) {
+            const data = await apiCall('/benefits');
+            const b = data.benefits.find(x => x.benefit_id === id);
+            if (!b) return;
+
+            const modal = document.getElementById('modal');
+            const body = document.getElementById('modal-body');
+            body.innerHTML = `
+                <div class="p-6">
+                    <div class="flex items-center justify-between mb-4">
+                        <h3 class="text-lg font-semibold text-gray-800">Update Benefit: ${b.benefit_name}</h3>
+                        <button onclick="closeModal()" class="text-gray-400 hover:text-gray-600"><i class="fas fa-times"></i></button>
+                    </div>
+                    <form onsubmit="updateBenefit(event, '${id}')">
+                        <div class="form-group">
+                            <label class="form-label">Actual Realised Value</label>
+                            <input type="number" id="edit-realised" class="form-input" value="${b.realised_value}">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Status</label>
+                            <select id="edit-status" class="form-select">
+                                <option ${b.status === 'On Track' ? 'selected' : ''}>On Track</option>
+                                <option ${b.status === 'At Risk' ? 'selected' : ''}>At Risk</option>
+                                <option ${b.status === 'Delayed' ? 'selected' : ''}>Delayed</option>
+                            </select>
+                        </div>
+                        <div class="flex gap-3 mt-6">
+                            <button type="submit" class="btn-success"><i class="fas fa-check mr-2"></i>Update</button>
+                            <button type="button" onclick="closeModal()" class="btn-primary bg-gray-500">Cancel</button>
+                        </div>
+                    </form>
+                </div>
+            `;
+            modal.classList.add('active');
+        }
+
+        async function updateBenefit(e, id) {
+            e.preventDefault();
+            const data = {
+                realised_value: parseFloat(document.getElementById('edit-realised').value),
+                status: document.getElementById('edit-status').value
+            };
+            await apiCall(`/benefits/${id}`, 'PATCH', data);
+            closeModal();
+            loadBenefits();
+            showToast('Benefit updated!');
+        }
+
+        // Modal utilities
+        function closeModal() {
+            document.getElementById('modal').classList.remove('active');
+        }
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            loadDashboardStats();
+        });
+    </script>
+</body>
+</html>
