@@ -11,11 +11,25 @@
     <style>
         * { font-family: 'Inter', sans-serif; }
         .gradient-bg { background: linear-gradient(135deg, #1e3a5f 0%, #0d2137 100%); }
+        .card-glass { background: rgba(255,255,255,0.95); backdrop-filter: blur(10px); }
+        .status-green { background: #dcfce7; color: #166534; }
+        .status-amber { background: #fef3c7; color: #92400e; }
+        .status-red { background: #fee2e2; color: #991b1b; }
         .hover-lift { transition: transform 0.2s, box-shadow 0.2s; }
         .hover-lift:hover { transform: translateY(-2px); box-shadow: 0 10px 40px rgba(0,0,0,0.1); }
-        .sidebar-item { transition: all 0.2s; cursor: pointer; }
+        .sidebar-item { transition: all 0.2s; }
         .sidebar-item:hover { background: rgba(255,255,255,0.1); }
         .sidebar-item.active { background: rgba(255,255,255,0.15); border-left: 3px solid #3b82f6; }
+        .chart-container { position: relative; height: 300px; }
+        .metric-card { background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%); }
+        .animate-fade-in { animation: fadeIn 0.5s ease-in; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        .risk-high { border-left: 4px solid #ef4444; }
+        .risk-medium { border-left: 4px solid #f59e0b; }
+        .risk-low { border-left: 4px solid #22c55e; }
+        .process-step { position: relative; }
+        .process-step::after { content: ''; position: absolute; top: 50%; right: -20px; width: 20px; height: 2px; background: #e2e8f0; }
+        .process-step:last-child::after { display: none; }
         .modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 50; align-items: center; justify-content: center; }
         .modal.active { display: flex; }
         .modal-content { background: white; border-radius: 12px; width: 90%; max-width: 700px; max-height: 90vh; overflow-y: auto; }
@@ -23,29 +37,17 @@
         .toast.show { transform: translateX(0); }
         .toast-success { background: #22c55e; }
         .toast-error { background: #ef4444; }
-        .status-green { background: #dcfce7; color: #166534; }
-        .status-amber { background: #fef3c7; color: #92400e; }
-        .status-red { background: #fee2e2; color: #991b1b; }
         .btn-primary { background: #3b82f6; color: white; padding: 8px 16px; border-radius: 6px; font-weight: 500; cursor: pointer; transition: all 0.2s; border: none; }
-        .btn-primary:hover { background: #2563eb; }
         .btn-success { background: #22c55e; color: white; padding: 8px 16px; border-radius: 6px; font-weight: 500; cursor: pointer; border: none; }
-        .btn-success:hover { background: #16a34a; }
         .btn-danger { background: #ef4444; color: white; padding: 8px 16px; border-radius: 6px; font-weight: 500; cursor: pointer; border: none; }
-        .btn-danger:hover { background: #dc2626; }
         .form-group { margin-bottom: 16px; }
         .form-label { display: block; font-size: 14px; font-weight: 500; color: #374151; margin-bottom: 4px; }
         .form-input { width: 100%; padding: 8px 12px; border: 1px solid #d1d5db; border-radius: 6px; font-size: 14px; }
-        .form-input:focus { outline: none; border-color: #3b82f6; box-shadow: 0 0 0 3px rgba(59,130,246,0.1); }
         .form-select { width: 100%; padding: 8px 12px; border: 1px solid #d1d5db; border-radius: 6px; font-size: 14px; background: white; }
         .form-textarea { width: 100%; padding: 8px 12px; border: 1px solid #d1d5db; border-radius: 6px; font-size: 14px; min-height: 80px; resize: vertical; }
-        .chart-container { position: relative; height: 300px; }
-        .metric-card { background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%); }
         .action-btn { padding: 4px 8px; border-radius: 4px; font-size: 12px; cursor: pointer; border: none; margin-right: 4px; }
         .edit-btn { background: #dbeafe; color: #1e40af; }
         .delete-btn { background: #fee2e2; color: #991b1b; }
-        .risk-high { border-left: 4px solid #ef4444; }
-        .risk-medium { border-left: 4px solid #f59e0b; }
-        .risk-low { border-left: 4px solid #22c55e; }
     </style>
 </head>
 <body class="bg-gray-100">
@@ -68,25 +70,40 @@
                 </div>
             </div>
             <nav class="flex-1 py-4">
-                <div class="sidebar-item active flex items-center gap-3 px-6 py-3 text-sm" onclick="showSection('executive', this)">
+                <a href="#" class="sidebar-item active flex items-center gap-3 px-6 py-3 text-sm" onclick="showSection('executive', this)">
                     <i class="fas fa-chart-line w-5"></i><span>Executive Dashboard</span>
-                </div>
-                <div class="sidebar-item flex items-center gap-3 px-6 py-3 text-sm" onclick="showSection('projects', this)">
-                    <i class="fas fa-folder-tree w-5"></i><span>Projects</span>
-                </div>
-                <div class="sidebar-item flex items-center gap-3 px-6 py-3 text-sm" onclick="showSection('demand', this)">
+                </a>
+                <a href="#" class="sidebar-item flex items-center gap-3 px-6 py-3 text-sm" onclick="showSection('portfolio', this)">
+                    <i class="fas fa-folder-tree w-5"></i><span>Portfolio View</span>
+                </a>
+                <a href="#" class="sidebar-item flex items-center gap-3 px-6 py-3 text-sm" onclick="showSection('projects', this)">
+                    <i class="fas fa-list-check w-5"></i><span>Projects</span>
+                </a>
+                <a href="#" class="sidebar-item flex items-center gap-3 px-6 py-3 text-sm" onclick="showSection('demand', this)">
                     <i class="fas fa-door-open w-5"></i><span>Demand Intake</span>
-                </div>
-                <div class="sidebar-item flex items-center gap-3 px-6 py-3 text-sm" onclick="showSection('ridac', this)">
+                </a>
+                <a href="#" class="sidebar-item flex items-center gap-3 px-6 py-3 text-sm" onclick="showSection('delivery', this)">
+                    <i class="fas fa-tasks w-5"></i><span>Delivery Control</span>
+                </a>
+                <a href="#" class="sidebar-item flex items-center gap-3 px-6 py-3 text-sm" onclick="showSection('ridac', this)">
                     <i class="fas fa-shield-halved w-5"></i><span>RIDAC Hub</span>
-                </div>
-                <div class="sidebar-item flex items-center gap-3 px-6 py-3 text-sm" onclick="showSection('value', this)">
+                </a>
+                <a href="#" class="sidebar-item flex items-center gap-3 px-6 py-3 text-sm" onclick="showSection('value', this)">
                     <i class="fas fa-gem w-5"></i><span>Value Realisation</span>
-                </div>
+                </a>
+                <a href="#" class="sidebar-item flex items-center gap-3 px-6 py-3 text-sm" onclick="showSection('process', this)">
+                    <i class="fas fa-arrows-spin w-5"></i><span>Process Improvement</span>
+                </a>
+                <a href="#" class="sidebar-item flex items-center gap-3 px-6 py-3 text-sm" onclick="showSection('capacity', this)">
+                    <i class="fas fa-users w-5"></i><span>Capacity Heatmap</span>
+                </a>
+                <a href="#" class="sidebar-item flex items-center gap-3 px-6 py-3 text-sm" onclick="showSection('ai', this)">
+                    <i class="fas fa-robot w-5"></i><span>VMO Copilot</span>
+                </a>
             </nav>
             <div class="p-4 border-t border-white/10">
                 <div class="bg-white/10 rounded-lg p-3">
-                    <p class="text-xs text-blue-200">Arqiva Demo</p>
+                    <p class="text-xs text-blue-200 mb-1">Arqiva Demo</p>
                     <p class="text-xs">Built for Senior Planning & Value Management Specialist</p>
                 </div>
             </div>
@@ -99,8 +116,8 @@
                     <span id="connection-status" class="px-3 py-1 bg-green-100 text-green-700 rounded-full text-xs font-medium">Live Data</span>
                 </div>
                 <div class="flex items-center gap-4">
-                    <button onclick="openCreateProjectModal()" class="btn-primary flex items-center gap-2">
-                        <i class="fas fa-plus"></i> New Project
+                    <button id="header-action-btn" onclick="openCreateProjectModal()" class="px-4 py-2 bg-blue-600 text-white rounded-lg text-sm font-medium hidden">
+                        <i class="fas fa-plus mr-2"></i>New Project
                     </button>
                     <div class="text-right">
                         <p class="text-sm font-medium text-gray-800">Nicola Thapan</p>
@@ -111,57 +128,168 @@
             </header>
 
             <div class="p-8">
-                <section id="executive" class="section-content">
+                <!-- EXECUTIVE DASHBOARD -->
+                <section id="executive" class="section-content animate-fade-in">
                     <div class="grid grid-cols-4 gap-6 mb-8">
                         <div class="metric-card rounded-xl p-6 hover-lift">
                             <div class="flex items-center justify-between mb-4">
-                                <div class="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center"><i class="fas fa-rocket text-blue-600 text-xl"></i></div>
+                                <div class="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
+                                    <i class="fas fa-rocket text-blue-600 text-xl"></i>
+                                </div>
                                 <span class="text-xs text-green-600 font-medium">Live</span>
                             </div>
-                            <p class="text-3xl font-bold text-gray-800" id="total-projects">--</p>
+                            <p id="total-projects" class="text-3xl font-bold text-gray-800">—</p>
                             <p class="text-sm text-gray-500">Active Initiatives</p>
-                            <div class="mt-3 flex gap-2" id="status-badges"></div>
+                            <div id="status-badges" class="mt-3 flex gap-2"></div>
                         </div>
                         <div class="metric-card rounded-xl p-6 hover-lift">
                             <div class="flex items-center justify-between mb-4">
-                                <div class="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center"><i class="fas fa-pound-sign text-purple-600 text-xl"></i></div>
+                                <div class="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center">
+                                    <i class="fas fa-pound-sign text-purple-600 text-xl"></i>
+                                </div>
                             </div>
-                            <p class="text-3xl font-bold text-gray-800" id="total-budget">--</p>
+                            <p id="total-budget" class="text-3xl font-bold text-gray-800">—</p>
                             <p class="text-sm text-gray-500">Total Investment</p>
                         </div>
                         <div class="metric-card rounded-xl p-6 hover-lift">
                             <div class="flex items-center justify-between mb-4">
-                                <div class="w-12 h-12 bg-red-100 rounded-lg flex items-center justify-center"><i class="fas fa-exclamation-triangle text-red-600 text-xl"></i></div>
+                                <div class="w-12 h-12 bg-red-100 rounded-lg flex items-center justify-center">
+                                    <i class="fas fa-exclamation-triangle text-red-600 text-xl"></i>
+                                </div>
+                                <span class="text-xs text-red-600 font-medium">Action required</span>
                             </div>
-                            <p class="text-3xl font-bold text-gray-800" id="at-risk">--</p>
+                            <p id="at-risk" class="text-3xl font-bold text-gray-800">—</p>
                             <p class="text-sm text-gray-500">At Risk Projects</p>
                         </div>
                         <div class="metric-card rounded-xl p-6 hover-lift">
                             <div class="flex items-center justify-between mb-4">
-                                <div class="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center"><i class="fas fa-gem text-green-600 text-xl"></i></div>
+                                <div class="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center">
+                                    <i class="fas fa-gem text-green-600 text-xl"></i>
+                                </div>
                             </div>
-                            <p class="text-3xl font-bold text-gray-800" id="variance">--</p>
+                            <p id="variance" class="text-3xl font-bold text-gray-800">—</p>
                             <p class="text-sm text-gray-500">Budget Variance</p>
                         </div>
                     </div>
-                    <div class="bg-white rounded-xl p-6 shadow-sm mb-8">
-                        <h3 class="font-semibold text-gray-800 mb-4">Portfolio Health</h3>
-                        <div class="chart-container"><canvas id="portfolioChart"></canvas></div>
+
+                    <div class="grid grid-cols-2 gap-6 mb-8">
+                        <div class="bg-white rounded-xl p-6 shadow-sm">
+                            <h3 class="font-semibold text-gray-800 mb-4">Portfolio Health</h3>
+                            <div class="chart-container"><canvas id="portfolioChart"></canvas></div>
+                        </div>
+                        <div class="bg-white rounded-xl p-6 shadow-sm">
+                            <h3 class="font-semibold text-gray-800 mb-4">Project Health Trend (6 Months)</h3>
+                            <div class="chart-container"><canvas id="healthTrendChart"></canvas></div>
+                        </div>
+                    </div>
+
+                    <div class="bg-white rounded-xl shadow-sm overflow-hidden">
+                        <div class="px-6 py-4 border-b">
+                            <h3 class="font-semibold text-gray-800">Initiative Status Overview</h3>
+                        </div>
+                        <div id="exec-projects-table">
+                            <table class="w-full">
+                                <thead class="bg-gray-50">
+                                    <tr>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Initiative</th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Manager</th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Status</th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Budget</th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Forecast</th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Variance</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="exec-projects-body" class="divide-y divide-gray-100"></tbody>
+                            </table>
+                        </div>
                     </div>
                 </section>
 
+                <!-- PORTFOLIO VIEW -->
+                <section id="portfolio" class="section-content hidden">
+                    <div class="grid grid-cols-2 gap-6 mb-8">
+                        <div class="bg-white rounded-xl p-6 shadow-sm">
+                            <h3 class="font-semibold text-gray-800 mb-4">Portfolio Budget Allocation</h3>
+                            <div class="chart-container"><canvas id="budgetChart"></canvas></div>
+                        </div>
+                        <div class="bg-white rounded-xl p-6 shadow-sm">
+                            <h3 class="font-semibold text-gray-800 mb-4">Portfolio Health Score</h3>
+                            <div class="space-y-4">
+                                <div>
+                                    <div class="flex justify-between text-sm mb-1"><span>Smart Utilities Networks</span><span class="font-medium">72%</span></div>
+                                    <div class="w-full bg-gray-200 rounded-full h-3"><div class="bg-amber-500 h-3 rounded-full" style="width:72%"></div></div>
+                                    <p class="text-xs text-gray-500 mt-1">2 Amber projects, 1 Red risk</p>
+                                </div>
+                                <div>
+                                    <div class="flex justify-between text-sm mb-1"><span>Media & Broadcast</span><span class="font-medium">92%</span></div>
+                                    <div class="w-full bg-gray-200 rounded-full h-3"><div class="bg-green-500 h-3 rounded-full" style="width:92%"></div></div>
+                                    <p class="text-xs text-gray-500 mt-1">On track, AWS migration progressing</p>
+                                </div>
+                                <div>
+                                    <div class="flex justify-between text-sm mb-1"><span>Enablement & Corporate</span><span class="font-medium">45%</span></div>
+                                    <div class="w-full bg-gray-200 rounded-full h-3"><div class="bg-red-500 h-3 rounded-full" style="width:45%"></div></div>
+                                    <p class="text-xs text-gray-500 mt-1">CNI-SEC Red, security vetting blocked</p>
+                                </div>
+                                <div>
+                                    <div class="flex justify-between text-sm mb-1"><span>Infrastructure & Sites</span><span class="font-medium">68%</span></div>
+                                    <div class="w-full bg-gray-200 rounded-full h-3"><div class="bg-amber-500 h-3 rounded-full" style="width:68%"></div></div>
+                                    <p class="text-xs text-gray-500 mt-1">Heritage delay, Emley Moor at risk</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="bg-white rounded-xl p-6 shadow-sm">
+                        <h3 class="font-semibold text-gray-800 mb-4">Portfolio Strategic Alignment</h3>
+                        <div class="grid grid-cols-4 gap-4">
+                            <div class="border rounded-lg p-4">
+                                <div class="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center mb-3"><i class="fas fa-droplet text-blue-600"></i></div>
+                                <h4 class="font-medium text-gray-800">Smart Utilities</h4>
+                                <p class="text-xs text-gray-500 mt-1">Reduce leakage 30ML/day</p>
+                                <div class="mt-3 flex items-center gap-2"><span class="text-2xl font-bold">£50M</span><span class="text-xs text-gray-500">budget</span></div>
+                                <div class="mt-2 flex gap-1">
+                                    <span class="px-2 py-1 bg-green-100 text-green-700 rounded text-xs">1G</span>
+                                    <span class="px-2 py-1 bg-amber-100 text-amber-700 rounded text-xs">1A</span>
+                                    <span class="px-2 py-1 bg-red-100 text-red-700 rounded text-xs">1R</span>
+                                </div>
+                            </div>
+                            <div class="border rounded-lg p-4">
+                                <div class="w-10 h-10 bg-purple-100 rounded-lg flex items-center justify-center mb-3"><i class="fas fa-tower-broadcast text-purple-600"></i></div>
+                                <h4 class="font-medium text-gray-800">Media & Broadcast</h4>
+                                <p class="text-xs text-gray-500 mt-1">Double media revenue</p>
+                                <div class="mt-3 flex items-center gap-2"><span class="text-2xl font-bold">£35M</span><span class="text-xs text-gray-500">budget</span></div>
+                                <div class="mt-2 flex gap-1"><span class="px-2 py-1 bg-green-100 text-green-700 rounded text-xs">2G</span></div>
+                            </div>
+                            <div class="border rounded-lg p-4">
+                                <div class="w-10 h-10 bg-red-100 rounded-lg flex items-center justify-center mb-3"><i class="fas fa-shield-halved text-red-600"></i></div>
+                                <h4 class="font-medium text-gray-800">Enablement</h4>
+                                <p class="text-xs text-gray-500 mt-1">Protect CNI infrastructure</p>
+                                <div class="mt-3 flex items-center gap-2"><span class="text-2xl font-bold">£25M</span><span class="text-xs text-gray-500">budget</span></div>
+                                <div class="mt-2 flex gap-1"><span class="px-2 py-1 bg-red-100 text-red-700 rounded text-xs">1R</span></div>
+                            </div>
+                            <div class="border rounded-lg p-4">
+                                <div class="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center mb-3"><i class="fas fa-map-pin text-green-600"></i></div>
+                                <h4 class="font-medium text-gray-800">Infrastructure</h4>
+                                <p class="text-xs text-gray-500 mt-1">Protect 1,800+ sites</p>
+                                <div class="mt-3 flex items-center gap-2"><span class="text-2xl font-bold">£40M</span><span class="text-xs text-gray-500">budget</span></div>
+                                <div class="mt-2 flex gap-1"><span class="px-2 py-1 bg-amber-100 text-amber-700 rounded text-xs">1A</span></div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- PROJECTS (Live CRUD) -->
                 <section id="projects" class="section-content hidden">
                     <div class="bg-white rounded-xl shadow-sm overflow-hidden">
                         <div class="px-6 py-4 border-b flex items-center justify-between">
-                            <h3 class="font-semibold text-gray-800">Project Management</h3>
-                            <div class="flex gap-2">
-                                <button onclick="openCreateProjectModal()" class="btn-primary"><i class="fas fa-plus mr-1"></i> Add Project</button>
-                                <select id="filter-status" onchange="loadProjects()" class="form-select w-32">
+                            <h3 class="font-semibold text-gray-800">All Projects</h3>
+                            <div class="flex items-center gap-3">
+                                <select id="filter-status" onchange="loadProjects()" class="form-select text-sm w-40">
                                     <option value="all">All Status</option>
                                     <option value="Green">Green</option>
                                     <option value="Amber">Amber</option>
                                     <option value="Red">Red</option>
                                 </select>
+                                <button onclick="openCreateProjectModal()" class="btn-primary text-sm"><i class="fas fa-plus mr-2"></i>New Project</button>
                             </div>
                         </div>
                         <table class="w-full">
@@ -179,87 +307,313 @@
                     </div>
                 </section>
 
+                <!-- DEMAND INTAKE -->
                 <section id="demand" class="section-content hidden">
-                    <div class="grid grid-cols-2 gap-6">
+                    <div class="grid grid-cols-3 gap-6 mb-8">
+                        <div class="bg-white rounded-xl p-6 shadow-sm col-span-2">
+                            <h3 class="font-semibold text-gray-800 mb-4">Value Scoring Breakdown</h3>
+                            <div class="chart-container"><canvas id="valueScoringChart"></canvas></div>
+                        </div>
                         <div class="bg-white rounded-xl p-6 shadow-sm">
                             <h3 class="font-semibold text-gray-800 mb-4">Submit New Demand</h3>
-                            <form id="demand-form" onsubmit="submitDemand(event)">
-                                <div class="form-group">
-                                    <label class="form-label">Demand Title</label>
-                                    <input type="text" id="demand-title" class="form-input" required placeholder="e.g., Smart Meter Upgrade">
+                            <form id="demand-form" onsubmit="submitDemand(event)" class="space-y-3">
+                                <div>
+                                    <label class="form-label">Title</label>
+                                    <input type="text" id="demand-title" class="form-input" required placeholder="Demand title">
                                 </div>
-                                <div class="form-group">
+                                <div>
                                     <label class="form-label">Business Area</label>
-                                    <select id="demand-area" class="form-select">
-                                        <option>Smart Utilities Networks</option>
-                                        <option>Media & Broadcast</option>
-                                        <option>Enablement & Corporate</option>
-                                    </select>
+                                    <input type="text" id="demand-area" class="form-input" required placeholder="e.g. Smart Utilities">
                                 </div>
-                                <div class="form-group">
+                                <div>
                                     <label class="form-label">Expected Benefit (£)</label>
-                                    <input type="number" id="demand-benefit" class="form-input" required placeholder="5000000">
+                                    <input type="number" id="demand-benefit" class="form-input" required>
                                 </div>
-                                <div class="grid grid-cols-2 gap-4">
-                                    <div class="form-group">
-                                        <label class="form-label">Strategic Alignment (0-10)</label>
-                                        <input type="range" id="demand-alignment" min="0" max="10" value="5" class="w-full" oninput="updateDemandScore()">
-                                        <span id="alignment-value" class="text-sm text-gray-600">5</span>
-                                    </div>
-                                    <div class="form-group">
-                                        <label class="form-label">Regulatory Score (0-10)</label>
-                                        <input type="range" id="demand-regulatory" min="0" max="10" value="5" class="w-full" oninput="updateDemandScore()">
-                                        <span id="regulatory-value" class="text-sm text-gray-600">5</span>
-                                    </div>
+                                <div>
+                                    <label class="form-label">Strategic Alignment: <span id="alignment-value">5</span></label>
+                                    <input type="range" id="demand-alignment" min="1" max="10" value="5" oninput="updateDemandScore()" class="w-full">
                                 </div>
-                                <div class="grid grid-cols-2 gap-4">
-                                    <div class="form-group">
-                                        <label class="form-label">Feasibility (0-10)</label>
-                                        <input type="range" id="demand-feasibility" min="0" max="10" value="5" class="w-full" oninput="updateDemandScore()">
-                                        <span id="feasibility-value" class="text-sm text-gray-600">5</span>
-                                    </div>
-                                    <div class="form-group">
-                                        <label class="form-label">Commercial (0-10)</label>
-                                        <input type="range" id="demand-commercial" min="0" max="10" value="5" class="w-full" oninput="updateDemandScore()">
-                                        <span id="commercial-value" class="text-sm text-gray-600">5</span>
-                                    </div>
+                                <div>
+                                    <label class="form-label">Regulatory: <span id="regulatory-value">5</span></label>
+                                    <input type="range" id="demand-regulatory" min="1" max="10" value="5" oninput="updateDemandScore()" class="w-full">
                                 </div>
-                                <div class="p-4 bg-blue-50 rounded-lg mb-4">
-                                    <p class="text-sm font-medium text-blue-800">Calculated VMO Score: <span id="vmo-score" class="text-xl">5.00</span></p>
-                                    <p class="text-xs text-blue-600">Formula: (Alignment×0.30) + (Regulatory×0.25) + (Feasibility×0.20) + (Commercial×0.25)</p>
+                                <div>
+                                    <label class="form-label">Feasibility: <span id="feasibility-value">5</span></label>
+                                    <input type="range" id="demand-feasibility" min="1" max="10" value="5" oninput="updateDemandScore()" class="w-full">
                                 </div>
-                                <button type="submit" class="btn-primary w-full"><i class="fas fa-paper-plane mr-2"></i>Submit Demand</button>
+                                <div>
+                                    <label class="form-label">Commercial: <span id="commercial-value">5</span></label>
+                                    <input type="range" id="demand-commercial" min="1" max="10" value="5" oninput="updateDemandScore()" class="w-full">
+                                </div>
+                                <div class="p-3 bg-blue-50 rounded-lg text-center">
+                                    <p class="text-xs text-gray-500">VMO Score</p>
+                                    <p id="vmo-score" class="text-3xl font-bold text-blue-600">5.00</p>
+                                </div>
+                                <button type="submit" class="btn-primary w-full">Submit Demand</button>
                             </form>
                         </div>
-                        <div class="bg-white rounded-xl p-6 shadow-sm">
-                            <h3 class="font-semibold text-gray-800 mb-4">Demand Pipeline</h3>
-                            <div id="demand-pipeline" class="space-y-3"></div>
-                        </div>
                     </div>
-                </section>
-
-                <section id="ridac" class="section-content hidden">
-                    <div class="mb-6">
-                        <div class="flex gap-4">
-                            <button onclick="filterRIDAC('all')" class="px-4 py-2 bg-gray-100 rounded-lg text-sm font-medium">All</button>
-                            <button onclick="filterRIDAC('Risk')" class="px-4 py-2 bg-red-100 text-red-700 rounded-lg text-sm font-medium">Risks</button>
-                            <button onclick="filterRIDAC('Issue')" class="px-4 py-2 bg-orange-100 text-orange-700 rounded-lg text-sm font-medium">Issues</button>
-                            <button onclick="filterRIDAC('Decision')" class="px-4 py-2 bg-blue-100 text-blue-700 rounded-lg text-sm font-medium">Decisions</button>
-                            <button onclick="filterRIDAC('Action')" class="px-4 py-2 bg-green-100 text-green-700 rounded-lg text-sm font-medium">Actions</button>
-                            <button onclick="filterRIDAC('Change')" class="px-4 py-2 bg-purple-100 text-purple-700 rounded-lg text-sm font-medium">Changes</button>
-                            <button onclick="openCreateRIDACModal()" class="btn-primary ml-auto"><i class="fas fa-plus mr-1"></i> Add RIDAC</button>
-                        </div>
-                    </div>
-                    <div id="ridac-container" class="grid grid-cols-1 gap-4"></div>
-                </section>
-
-                <section id="value" class="section-content hidden">
                     <div class="bg-white rounded-xl shadow-sm overflow-hidden">
-                        <div class="px-6 py-4 border-b">
-                            <h3 class="font-semibold text-gray-800">Benefit Realisation Tracker</h3>
+                        <div class="px-6 py-4 border-b"><h3 class="font-semibold text-gray-800">Demand Pipeline</h3></div>
+                        <div id="demand-pipeline" class="p-6 space-y-4"></div>
+                    </div>
+                </section>
+
+                <!-- DELIVERY CONTROL -->
+                <section id="delivery" class="section-content hidden">
+                    <div class="grid grid-cols-2 gap-6 mb-8">
+                        <div class="bg-white rounded-xl p-6 shadow-sm">
+                            <h3 class="font-semibold text-gray-800 mb-4">Methodology-Agnostic Portfolio Gantt</h3>
+                            <div class="space-y-4">
+                                <div>
+                                    <div class="flex items-center justify-between text-sm mb-2"><span class="font-medium">PRJ-AMP8-UU (Waterfall)</span><span class="text-amber-600">Amber</span></div>
+                                    <div class="flex gap-1">
+                                        <div class="flex-1 h-8 bg-green-500 rounded-l text-xs text-white flex items-center justify-center">Feasibility</div>
+                                        <div class="flex-1 h-8 bg-green-500 text-xs text-white flex items-center justify-center">Audit</div>
+                                        <div class="flex-1 h-8 bg-amber-500 text-xs text-white flex items-center justify-center">Rigging</div>
+                                        <div class="flex-1 h-8 bg-gray-200 rounded-r text-xs text-gray-500 flex items-center justify-center">Commission</div>
+                                    </div>
+                                </div>
+                                <div>
+                                    <div class="flex items-center justify-between text-sm mb-2"><span class="font-medium">PRJ-M&B-AWS (Hybrid)</span><span class="text-green-600">Green</span></div>
+                                    <div class="flex gap-1">
+                                        <div class="flex-1 h-8 bg-green-500 rounded-l text-xs text-white flex items-center justify-center">Sprint 1-3</div>
+                                        <div class="flex-1 h-8 bg-green-500 text-xs text-white flex items-center justify-center">Sprint 4-6</div>
+                                        <div class="flex-1 h-8 bg-blue-500 text-xs text-white flex items-center justify-center">Sprint 7-9</div>
+                                        <div class="flex-1 h-8 bg-gray-200 rounded-r text-xs text-gray-500 flex items-center justify-center">Release 2</div>
+                                    </div>
+                                </div>
+                                <div>
+                                    <div class="flex items-center justify-between text-sm mb-2"><span class="font-medium">PRJ-CNI-SEC (Agile)</span><span class="text-red-600">Red</span></div>
+                                    <div class="flex gap-1">
+                                        <div class="flex-1 h-8 bg-green-500 rounded-l text-xs text-white flex items-center justify-center">Sprint 1</div>
+                                        <div class="flex-1 h-8 bg-red-500 text-xs text-white flex items-center justify-center">Sprint 2</div>
+                                        <div class="flex-1 h-8 bg-gray-200 text-xs text-gray-500 flex items-center justify-center">Sprint 3</div>
+                                        <div class="flex-1 h-8 bg-gray-200 rounded-r text-xs text-gray-500 flex items-center justify-center">Sprint 4</div>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
-                        <div class="p-6">
+                        <div class="bg-white rounded-xl p-6 shadow-sm">
+                            <h3 class="font-semibold text-gray-800 mb-4">Milestone Status</h3>
+                            <div class="space-y-3">
+                                <div class="flex items-center justify-between p-3 border rounded-lg">
+                                    <div><p class="text-sm font-medium">Site Access Audit Complete</p><p class="text-xs text-gray-500">PRJ-AMP8-UU | Planned: 01 Mar</p></div>
+                                    <span class="px-2 py-1 bg-green-100 text-green-700 rounded text-xs">Completed 15 Mar</span>
+                                </div>
+                                <div class="flex items-center justify-between p-3 border rounded-lg border-amber-300">
+                                    <div><p class="text-sm font-medium">Rigging Mobilisation</p><p class="text-xs text-gray-500">PRJ-AMP8-UU | Planned: 01 Apr</p></div>
+                                    <span class="px-2 py-1 bg-amber-100 text-amber-700 rounded text-xs">Delayed 35%</span>
+                                </div>
+                                <div class="flex items-center justify-between p-3 border rounded-lg border-red-300">
+                                    <div><p class="text-sm font-medium">Government API Integration</p><p class="text-xs text-gray-500">PRJ-CNI-SEC | Planned: 30 Jun</p></div>
+                                    <span class="px-2 py-1 bg-red-100 text-red-700 rounded text-xs">Delayed 15%</span>
+                                </div>
+                                <div class="flex items-center justify-between p-3 border rounded-lg">
+                                    <div><p class="text-sm font-medium">45 Channels Migrated (Phase 1)</p><p class="text-xs text-gray-500">PRJ-M&B-AWS | Planned: 30 Jun</p></div>
+                                    <span class="px-2 py-1 bg-blue-100 text-blue-700 rounded text-xs">In Progress 78%</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- RIDAC HUB -->
+                <section id="ridac" class="section-content hidden">
+                    <div class="flex gap-4 mb-6">
+                        <button onclick="filterRIDAC('all')" class="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg text-sm font-medium">All</button>
+                        <button onclick="filterRIDAC('Risk')" class="px-4 py-2 bg-red-100 text-red-700 rounded-lg text-sm font-medium">Risks</button>
+                        <button onclick="filterRIDAC('Issue')" class="px-4 py-2 bg-orange-100 text-orange-700 rounded-lg text-sm font-medium">Issues</button>
+                        <button onclick="filterRIDAC('Decision')" class="px-4 py-2 bg-blue-100 text-blue-700 rounded-lg text-sm font-medium">Decisions</button>
+                        <button onclick="filterRIDAC('Action')" class="px-4 py-2 bg-green-100 text-green-700 rounded-lg text-sm font-medium">Actions</button>
+                        <button onclick="filterRIDAC('Change')" class="px-4 py-2 bg-purple-100 text-purple-700 rounded-lg text-sm font-medium">Changes</button>
+                        <button onclick="openCreateRIDACModal()" class="ml-auto btn-primary text-sm"><i class="fas fa-plus mr-2"></i>Add Item</button>
+                    </div>
+                    <div id="ridac-container" class="space-y-4"></div>
+                </section>
+
+                <!-- VALUE REALISATION -->
+                <section id="value" class="section-content hidden">
+                    <div class="grid grid-cols-3 gap-6 mb-8">
+                        <div class="bg-white rounded-xl p-6 shadow-sm">
+                            <h3 class="font-semibold text-gray-800 mb-4">Benefit Realisation</h3>
                             <div id="benefits-list" class="space-y-4"></div>
+                        </div>
+                        <div class="bg-white rounded-xl p-6 shadow-sm col-span-2">
+                            <h3 class="font-semibold text-gray-800 mb-4">Planned vs Actual Benefits</h3>
+                            <div class="chart-container"><canvas id="benefitChart"></canvas></div>
+                        </div>
+                    </div>
+                    <div class="bg-white rounded-xl p-6 shadow-sm">
+                        <h3 class="font-semibold text-gray-800 mb-4">Continuous Improvement Feedback Loop</h3>
+                        <div class="flex items-center justify-between">
+                            <div class="flex-1 text-center p-4">
+                                <div class="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-3"><i class="fas fa-comments text-blue-600 text-xl"></i></div>
+                                <h4 class="font-medium text-gray-800">Stakeholder Feedback</h4>
+                                <p class="text-xs text-gray-500 mt-1">Field reports, customer surveys, team retrospectives</p>
+                                <div class="mt-2 text-xs text-blue-600 font-medium">340 feedback items this quarter</div>
+                            </div>
+                            <div class="text-2xl text-gray-300">→</div>
+                            <div class="flex-1 text-center p-4">
+                                <div class="w-16 h-16 bg-amber-100 rounded-full flex items-center justify-center mx-auto mb-3"><i class="fas fa-sliders text-amber-600 text-xl"></i></div>
+                                <h4 class="font-medium text-gray-800">VMO Process Adjustment</h4>
+                                <p class="text-xs text-gray-500 mt-1">Analyse patterns, identify root causes, design improvements</p>
+                                <div class="mt-2 text-xs text-amber-600 font-medium">12 process changes implemented</div>
+                            </div>
+                            <div class="text-2xl text-gray-300">→</div>
+                            <div class="flex-1 text-center p-4">
+                                <div class="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-3"><i class="fas fa-chart-line text-green-600 text-xl"></i></div>
+                                <h4 class="font-medium text-gray-800">Dashboard Metric Updates</h4>
+                                <p class="text-xs text-gray-500 mt-1">Real-time KPI refresh, automated alerts, executive reporting</p>
+                                <div class="mt-2 text-xs text-green-600 font-medium">Metrics updated daily</div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- PROCESS IMPROVEMENT -->
+                <section id="process" class="section-content hidden">
+                    <div class="grid grid-cols-2 gap-6 mb-8">
+                        <div class="bg-white rounded-xl p-6 shadow-sm">
+                            <h3 class="font-semibold text-gray-800 mb-4">Process Improvement Pipeline</h3>
+                            <div class="space-y-3">
+                                <div class="flex items-center gap-3 p-3 bg-green-50 rounded-lg border border-green-200">
+                                    <div class="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center"><i class="fas fa-check text-green-600"></i></div>
+                                    <div class="flex-1"><p class="text-sm font-medium">Contract Approval Process</p><p class="text-xs text-gray-500">60% faster | 15 days → 6 days</p></div>
+                                    <span class="px-2 py-1 bg-green-100 text-green-700 rounded text-xs">Validated</span>
+                                </div>
+                                <div class="flex items-center gap-3 p-3 bg-green-50 rounded-lg border border-green-200">
+                                    <div class="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center"><i class="fas fa-check text-green-600"></i></div>
+                                    <div class="flex-1"><p class="text-sm font-medium">Field Service Dispatch</p><p class="text-xs text-gray-500">130% productivity gain | 4hrs → 2hrs</p></div>
+                                    <span class="px-2 py-1 bg-green-100 text-green-700 rounded text-xs">Validated</span>
+                                </div>
+                                <div class="flex items-center gap-3 p-3 bg-amber-50 rounded-lg border border-amber-200">
+                                    <div class="w-10 h-10 bg-amber-100 rounded-full flex items-center justify-center"><i class="fas fa-spinner text-amber-600"></i></div>
+                                    <div class="flex-1"><p class="text-sm font-medium">Security Clearance Onboarding</p><p class="text-xs text-gray-500">60% reduction target | 20 weeks → 8 weeks</p></div>
+                                    <span class="px-2 py-1 bg-amber-100 text-amber-700 rounded text-xs">Implementing</span>
+                                </div>
+                                <div class="flex items-center gap-3 p-3 bg-blue-50 rounded-lg border border-blue-200">
+                                    <div class="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center"><i class="fas fa-lightbulb text-blue-600"></i></div>
+                                    <div class="flex-1"><p class="text-sm font-medium">Project Status Reporting</p><p class="text-xs text-gray-500">85% reduction target | 8hrs → 1hr</p></div>
+                                    <span class="px-2 py-1 bg-blue-100 text-blue-700 rounded text-xs">Proposed</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="bg-white rounded-xl p-6 shadow-sm">
+                            <h3 class="font-semibold text-gray-800 mb-4">Improvement Impact</h3>
+                            <div class="chart-container"><canvas id="improvementChart"></canvas></div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- CAPACITY HEATMAP -->
+                <section id="capacity" class="section-content hidden">
+                    <div class="grid grid-cols-2 gap-6 mb-8">
+                        <div class="bg-white rounded-xl p-6 shadow-sm">
+                            <h3 class="font-semibold text-gray-800 mb-4">Resource Capacity Heatmap</h3>
+                            <div class="space-y-4">
+                                <div>
+                                    <div class="flex justify-between text-sm mb-2"><span class="font-medium">Cloud Engineering</span><span class="text-red-600 font-medium">95% - Overallocated</span></div>
+                                    <div class="w-full bg-gray-200 rounded-full h-4"><div class="bg-gradient-to-r from-green-500 via-amber-500 to-red-500 h-4 rounded-full" style="width:95%"></div></div>
+                                    <p class="text-xs text-gray-500 mt-1">AWS Architects: 2/5 available</p>
+                                </div>
+                                <div>
+                                    <div class="flex justify-between text-sm mb-2"><span class="font-medium">Field Operations</span><span class="text-amber-600 font-medium">88% - At Risk</span></div>
+                                    <div class="w-full bg-gray-200 rounded-full h-4"><div class="bg-gradient-to-r from-green-500 via-amber-500 to-red-500 h-4 rounded-full" style="width:88%"></div></div>
+                                    <p class="text-xs text-gray-500 mt-1">RF Riggers: 3 vacancies unfilled</p>
+                                </div>
+                                <div>
+                                    <div class="flex justify-between text-sm mb-2"><span class="font-medium">Offshore DevOps</span><span class="text-red-600 font-medium">100% - Overallocated</span></div>
+                                    <div class="w-full bg-gray-200 rounded-full h-4"><div class="bg-gradient-to-r from-green-500 via-amber-500 to-red-500 h-4 rounded-full" style="width:100%"></div></div>
+                                    <p class="text-xs text-gray-500 mt-1">SC Cleared: 100% utilised</p>
+                                </div>
+                                <div>
+                                    <div class="flex justify-between text-sm mb-2"><span class="font-medium">Security Vetting</span><span class="text-green-600 font-medium">75% - Available</span></div>
+                                    <div class="w-full bg-gray-200 rounded-full h-4"><div class="bg-green-400 h-4 rounded-full" style="width:75%"></div></div>
+                                    <p class="text-xs text-gray-500 mt-1">Capacity for new projects</p>
+                                </div>
+                                <div>
+                                    <div class="flex justify-between text-sm mb-2"><span class="font-medium">Smart Utilities PMO</span><span class="text-amber-600 font-medium">90% - At Risk</span></div>
+                                    <div class="w-full bg-gray-200 rounded-full h-4"><div class="bg-gradient-to-r from-green-500 via-amber-500 to-red-500 h-4 rounded-full" style="width:90%"></div></div>
+                                    <p class="text-xs text-gray-500 mt-1">Peak load during AMP8 delivery</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="bg-white rounded-xl p-6 shadow-sm">
+                            <h3 class="font-semibold text-gray-800 mb-4">Critical Bottlenecks</h3>
+                            <div class="space-y-4">
+                                <div class="p-4 bg-red-50 rounded-lg border border-red-200">
+                                    <div class="flex items-center gap-2 mb-2"><i class="fas fa-triangle-exclamation text-red-600"></i><span class="font-medium text-red-700">Critical</span></div>
+                                    <p class="text-sm font-medium">AWS Solutions Architect shortage</p>
+                                    <p class="text-xs text-gray-600 mt-1">2 certified architects available vs 5 required. Sprint velocity at risk.</p>
+                                    <div class="mt-2 flex gap-2"><span class="px-2 py-1 bg-white rounded text-xs">PRJ-M&B-AWS</span></div>
+                                </div>
+                                <div class="p-4 bg-amber-50 rounded-lg border border-amber-200">
+                                    <div class="flex items-center gap-2 mb-2"><i class="fas fa-exclamation-circle text-amber-600"></i><span class="font-medium text-amber-700">High</span></div>
+                                    <p class="text-sm font-medium">RF Rigger vacancies</p>
+                                    <p class="text-xs text-gray-600 mt-1">3 unfilled positions for 6 weeks. Directly impacting AMP8 rollout.</p>
+                                    <div class="mt-2 flex gap-2"><span class="px-2 py-1 bg-white rounded text-xs">PRJ-AMP8-UU</span></div>
+                                </div>
+                                <div class="p-4 bg-amber-50 rounded-lg border border-amber-200">
+                                    <div class="flex items-center gap-2 mb-2"><i class="fas fa-exclamation-circle text-amber-600"></i><span class="font-medium text-amber-700">High</span></div>
+                                    <p class="text-sm font-medium">SC Cleared DevOps at capacity</p>
+                                    <p class="text-xs text-gray-600 mt-1">100% utilised. Cannot take additional CNI security work.</p>
+                                    <div class="mt-2 flex gap-2"><span class="px-2 py-1 bg-white rounded text-xs">PRJ-CNI-SEC</span></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- VMO COPILOT -->
+                <section id="ai" class="section-content hidden">
+                    <div class="grid grid-cols-2 gap-6 mb-8">
+                        <div class="bg-white rounded-xl p-6 shadow-sm">
+                            <div class="flex items-center gap-3 mb-4">
+                                <div class="w-12 h-12 bg-gradient-to-br from-blue-500 to-purple-600 rounded-lg flex items-center justify-center"><i class="fas fa-robot text-white text-xl"></i></div>
+                                <div><h3 class="font-semibold text-gray-800">VMO Copilot</h3><p class="text-xs text-gray-500">AI-Powered Decision Support</p></div>
+                            </div>
+                            <div class="space-y-4">
+                                <div class="p-4 bg-blue-50 rounded-lg border border-blue-200">
+                                    <p class="text-sm font-medium text-blue-800 mb-2"><i class="fas fa-wand-magic-sparkles mr-1"></i> Executive Summary Generator</p>
+                                    <p class="text-xs text-blue-600">Auto-generates weekly executive summaries from Jira sprint data, ServiceNow deployment logs, and financial actuals.</p>
+                                    <div class="mt-2 flex gap-2"><span class="px-2 py-1 bg-white rounded text-xs">Saves 6 hours/week</span><span class="px-2 py-1 bg-white rounded text-xs">85% accuracy</span></div>
+                                </div>
+                                <div class="p-4 bg-purple-50 rounded-lg border border-purple-200">
+                                    <p class="text-sm font-medium text-purple-800 mb-2"><i class="fas fa-brain mr-1"></i> Risk Prediction Engine</p>
+                                    <p class="text-xs text-purple-600">Analyses leading indicators to predict project failure probability.</p>
+                                    <div class="mt-2">
+                                        <div class="flex justify-between text-xs mb-1"><span>PRJ-CNI-SEC failure probability</span><span class="font-bold text-red-600">82%</span></div>
+                                        <div class="w-full bg-gray-200 rounded-full h-2"><div class="bg-red-500 h-2 rounded-full" style="width:82%"></div></div>
+                                    </div>
+                                </div>
+                                <div class="p-4 bg-green-50 rounded-lg border border-green-200">
+                                    <p class="text-sm font-medium text-green-800 mb-2"><i class="fas fa-file-lines mr-1"></i> Intake Summarizer</p>
+                                    <textarea class="w-full p-2 border rounded text-xs" rows="3" placeholder="Paste business case here..."></textarea>
+                                    <button class="mt-2 px-3 py-1 bg-green-600 text-white rounded text-xs">Generate Summary</button>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="bg-white rounded-xl p-6 shadow-sm">
+                            <h3 class="font-semibold text-gray-800 mb-4">AI-Generated Insights</h3>
+                            <div class="space-y-4">
+                                <div class="p-4 border rounded-lg">
+                                    <div class="flex items-center gap-2 mb-2"><i class="fas fa-lightbulb text-amber-500"></i><span class="font-medium text-sm">Pattern Detection</span></div>
+                                    <p class="text-xs text-gray-600">"3 of 4 Amber/Red projects share common factor: SC clearance delays. Recommend prioritising vetting process automation."</p>
+                                </div>
+                                <div class="p-4 border rounded-lg">
+                                    <div class="flex items-center gap-2 mb-2"><i class="fas fa-chart-line text-blue-500"></i><span class="font-medium text-sm">Trend Analysis</span></div>
+                                    <p class="text-xs text-gray-600">"Budget variance trending negative across Smart Utilities portfolio. Average -8.3% vs -2.1% for Media & Broadcast."</p>
+                                </div>
+                                <div class="p-4 border rounded-lg">
+                                    <div class="flex items-center gap-2 mb-2"><i class="fas fa-link text-purple-500"></i><span class="font-medium text-sm">Dependency Alert</span></div>
+                                    <p class="text-xs text-gray-600">"PRJ-M&B-AWS depends on PRJ-CNI-SEC for SC-cleared engineers. If CNI-SEC slips 6 weeks, AWS migration could delay 3 weeks."</p>
+                                </div>
+                                <div class="p-4 border rounded-lg border-amber-300 bg-amber-50">
+                                    <div class="flex items-center gap-2 mb-2"><i class="fas fa-triangle-exclamation text-amber-600"></i><span class="font-medium text-sm">Early Warning</span></div>
+                                    <p class="text-xs text-amber-700">"PRJ-SITE-EM heritage delay has 73% probability of cascading to PRJ-AMP8-UU. Recommend parallel tracking."</p>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </section>
@@ -268,34 +622,32 @@
     </div>
 
     <script>
-        // API Configuration - UPDATE THIS AFTER DEPLOYMENT
-        const API_BASE = window.location.origin.includes('localhost') 
-            ? 'http://localhost:8000' 
-            : window.location.origin + '/api';
-
+        const API_BASE = '/api';
         let charts = {};
 
-        function showToast(message, type = 'success') {
-            const toast = document.getElementById('toast');
-            toast.textContent = message;
-            toast.className = `toast toast-${type}`;
-            toast.classList.add('show');
-            setTimeout(() => toast.classList.remove('show'), 3000);
-        }
-
-        function formatCurrency(value) {
-            if (!value) return '£0';
-            if (value >= 1000000) return '£' + (value / 1000000).toFixed(1) + 'M';
-            if (value >= 1000) return '£' + (value / 1000).toFixed(0) + 'K';
-            return '£' + value;
+        function formatCurrency(val) {
+            if (!val && val !== 0) return '—';
+            if (val >= 1000000) return '£' + (val / 1000000).toFixed(1) + 'M';
+            if (val >= 1000) return '£' + (val / 1000).toFixed(0) + 'K';
+            return '£' + val.toFixed(0);
         }
 
         function getStatusBadge(status) {
-            const classes = { 'Green': 'status-green', 'Amber': 'status-amber', 'Red': 'status-red' };
-            return `<span class="px-2 py-1 ${classes[status] || 'bg-gray-100'} rounded-full text-xs font-medium">${status}</span>`;
+            const map = { Green: 'status-green', Amber: 'status-amber', Red: 'status-red' };
+            return `<span class="px-2 py-1 ${map[status] || 'bg-gray-100'} rounded-full text-xs font-medium">${status}</span>`;
         }
 
-        // Navigation
+        function showToast(msg, type = 'success') {
+            const t = document.getElementById('toast');
+            t.textContent = msg;
+            t.className = `toast toast-${type} show`;
+            setTimeout(() => t.classList.remove('show'), 3000);
+        }
+
+        function closeModal() {
+            document.getElementById('modal').classList.remove('active');
+        }
+
         function showSection(sectionId, element) {
             document.querySelectorAll('.section-content').forEach(s => s.classList.add('hidden'));
             document.getElementById(sectionId).classList.remove('hidden');
@@ -303,38 +655,39 @@
             if (element) element.classList.add('active');
 
             const titles = {
-                'executive': 'Executive Dashboard', 'projects': 'Project Management',
-                'demand': 'Demand Intake', 'ridac': 'RIDAC Hub', 'value': 'Value Realisation'
+                'executive': 'Executive Dashboard', 'portfolio': 'Portfolio View', 'projects': 'Projects',
+                'demand': 'Demand Intake', 'delivery': 'Delivery Control', 'ridac': 'RIDAC Hub',
+                'value': 'Value Realisation', 'process': 'Process Improvement',
+                'capacity': 'Capacity Heatmap', 'ai': 'VMO Copilot'
             };
             document.getElementById('page-title').textContent = titles[sectionId];
+            document.getElementById('header-action-btn').classList.toggle('hidden', sectionId !== 'projects');
 
             if (sectionId === 'executive') loadDashboardStats();
+            if (sectionId === 'portfolio') initPortfolioCharts();
             if (sectionId === 'projects') loadProjects();
-            if (sectionId === 'demand') loadDemands();
+            if (sectionId === 'demand') { loadDemands(); initDemandChart(); }
             if (sectionId === 'ridac') loadRIDAC('all');
             if (sectionId === 'value') loadBenefits();
+            if (sectionId === 'process') initProcessChart();
         }
 
-        // API Calls
         async function apiCall(endpoint, method = 'GET', body = null) {
             try {
-                const options = {
-                    method,
-                    headers: { 'Content-Type': 'application/json' }
-                };
+                const options = { method, headers: { 'Content-Type': 'application/json' } };
                 if (body) options.body = JSON.stringify(body);
-
                 const response = await fetch(`${API_BASE}${endpoint}`, options);
                 if (!response.ok) throw new Error(`HTTP ${response.status}`);
                 return await response.json();
             } catch (error) {
                 console.error('API Error:', error);
-                showToast('Error connecting to server. Using demo mode.', 'error');
+                document.getElementById('connection-status').textContent = 'Offline';
+                document.getElementById('connection-status').className = 'px-3 py-1 bg-red-100 text-red-700 rounded-full text-xs font-medium';
                 return null;
             }
         }
 
-        // Dashboard Stats
+        // EXECUTIVE DASHBOARD
         async function loadDashboardStats() {
             const data = await apiCall('/dashboard/stats');
             if (!data) return;
@@ -343,15 +696,30 @@
             document.getElementById('total-budget').textContent = formatCurrency(data.total_budget);
             document.getElementById('at-risk').textContent = (data.amber || 0) + (data.red || 0);
             document.getElementById('variance').textContent = formatCurrency(data.variance);
-
-            const badges = document.getElementById('status-badges');
-            badges.innerHTML = `
+            document.getElementById('status-badges').innerHTML = `
                 <span class="px-2 py-1 bg-green-100 text-green-700 rounded text-xs">${data.green || 0} Green</span>
                 <span class="px-2 py-1 bg-amber-100 text-amber-700 rounded text-xs">${data.amber || 0} Amber</span>
                 <span class="px-2 py-1 bg-red-100 text-red-700 rounded text-xs">${data.red || 0} Red</span>
             `;
-
             initPortfolioChart(data.green || 0, data.amber || 0, data.red || 0);
+            loadExecProjectsTable();
+        }
+
+        async function loadExecProjectsTable() {
+            const data = await apiCall('/projects');
+            if (!data || !data.projects) return;
+            const tbody = document.getElementById('exec-projects-body');
+            tbody.innerHTML = data.projects.map(p => {
+                const variance = (p.budget || 0) - (p.forecast_cost || 0);
+                return `<tr class="hover:bg-gray-50">
+                    <td class="px-6 py-4"><p class="font-medium text-gray-800">${p.project_code}</p><p class="text-xs text-gray-500">${p.project_name}</p></td>
+                    <td class="px-6 py-4 text-sm">${p.delivery_manager}</td>
+                    <td class="px-6 py-4">${getStatusBadge(p.status)}</td>
+                    <td class="px-6 py-4 text-sm">${formatCurrency(p.budget)}</td>
+                    <td class="px-6 py-4 text-sm">${formatCurrency(p.forecast_cost)}</td>
+                    <td class="px-6 py-4 text-sm ${variance >= 0 ? 'text-green-600' : 'text-red-600'}">${variance >= 0 ? '+' : ''}${formatCurrency(variance)}</td>
+                </tr>`;
+            }).join('');
         }
 
         function initPortfolioChart(green, amber, red) {
@@ -359,169 +727,137 @@
             const ctx = document.getElementById('portfolioChart').getContext('2d');
             charts.portfolio = new Chart(ctx, {
                 type: 'doughnut',
-                data: {
-                    labels: ['Green', 'Amber', 'Red'],
-                    datasets: [{ data: [green, amber, red], backgroundColor: ['#22c55e', '#f59e0b', '#ef4444'], borderWidth: 0 }]
-                },
+                data: { labels: ['Green', 'Amber', 'Red'], datasets: [{ data: [green, amber, red], backgroundColor: ['#22c55e', '#f59e0b', '#ef4444'], borderWidth: 0 }] },
                 options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom' } } }
+            });
+            if (!charts.healthTrend) {
+                const ctx2 = document.getElementById('healthTrendChart').getContext('2d');
+                charts.healthTrend = new Chart(ctx2, {
+                    type: 'line',
+                    data: { labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'], datasets: [
+                        { label: 'Green', data: [4,4,3,3,2,green], borderColor: '#22c55e', tension: 0.4 },
+                        { label: 'Amber', data: [1,1,2,2,3,amber], borderColor: '#f59e0b', tension: 0.4 },
+                        { label: 'Red', data: [0,0,1,1,1,red], borderColor: '#ef4444', tension: 0.4 }
+                    ]},
+                    options: { responsive: true, maintainAspectRatio: false, scales: { y: { beginAtZero: true } } }
+                });
+            }
+        }
+
+        // PORTFOLIO
+        function initPortfolioCharts() {
+            if (charts.budget) return;
+            const ctx = document.getElementById('budgetChart').getContext('2d');
+            charts.budget = new Chart(ctx, {
+                type: 'bar',
+                data: { labels: ['Smart Utilities', 'Media & Broadcast', 'Enablement', 'Infrastructure'], datasets: [
+                    { label: 'Budget', data: [50000000,35000000,25000000,40000000], backgroundColor: '#3b82f6' },
+                    { label: 'Actual', data: [17000000,12000000,450000,3000000], backgroundColor: '#22c55e' },
+                    { label: 'Forecast', data: [30400000,17500000,3800000,4800000], backgroundColor: '#f59e0b' }
+                ]},
+                options: { responsive: true, maintainAspectRatio: false, scales: { y: { beginAtZero: true } } }
             });
         }
 
-        // Projects CRUD
+        // PROJECTS CRUD
         async function loadProjects() {
-            const filter = document.getElementById('filter-status').value;
+            const filter = document.getElementById('filter-status') ? document.getElementById('filter-status').value : 'all';
             const data = await apiCall('/projects');
             if (!data || !data.projects) return;
-
             let projects = data.projects;
             if (filter !== 'all') projects = projects.filter(p => p.status === filter);
-
             const tbody = document.getElementById('projects-table-body');
             tbody.innerHTML = projects.map(p => `
                 <tr class="hover:bg-gray-50">
-                    <td class="px-6 py-4">
-                        <p class="font-medium text-gray-800">${p.project_code}</p>
-                        <p class="text-xs text-gray-500">${p.project_name}</p>
-                    </td>
+                    <td class="px-6 py-4"><p class="font-medium text-gray-800">${p.project_code}</p><p class="text-xs text-gray-500">${p.project_name}</p></td>
                     <td class="px-6 py-4 text-sm">${p.delivery_manager}</td>
                     <td class="px-6 py-4">${getStatusBadge(p.status)}</td>
                     <td class="px-6 py-4 text-sm">${formatCurrency(p.budget)}</td>
                     <td class="px-6 py-4">
-                        <button onclick="editProject('${p.project_id}')" class="action-btn edit-btn">Edit</button>
+                        <button onclick="editProject('${p.project_id}', ${JSON.stringify(p).replace(/"/g, '&quot;')})" class="action-btn edit-btn">Edit</button>
                         <button onclick="deleteProject('${p.project_id}')" class="action-btn delete-btn">Delete</button>
                     </td>
-                </tr>
-            `).join('');
-        }
-
-        async function editProject(id) {
-            const data = await apiCall(`/projects/${id}`);
-            if (!data || !data.project) return;
-            const p = data.project;
-
-            const modal = document.getElementById('modal');
-            const body = document.getElementById('modal-body');
-            body.innerHTML = `
-                <div class="p-6">
-                    <div class="flex items-center justify-between mb-4">
-                        <h3 class="text-lg font-semibold text-gray-800">Edit Project: ${p.project_code}</h3>
-                        <button onclick="closeModal()" class="text-gray-400 hover:text-gray-600"><i class="fas fa-times"></i></button>
-                    </div>
-                    <form onsubmit="updateProject(event, '${id}')">
-                        <div class="form-group">
-                            <label class="form-label">Project Name</label>
-                            <input type="text" id="edit-name" class="form-input" value="${p.project_name}">
-                        </div>
-                        <div class="form-group">
-                            <label class="form-label">Delivery Manager</label>
-                            <input type="text" id="edit-manager" class="form-input" value="${p.delivery_manager}">
-                        </div>
-                        <div class="form-group">
-                            <label class="form-label">Status</label>
-                            <select id="edit-status" class="form-select">
-                                <option ${p.status === 'Green' ? 'selected' : ''}>Green</option>
-                                <option ${p.status === 'Amber' ? 'selected' : ''}>Amber</option>
-                                <option ${p.status === 'Red' ? 'selected' : ''}>Red</option>
-                            </select>
-                        </div>
-                        <div class="form-group">
-                            <label class="form-label">RAG Reason</label>
-                            <textarea id="edit-rag" class="form-textarea">${p.rag_reason || ''}</textarea>
-                        </div>
-                        <div class="flex gap-3 mt-6">
-                            <button type="submit" class="btn-success"><i class="fas fa-check mr-2"></i>Save</button>
-                            <button type="button" onclick="closeModal()" class="btn-primary bg-gray-500">Cancel</button>
-                        </div>
-                    </form>
-                </div>
-            `;
-            modal.classList.add('active');
-        }
-
-        async function updateProject(e, id) {
-            e.preventDefault();
-            const data = {
-                project_name: document.getElementById('edit-name').value,
-                delivery_manager: document.getElementById('edit-manager').value,
-                status: document.getElementById('edit-status').value,
-                rag_reason: document.getElementById('edit-rag').value
-            };
-            await apiCall(`/projects/${id}`, 'PUT', data);
-            closeModal();
-            loadProjects();
-            showToast('Project updated!');
-        }
-
-        async function deleteProject(id) {
-            if (!confirm('Delete this project?')) return;
-            await apiCall(`/projects/${id}`, 'DELETE');
-            loadProjects();
-            showToast('Project deleted', 'error');
+                </tr>`).join('');
         }
 
         function openCreateProjectModal() {
-            const modal = document.getElementById('modal');
-            const body = document.getElementById('modal-body');
-            body.innerHTML = `
+            document.getElementById('modal-body').innerHTML = `
                 <div class="p-6">
                     <div class="flex items-center justify-between mb-4">
-                        <h3 class="text-lg font-semibold text-gray-800">Create New Project</h3>
+                        <h3 class="text-lg font-semibold">Create New Project</h3>
                         <button onclick="closeModal()" class="text-gray-400 hover:text-gray-600"><i class="fas fa-times"></i></button>
                     </div>
                     <form onsubmit="createProject(event)">
                         <div class="grid grid-cols-2 gap-4">
-                            <div class="form-group">
-                                <label class="form-label">Project Code</label>
-                                <input type="text" id="new-code" class="form-input" required placeholder="PRJ-XXX">
-                            </div>
-                            <div class="form-group">
-                                <label class="form-label">Project Name</label>
-                                <input type="text" id="new-name" class="form-input" required>
-                            </div>
+                            <div class="form-group"><label class="form-label">Project Code</label><input type="text" id="new-code" class="form-input" required placeholder="PRJ-XXX"></div>
+                            <div class="form-group"><label class="form-label">Project Name</label><input type="text" id="new-name" class="form-input" required></div>
                         </div>
-                        <div class="form-group">
-                            <label class="form-label">Delivery Manager</label>
-                            <input type="text" id="new-manager" class="form-input" required>
-                        </div>
+                        <div class="form-group"><label class="form-label">Delivery Manager</label><input type="text" id="new-manager" class="form-input" required></div>
                         <div class="grid grid-cols-2 gap-4">
-                            <div class="form-group">
-                                <label class="form-label">Status</label>
-                                <select id="new-status" class="form-select">
-                                    <option>Green</option><option>Amber</option><option>Red</option>
-                                </select>
-                            </div>
-                            <div class="form-group">
-                                <label class="form-label">Budget (£)</label>
-                                <input type="number" id="new-budget" class="form-input" required>
-                            </div>
+                            <div class="form-group"><label class="form-label">Status</label><select id="new-status" class="form-select"><option>Green</option><option>Amber</option><option>Red</option></select></div>
+                            <div class="form-group"><label class="form-label">Budget (£)</label><input type="number" id="new-budget" class="form-input" required></div>
                         </div>
-                        <div class="flex gap-3 mt-6">
-                            <button type="submit" class="btn-success"><i class="fas fa-check mr-2"></i>Create</button>
-                            <button type="button" onclick="closeModal()" class="btn-primary bg-gray-500">Cancel</button>
-                        </div>
+                        <div class="flex gap-3 mt-4"><button type="submit" class="btn-success">Create</button><button type="button" onclick="closeModal()" class="btn-primary" style="background:#6b7280">Cancel</button></div>
                     </form>
-                </div>
-            `;
-            modal.classList.add('active');
+                </div>`;
+            document.getElementById('modal').classList.add('active');
         }
 
         async function createProject(e) {
             e.preventDefault();
-            const data = {
+            await apiCall('/projects', 'POST', {
                 project_code: document.getElementById('new-code').value,
                 project_name: document.getElementById('new-name').value,
                 delivery_manager: document.getElementById('new-manager').value,
                 status: document.getElementById('new-status').value,
                 budget: parseFloat(document.getElementById('new-budget').value),
                 expected_benefit: 0
-            };
-            await apiCall('/projects', 'POST', data);
-            closeModal();
-            loadProjects();
-            showToast('Project created!');
+            });
+            closeModal(); loadProjects(); showToast('Project created!');
         }
 
-        // Demand Intake
+        function editProject(id, p) {
+            document.getElementById('modal-body').innerHTML = `
+                <div class="p-6">
+                    <div class="flex items-center justify-between mb-4">
+                        <h3 class="text-lg font-semibold">Edit Project: ${p.project_code}</h3>
+                        <button onclick="closeModal()" class="text-gray-400 hover:text-gray-600"><i class="fas fa-times"></i></button>
+                    </div>
+                    <form onsubmit="updateProject(event, '${id}')">
+                        <div class="form-group"><label class="form-label">Project Name</label><input type="text" id="edit-name" class="form-input" value="${p.project_name}"></div>
+                        <div class="form-group"><label class="form-label">Delivery Manager</label><input type="text" id="edit-manager" class="form-input" value="${p.delivery_manager}"></div>
+                        <div class="form-group"><label class="form-label">Status</label>
+                            <select id="edit-status" class="form-select">
+                                <option ${p.status==='Green'?'selected':''}>Green</option>
+                                <option ${p.status==='Amber'?'selected':''}>Amber</option>
+                                <option ${p.status==='Red'?'selected':''}>Red</option>
+                            </select>
+                        </div>
+                        <div class="form-group"><label class="form-label">RAG Reason</label><textarea id="edit-rag" class="form-textarea">${p.rag_reason || ''}</textarea></div>
+                        <div class="flex gap-3 mt-4"><button type="submit" class="btn-success">Save</button><button type="button" onclick="closeModal()" class="btn-primary" style="background:#6b7280">Cancel</button></div>
+                    </form>
+                </div>`;
+            document.getElementById('modal').classList.add('active');
+        }
+
+        async function updateProject(e, id) {
+            e.preventDefault();
+            await apiCall(`/projects/${id}`, 'PUT', {
+                project_name: document.getElementById('edit-name').value,
+                delivery_manager: document.getElementById('edit-manager').value,
+                status: document.getElementById('edit-status').value,
+                rag_reason: document.getElementById('edit-rag').value
+            });
+            closeModal(); loadProjects(); showToast('Project updated!');
+        }
+
+        async function deleteProject(id) {
+            if (!confirm('Delete this project?')) return;
+            await apiCall(`/projects/${id}`, 'DELETE');
+            loadProjects(); showToast('Project deleted', 'error');
+        }
+
+        // DEMAND INTAKE
         function updateDemandScore() {
             const a = parseFloat(document.getElementById('demand-alignment').value);
             const r = parseFloat(document.getElementById('demand-regulatory').value);
@@ -540,15 +876,14 @@
             const r = parseFloat(document.getElementById('demand-regulatory').value);
             const f = parseFloat(document.getElementById('demand-feasibility').value);
             const c = parseFloat(document.getElementById('demand-commercial').value);
-            const data = {
+            await apiCall('/demands', 'POST', {
                 demand_code: 'D' + Date.now(),
                 title: document.getElementById('demand-title').value,
                 business_area: document.getElementById('demand-area').value,
                 expected_benefit: parseFloat(document.getElementById('demand-benefit').value),
                 strategic_alignment: a, regulatory_score: r, feasibility_score: f, commercial_score: c,
-                vmo_score: ((a*0.30)+(r*0.25)+(f*0.20)+(c*0.25)), stage: 'Draft'
-            };
-            await apiCall('/demands', 'POST', data);
+                vmo_score: (a*0.30)+(r*0.25)+(f*0.20)+(c*0.25), stage: 'Draft'
+            });
             document.getElementById('demand-form').reset();
             updateDemandScore();
             loadDemands();
@@ -558,117 +893,97 @@
         async function loadDemands() {
             const data = await apiCall('/demands');
             if (!data || !data.demands) return;
-
-            const container = document.getElementById('demand-pipeline');
-            container.innerHTML = data.demands.map(d => `
+            document.getElementById('demand-pipeline').innerHTML = data.demands.map(d => `
                 <div class="border rounded-lg p-4 hover-lift">
                     <div class="flex items-start justify-between">
                         <div>
                             <div class="flex items-center gap-2 mb-1">
-                                <span class="px-2 py-1 ${d.stage === 'Approved' ? 'bg-green-100 text-green-700' : d.stage === 'Screening' ? 'bg-amber-100 text-amber-700' : 'bg-gray-100 text-gray-700'} rounded text-xs">${d.stage}</span>
+                                <span class="px-2 py-1 ${d.stage==='Approved'?'bg-green-100 text-green-700':d.stage==='Screening'?'bg-amber-100 text-amber-700':'bg-gray-100 text-gray-700'} rounded text-xs">${d.stage}</span>
                                 <span class="px-2 py-1 bg-blue-100 text-blue-700 rounded text-xs">${d.business_area}</span>
                             </div>
                             <h4 class="font-medium text-gray-800">${d.title}</h4>
                             <p class="text-xs text-gray-500">Benefit: ${formatCurrency(d.expected_benefit)}</p>
                         </div>
                         <div class="text-right">
-                            <p class="text-2xl font-bold text-blue-600">${d.vmo_score ? d.vmo_score.toFixed(2) : '0.00'}</p>
+                            <p class="text-2xl font-bold text-blue-600">${d.vmo_score ? parseFloat(d.vmo_score).toFixed(2) : '0.00'}</p>
                             <p class="text-xs text-gray-500">VMO Score</p>
                         </div>
                     </div>
-                </div>
-            `).join('');
+                </div>`).join('');
+        }
+
+        function initDemandChart() {
+            if (charts.valueScoring) return;
+            const ctx = document.getElementById('valueScoringChart').getContext('2d');
+            charts.valueScoring = new Chart(ctx, {
+                type: 'radar',
+                data: { labels: ['Strategic Alignment', 'Regulatory', 'Feasibility', 'Commercial'], datasets: [
+                    { label: 'D001 (UU Smart Meters)', data: [9.5,9.0,7.5,9.0], borderColor: '#3b82f6', backgroundColor: 'rgba(59,130,246,0.2)' },
+                    { label: 'D002 (AWS Cloud)', data: [9.0,6.0,8.5,8.5], borderColor: '#8b5cf6', backgroundColor: 'rgba(139,92,246,0.2)' },
+                    { label: 'D004 (Security Vetting)', data: [8.5,10.0,6.0,7.5], borderColor: '#ef4444', backgroundColor: 'rgba(239,68,68,0.2)' }
+                ]},
+                options: { responsive: true, maintainAspectRatio: false, scales: { r: { beginAtZero: true, max: 10 } } }
+            });
         }
 
         // RIDAC
         async function loadRIDAC(filter = 'all') {
             const data = await apiCall('/ridac');
             if (!data || !data.ridac) return;
-
             let items = data.ridac;
             if (filter !== 'all') items = items.filter(r => r.type === filter);
-
-            const container = document.getElementById('ridac-container');
-            container.innerHTML = items.map(r => {
-                const border = r.impact === 'Critical' || r.impact === 'High' ? 'risk-high' : r.impact === 'Medium' ? 'risk-medium' : 'risk-low';
-                const colors = { 'Risk': 'bg-red-100 text-red-700', 'Issue': 'bg-orange-100 text-orange-700', 'Decision': 'bg-blue-100 text-blue-700', 'Action': 'bg-green-100 text-green-700', 'Change': 'bg-purple-100 text-purple-700' };
-                return `
-                    <div class="bg-white rounded-xl p-6 shadow-sm ${border}">
-                        <div class="flex items-start justify-between">
-                            <div class="flex-1">
-                                <div class="flex items-center gap-2 mb-2">
-                                    <span class="px-2 py-1 ${colors[r.type]} rounded text-xs font-bold">${r.type.toUpperCase()}</span>
-                                    <span class="px-2 py-1 bg-gray-100 rounded text-xs">${r.ridac_code}</span>
-                                </div>
-                                <h4 class="font-medium text-gray-800">${r.title}</h4>
-                                <p class="text-sm text-gray-500 mt-1">Owner: ${r.owner} | Target: ${r.target_date || 'TBD'}</p>
-                                <p class="text-sm text-gray-600 mt-2">${r.description}</p>
-                                <div class="mt-3 p-3 bg-gray-50 rounded-lg">
-                                    <p class="text-sm font-medium text-gray-700">Action Required:</p>
-                                    <p class="text-sm text-gray-600">${r.action_required}</p>
-                                </div>
+            const colors = { Risk: 'bg-red-100 text-red-700', Issue: 'bg-orange-100 text-orange-700', Decision: 'bg-blue-100 text-blue-700', Action: 'bg-green-100 text-green-700', Change: 'bg-purple-100 text-purple-700' };
+            document.getElementById('ridac-container').innerHTML = items.map(r => {
+                const border = (r.impact === 'Critical' || r.impact === 'High') ? 'risk-high' : r.impact === 'Medium' ? 'risk-medium' : 'risk-low';
+                return `<div class="bg-white rounded-xl p-6 shadow-sm ${border}">
+                    <div class="flex items-start justify-between">
+                        <div class="flex-1">
+                            <div class="flex items-center gap-2 mb-2">
+                                <span class="px-2 py-1 ${colors[r.type] || 'bg-gray-100'} rounded text-xs font-bold">${r.type.toUpperCase()}</span>
+                                <span class="px-2 py-1 bg-gray-100 rounded text-xs">${r.ridac_code}</span>
+                                <span class="px-2 py-1 bg-gray-100 rounded text-xs">${r.impact || 'Medium'}</span>
+                                <span class="px-2 py-1 ${r.status==='Escalated'?'bg-red-100 text-red-700':'bg-amber-100 text-amber-700'} rounded text-xs">${r.status}</span>
+                            </div>
+                            <h4 class="font-medium text-gray-800">${r.title}</h4>
+                            <p class="text-sm text-gray-500 mt-1">Owner: ${r.owner} | Target: ${r.target_date || 'TBD'}</p>
+                            <p class="text-sm text-gray-600 mt-2">${r.description}</p>
+                            <div class="mt-3 p-3 bg-gray-50 rounded-lg">
+                                <p class="text-sm font-medium text-gray-700">Action Required:</p>
+                                <p class="text-sm text-gray-600">${r.action_required}</p>
                             </div>
                         </div>
                     </div>
-                `;
+                </div>`;
             }).join('');
         }
 
-        function filterRIDAC(type) {
-            loadRIDAC(type);
-        }
+        function filterRIDAC(type) { loadRIDAC(type); }
 
         function openCreateRIDACModal() {
-            const modal = document.getElementById('modal');
-            const body = document.getElementById('modal-body');
-            body.innerHTML = `
+            document.getElementById('modal-body').innerHTML = `
                 <div class="p-6">
                     <div class="flex items-center justify-between mb-4">
-                        <h3 class="text-lg font-semibold text-gray-800">Add RIDAC Item</h3>
+                        <h3 class="text-lg font-semibold">Add RIDAC Item</h3>
                         <button onclick="closeModal()" class="text-gray-400 hover:text-gray-600"><i class="fas fa-times"></i></button>
                     </div>
                     <form onsubmit="createRIDAC(event)">
                         <div class="grid grid-cols-2 gap-4">
-                            <div class="form-group">
-                                <label class="form-label">Type</label>
-                                <select id="new-ridac-type" class="form-select">
-                                    <option>Risk</option><option>Issue</option><option>Decision</option><option>Action</option><option>Change</option>
-                                </select>
-                            </div>
-                            <div class="form-group">
-                                <label class="form-label">Code</label>
-                                <input type="text" id="new-ridac-code" class="form-input" placeholder="R001">
-                            </div>
+                            <div class="form-group"><label class="form-label">Type</label><select id="new-ridac-type" class="form-select"><option>Risk</option><option>Issue</option><option>Decision</option><option>Action</option><option>Change</option></select></div>
+                            <div class="form-group"><label class="form-label">Code</label><input type="text" id="new-ridac-code" class="form-input" placeholder="R007"></div>
                         </div>
-                        <div class="form-group">
-                            <label class="form-label">Title</label>
-                            <input type="text" id="new-ridac-title" class="form-input" required>
-                        </div>
-                        <div class="form-group">
-                            <label class="form-label">Description</label>
-                            <textarea id="new-ridac-desc" class="form-textarea" required></textarea>
-                        </div>
-                        <div class="form-group">
-                            <label class="form-label">Owner</label>
-                            <input type="text" id="new-ridac-owner" class="form-input" required>
-                        </div>
-                        <div class="form-group">
-                            <label class="form-label">Action Required</label>
-                            <textarea id="new-ridac-action" class="form-textarea" required></textarea>
-                        </div>
-                        <div class="flex gap-3 mt-6">
-                            <button type="submit" class="btn-success"><i class="fas fa-check mr-2"></i>Add</button>
-                            <button type="button" onclick="closeModal()" class="btn-primary bg-gray-500">Cancel</button>
-                        </div>
+                        <div class="form-group"><label class="form-label">Title</label><input type="text" id="new-ridac-title" class="form-input" required></div>
+                        <div class="form-group"><label class="form-label">Description</label><textarea id="new-ridac-desc" class="form-textarea" required></textarea></div>
+                        <div class="form-group"><label class="form-label">Owner</label><input type="text" id="new-ridac-owner" class="form-input" required></div>
+                        <div class="form-group"><label class="form-label">Action Required</label><textarea id="new-ridac-action" class="form-textarea" required></textarea></div>
+                        <div class="flex gap-3 mt-4"><button type="submit" class="btn-success">Add</button><button type="button" onclick="closeModal()" class="btn-primary" style="background:#6b7280">Cancel</button></div>
                     </form>
-                </div>
-            `;
-            modal.classList.add('active');
+                </div>`;
+            document.getElementById('modal').classList.add('active');
         }
 
         async function createRIDAC(e) {
             e.preventDefault();
-            const data = {
+            await apiCall('/ridac', 'POST', {
                 ridac_code: document.getElementById('new-ridac-code').value,
                 type: document.getElementById('new-ridac-type').value,
                 title: document.getElementById('new-ridac-title').value,
@@ -676,106 +991,93 @@
                 owner: document.getElementById('new-ridac-owner').value,
                 action_required: document.getElementById('new-ridac-action').value,
                 impact: 'Medium', status: 'Active'
-            };
-            await apiCall('/ridac', 'POST', data);
-            closeModal();
-            loadRIDAC('all');
-            showToast('RIDAC item added!');
+            });
+            closeModal(); loadRIDAC('all'); showToast('RIDAC item added!');
         }
 
-        // Benefits
+        // BENEFITS
         async function loadBenefits() {
             const data = await apiCall('/benefits');
             if (!data || !data.benefits) return;
-
             const container = document.getElementById('benefits-list');
             container.innerHTML = data.benefits.map(b => {
                 const pct = b.expected_value > 0 ? (b.realised_value / b.expected_value * 100) : 0;
-                return `
-                    <div class="border rounded-lg p-4">
-                        <div class="flex items-start justify-between">
-                            <div class="flex-1">
-                                <div class="flex items-center gap-2 mb-1">
-                                    <span class="px-2 py-1 bg-blue-100 text-blue-700 rounded text-xs">${b.benefit_type}</span>
-                                    <span class="px-2 py-1 ${b.status === 'On Track' ? 'bg-green-100 text-green-700' : 'bg-amber-100 text-amber-700'} rounded text-xs">${b.status}</span>
-                                </div>
-                                <h4 class="font-medium text-gray-800">${b.benefit_name}</h4>
-                                <div class="mt-2">
-                                    <div class="flex justify-between text-xs mb-1">
-                                        <span>Realisation: ${pct.toFixed(1)}%</span>
-                                        <span>${formatCurrency(b.realised_value)} / ${formatCurrency(b.expected_value)}</span>
-                                    </div>
-                                    <div class="w-full bg-gray-200 rounded-full h-2">
-                                        <div class="bg-green-500 h-2 rounded-full" style="width:${Math.min(pct, 100)}%"></div>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="ml-4">
-                                <button onclick="editBenefit('${b.benefit_id}')" class="action-btn edit-btn">Update</button>
-                            </div>
-                        </div>
+                return `<div class="border rounded-lg p-4">
+                    <div class="flex items-center gap-2 mb-1">
+                        <span class="px-2 py-1 bg-blue-100 text-blue-700 rounded text-xs">${b.benefit_type}</span>
+                        <span class="px-2 py-1 ${b.status==='On Track'?'bg-green-100 text-green-700':'bg-amber-100 text-amber-700'} rounded text-xs">${b.status}</span>
                     </div>
-                `;
+                    <h4 class="font-medium text-gray-800 text-sm">${b.benefit_name}</h4>
+                    <div class="mt-2">
+                        <div class="flex justify-between text-xs mb-1"><span>${pct.toFixed(1)}% realised</span><span>${formatCurrency(b.realised_value)} / ${formatCurrency(b.expected_value)}</span></div>
+                        <div class="w-full bg-gray-200 rounded-full h-2"><div class="bg-green-500 h-2 rounded-full" style="width:${Math.min(pct,100)}%"></div></div>
+                    </div>
+                    <button onclick="editBenefit('${b.benefit_id}', ${JSON.stringify(b).replace(/"/g,'&quot;')})" class="action-btn edit-btn mt-2">Update</button>
+                </div>`;
             }).join('');
+
+            if (!charts.benefit) {
+                const ctx = document.getElementById('benefitChart').getContext('2d');
+                charts.benefit = new Chart(ctx, {
+                    type: 'bar',
+                    data: { labels: data.benefits.map(b => b.benefit_name.substring(0,20)), datasets: [
+                        { label: 'Expected', data: data.benefits.map(b => b.expected_value), backgroundColor: '#3b82f6' },
+                        { label: 'Realised', data: data.benefits.map(b => b.realised_value), backgroundColor: '#22c55e' }
+                    ]},
+                    options: { responsive: true, maintainAspectRatio: false, scales: { y: { beginAtZero: true } } }
+                });
+            }
         }
 
-        async function editBenefit(id) {
-            const data = await apiCall('/benefits');
-            const b = data.benefits.find(x => x.benefit_id === id);
-            if (!b) return;
-
-            const modal = document.getElementById('modal');
-            const body = document.getElementById('modal-body');
-            body.innerHTML = `
+        function editBenefit(id, b) {
+            document.getElementById('modal-body').innerHTML = `
                 <div class="p-6">
                     <div class="flex items-center justify-between mb-4">
-                        <h3 class="text-lg font-semibold text-gray-800">Update Benefit: ${b.benefit_name}</h3>
+                        <h3 class="text-lg font-semibold">Update: ${b.benefit_name}</h3>
                         <button onclick="closeModal()" class="text-gray-400 hover:text-gray-600"><i class="fas fa-times"></i></button>
                     </div>
                     <form onsubmit="updateBenefit(event, '${id}')">
-                        <div class="form-group">
-                            <label class="form-label">Actual Realised Value</label>
-                            <input type="number" id="edit-realised" class="form-input" value="${b.realised_value}">
-                        </div>
-                        <div class="form-group">
-                            <label class="form-label">Status</label>
-                            <select id="edit-status" class="form-select">
-                                <option ${b.status === 'On Track' ? 'selected' : ''}>On Track</option>
-                                <option ${b.status === 'At Risk' ? 'selected' : ''}>At Risk</option>
-                                <option ${b.status === 'Delayed' ? 'selected' : ''}>Delayed</option>
+                        <div class="form-group"><label class="form-label">Realised Value (£)</label><input type="number" id="edit-realised" class="form-input" value="${b.realised_value}"></div>
+                        <div class="form-group"><label class="form-label">Status</label>
+                            <select id="edit-benefit-status" class="form-select">
+                                <option ${b.status==='On Track'?'selected':''}>On Track</option>
+                                <option ${b.status==='At Risk'?'selected':''}>At Risk</option>
+                                <option ${b.status==='Delayed'?'selected':''}>Delayed</option>
                             </select>
                         </div>
-                        <div class="flex gap-3 mt-6">
-                            <button type="submit" class="btn-success"><i class="fas fa-check mr-2"></i>Update</button>
-                            <button type="button" onclick="closeModal()" class="btn-primary bg-gray-500">Cancel</button>
-                        </div>
+                        <div class="flex gap-3 mt-4"><button type="submit" class="btn-success">Update</button><button type="button" onclick="closeModal()" class="btn-primary" style="background:#6b7280">Cancel</button></div>
                     </form>
-                </div>
-            `;
-            modal.classList.add('active');
+                </div>`;
+            document.getElementById('modal').classList.add('active');
         }
 
         async function updateBenefit(e, id) {
             e.preventDefault();
-            const data = {
+            await apiCall(`/benefits/${id}`, 'PATCH', {
                 realised_value: parseFloat(document.getElementById('edit-realised').value),
-                status: document.getElementById('edit-status').value
-            };
-            await apiCall(`/benefits/${id}`, 'PATCH', data);
+                status: document.getElementById('edit-benefit-status').value
+            });
             closeModal();
+            charts.benefit = null;
             loadBenefits();
             showToast('Benefit updated!');
         }
 
-        // Modal utilities
-        function closeModal() {
-            document.getElementById('modal').classList.remove('active');
+        // PROCESS CHART
+        function initProcessChart() {
+            if (charts.improvement) return;
+            const ctx = document.getElementById('improvementChart').getContext('2d');
+            charts.improvement = new Chart(ctx, {
+                type: 'bar',
+                data: { labels: ['Contract Approval', 'Field Dispatch', 'Security Vetting', 'Status Reporting'], datasets: [
+                    { label: 'Before (Days)', data: [15,4,20,8], backgroundColor: '#ef4444' },
+                    { label: 'After (Days)', data: [6,2,8,1], backgroundColor: '#22c55e' }
+                ]},
+                options: { responsive: true, maintainAspectRatio: false, indexAxis: 'y' }
+            });
         }
 
-        // Initialize
-        document.addEventListener('DOMContentLoaded', function() {
-            loadDashboardStats();
-        });
+        document.addEventListener('DOMContentLoaded', function() { loadDashboardStats(); });
     </script>
 </body>
 </html>
