@@ -3,1081 +3,1510 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>VMO Clarity | Value Management Office Control Tower</title>
+    <title>VMO Clarity | Arqiva Value Management Office</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         * { font-family: 'Inter', sans-serif; }
-        .gradient-bg { background: linear-gradient(135deg, #1e3a5f 0%, #0d2137 100%); }
-        .card-glass { background: rgba(255,255,255,0.95); backdrop-filter: blur(10px); }
-        .status-green { background: #dcfce7; color: #166534; }
-        .status-amber { background: #fef3c7; color: #92400e; }
-        .status-red { background: #fee2e2; color: #991b1b; }
-        .hover-lift { transition: transform 0.2s, box-shadow 0.2s; }
-        .hover-lift:hover { transform: translateY(-2px); box-shadow: 0 10px 40px rgba(0,0,0,0.1); }
-        .sidebar-item { transition: all 0.2s; }
-        .sidebar-item:hover { background: rgba(255,255,255,0.1); }
-        .sidebar-item.active { background: rgba(255,255,255,0.15); border-left: 3px solid #3b82f6; }
-        .chart-container { position: relative; height: 300px; }
-        .metric-card { background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%); }
-        .animate-fade-in { animation: fadeIn 0.5s ease-in; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-        .risk-high { border-left: 4px solid #ef4444; }
-        .risk-medium { border-left: 4px solid #f59e0b; }
-        .risk-low { border-left: 4px solid #22c55e; }
-        .process-step { position: relative; }
-        .process-step::after { content: ''; position: absolute; top: 50%; right: -20px; width: 20px; height: 2px; background: #e2e8f0; }
-        .process-step:last-child::after { display: none; }
-        .modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 50; align-items: center; justify-content: center; }
-        .modal.active { display: flex; }
-        .modal-content { background: white; border-radius: 12px; width: 90%; max-width: 700px; max-height: 90vh; overflow-y: auto; }
-        .toast { position: fixed; bottom: 20px; right: 20px; padding: 12px 20px; border-radius: 8px; color: white; font-weight: 500; z-index: 100; transform: translateX(400px); transition: transform 0.3s; }
-        .toast.show { transform: translateX(0); }
-        .toast-success { background: #22c55e; }
-        .toast-error { background: #ef4444; }
-        .btn-primary { background: #3b82f6; color: white; padding: 8px 16px; border-radius: 6px; font-weight: 500; cursor: pointer; transition: all 0.2s; border: none; }
-        .btn-success { background: #22c55e; color: white; padding: 8px 16px; border-radius: 6px; font-weight: 500; cursor: pointer; border: none; }
-        .btn-danger { background: #ef4444; color: white; padding: 8px 16px; border-radius: 6px; font-weight: 500; cursor: pointer; border: none; }
-        .form-group { margin-bottom: 16px; }
-        .form-label { display: block; font-size: 14px; font-weight: 500; color: #374151; margin-bottom: 4px; }
-        .form-input { width: 100%; padding: 8px 12px; border: 1px solid #d1d5db; border-radius: 6px; font-size: 14px; }
-        .form-select { width: 100%; padding: 8px 12px; border: 1px solid #d1d5db; border-radius: 6px; font-size: 14px; background: white; }
-        .form-textarea { width: 100%; padding: 8px 12px; border: 1px solid #d1d5db; border-radius: 6px; font-size: 14px; min-height: 80px; resize: vertical; }
-        .action-btn { padding: 4px 8px; border-radius: 4px; font-size: 12px; cursor: pointer; border: none; margin-right: 4px; }
-        .edit-btn { background: #dbeafe; color: #1e40af; }
-        .delete-btn { background: #fee2e2; color: #991b1b; }
+        body { background: #F4F5F7; }
+
+        /* Atlassian sidebar */
+        .atl-sidebar { background: #0747A6; width: 240px; }
+        .atl-sidebar-header { background: #172B4D; }
+        .atl-nav-group { padding: 16px 0 4px; }
+        .atl-nav-label { font-size: 11px; font-weight: 600; color: #8993A4; text-transform: uppercase; letter-spacing: 0.08em; padding: 0 16px 6px; }
+        .atl-nav-item { display: flex; align-items: center; gap: 10px; padding: 8px 16px; font-size: 13px; font-weight: 500; color: #B8C2D0; cursor: pointer; transition: all 0.15s; border-left: 3px solid transparent; text-decoration: none; }
+        .atl-nav-item:hover { background: rgba(255,255,255,0.08); color: #fff; }
+        .atl-nav-item.active { background: rgba(255,255,255,0.12); color: #fff; border-left-color: #4C9AFF; }
+        .atl-nav-item i { width: 16px; text-align: center; font-size: 13px; }
+
+        /* Atlassian cards */
+        .atl-card { background: #fff; border-radius: 3px; box-shadow: 0 1px 1px rgba(9,30,66,0.25), 0 0 0 1px rgba(9,30,66,0.08); }
+        .atl-card-header { padding: 16px 20px; border-bottom: 1px solid #EBECF0; display: flex; align-items: center; justify-content: space-between; }
+        .atl-card-title { font-size: 14px; font-weight: 600; color: #172B4D; }
+
+        /* Atlassian lozenges */
+        .loz { display: inline-flex; align-items: center; padding: 2px 8px; border-radius: 3px; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.04em; }
+        .loz-green { background: #E3FCEF; color: #006644; }
+        .loz-amber { background: #FFFAE6; color: #974F0C; }
+        .loz-red { background: #FFEBE6; color: #BF2600; }
+        .loz-blue { background: #DEEBFF; color: #0747A6; }
+        .loz-purple { background: #EAE6FF; color: #403294; }
+        .loz-gray { background: #F4F5F7; color: #42526E; }
+        .loz-teal { background: #E6FCFF; color: #006C8A; }
+
+        /* Atlassian buttons */
+        .btn-atl-primary { background: #0052CC; color: #fff; border: none; padding: 6px 14px; border-radius: 3px; font-size: 13px; font-weight: 500; cursor: pointer; transition: background 0.15s; }
+        .btn-atl-primary:hover { background: #0065FF; }
+        .btn-atl-success { background: #00875A; color: #fff; border: none; padding: 6px 14px; border-radius: 3px; font-size: 13px; font-weight: 500; cursor: pointer; }
+        .btn-atl-danger { background: #DE350B; color: #fff; border: none; padding: 6px 14px; border-radius: 3px; font-size: 13px; font-weight: 500; cursor: pointer; }
+        .btn-atl-subtle { background: #F4F5F7; color: #42526E; border: none; padding: 6px 14px; border-radius: 3px; font-size: 13px; font-weight: 500; cursor: pointer; }
+        .btn-atl-subtle:hover { background: #EBECF0; }
+        .btn-sm { padding: 3px 8px; font-size: 12px; border-radius: 3px; border: none; cursor: pointer; font-weight: 500; }
+        .btn-sm-blue { background: #DEEBFF; color: #0052CC; }
+        .btn-sm-red { background: #FFEBE6; color: #BF2600; }
+
+        /* Atlassian forms */
+        .atl-input { width: 100%; padding: 6px 10px; border: 2px solid #DFE1E6; border-radius: 3px; font-size: 14px; color: #172B4D; background: #FAFBFC; transition: border-color 0.15s; }
+        .atl-input:focus { outline: none; border-color: #4C9AFF; background: #fff; box-shadow: 0 0 0 2px rgba(76,154,255,0.2); }
+        .atl-select { width: 100%; padding: 6px 10px; border: 2px solid #DFE1E6; border-radius: 3px; font-size: 14px; color: #172B4D; background: #FAFBFC; }
+        .atl-label { display: block; font-size: 12px; font-weight: 600; color: #6B778C; margin-bottom: 4px; text-transform: uppercase; letter-spacing: 0.04em; }
+        .atl-textarea { width: 100%; padding: 6px 10px; border: 2px solid #DFE1E6; border-radius: 3px; font-size: 14px; color: #172B4D; background: #FAFBFC; min-height: 80px; resize: vertical; }
+
+        /* Atlassian table */
+        .atl-table { width: 100%; border-collapse: collapse; }
+        .atl-table thead th { background: #F4F5F7; padding: 8px 16px; text-align: left; font-size: 11px; font-weight: 700; color: #6B778C; text-transform: uppercase; letter-spacing: 0.06em; border-bottom: 2px solid #DFE1E6; }
+        .atl-table tbody td { padding: 10px 16px; border-bottom: 1px solid #EBECF0; font-size: 13px; color: #172B4D; }
+        .atl-table tbody tr:hover { background: #F4F5F7; }
+        .atl-table tbody tr:last-child td { border-bottom: none; }
+
+        /* KPI cards */
+        .kpi-card { background: #fff; border-radius: 3px; padding: 20px; box-shadow: 0 1px 1px rgba(9,30,66,0.25), 0 0 0 1px rgba(9,30,66,0.08); }
+        .kpi-value { font-size: 28px; font-weight: 700; color: #172B4D; line-height: 1; margin: 8px 0 4px; }
+        .kpi-label { font-size: 12px; color: #6B778C; font-weight: 500; }
+        .kpi-icon { width: 36px; height: 36px; border-radius: 3px; display: flex; align-items: center; justify-content: center; font-size: 15px; }
+
+        /* Chart container */
+        .chart-box { position: relative; height: 260px; }
+
+        /* Modal */
+        .atl-modal { display: none; position: fixed; inset: 0; background: rgba(9,30,66,0.54); z-index: 100; align-items: center; justify-content: center; }
+        .atl-modal.active { display: flex; }
+        .atl-modal-content { background: #fff; border-radius: 3px; width: 90%; max-width: 600px; max-height: 90vh; overflow-y: auto; box-shadow: 0 8px 16px rgba(9,30,66,0.31); }
+        .atl-modal-header { padding: 20px 24px 16px; border-bottom: 1px solid #EBECF0; }
+        .atl-modal-body { padding: 20px 24px; }
+        .atl-modal-footer { padding: 16px 24px; border-top: 1px solid #EBECF0; display: flex; gap: 8px; }
+
+        /* Toast */
+        .atl-toast { position: fixed; bottom: 24px; right: 24px; padding: 12px 18px; border-radius: 3px; color: #fff; font-size: 13px; font-weight: 500; z-index: 200; transform: translateY(80px); transition: transform 0.25s; box-shadow: 0 4px 8px rgba(9,30,66,0.31); }
+        .atl-toast.show { transform: translateY(0); }
+        .atl-toast-success { background: #00875A; }
+        .atl-toast-error { background: #DE350B; }
+
+        /* Progress bar */
+        .atl-progress { background: #DFE1E6; border-radius: 3px; height: 6px; }
+        .atl-progress-fill { height: 6px; border-radius: 3px; transition: width 0.4s; }
+
+        /* Section */
+        .section-content { display: none; }
+        .section-content.active { display: block; }
+
+        /* Vision 2031 pillar pills */
+        .v2031-broadcast { background: #EAE6FF; color: #403294; }
+        .v2031-cloud { background: #E6FCFF; color: #006C8A; }
+        .v2031-utilities { background: #E3FCEF; color: #006644; }
+        .v2031-connectivity { background: #FFFAE6; color: #974F0C; }
+
+        /* Governance radar wrapper */
+        .radar-box { position: relative; height: 320px; }
+
+        /* RIDAC border colours */
+        .ridac-risk { border-left: 3px solid #DE350B; }
+        .ridac-issue { border-left: 3px solid #FF991F; }
+        .ridac-decision { border-left: 3px solid #0052CC; }
+        .ridac-action { border-left: 3px solid #00875A; }
+        .ridac-change { border-left: 3px solid #6554C0; }
+
+        /* AMP8 progress */
+        .amp8-row { padding: 14px 0; border-bottom: 1px solid #EBECF0; }
+        .amp8-row:last-child { border-bottom: none; }
+
+        /* Copilot summary box */
+        .copilot-summary { background: #F4F5F7; border-left: 3px solid #0052CC; padding: 14px 16px; border-radius: 0 3px 3px 0; font-size: 13px; color: #172B4D; line-height: 1.6; }
+
+        /* Fade in */
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+        .fade-in { animation: fadeIn 0.3s ease; }
     </style>
 </head>
-<body class="bg-gray-100">
-    <div id="toast" class="toast"></div>
-    <div id="modal" class="modal">
-        <div class="modal-content" id="modal-body"></div>
-    </div>
+<body>
 
-    <div class="flex h-screen">
-        <aside class="w-64 gradient-bg text-white flex flex-col">
-            <div class="p-6 border-b border-white/10">
-                <div class="flex items-center gap-3">
-                    <div class="w-10 h-10 bg-blue-500 rounded-lg flex items-center justify-center">
-                        <i class="fas fa-tower-broadcast text-white"></i>
-                    </div>
-                    <div>
-                        <h1 class="font-bold text-lg">VMO Clarity</h1>
-                        <p class="text-xs text-blue-200">Value Management Office</p>
-                    </div>
+<div id="toast" class="atl-toast"></div>
+<div id="modal" class="atl-modal">
+    <div class="atl-modal-content" id="modal-body"></div>
+</div>
+
+<div class="flex h-screen overflow-hidden">
+    <!-- SIDEBAR -->
+    <aside class="atl-sidebar flex flex-col flex-shrink-0">
+        <div class="atl-sidebar-header px-4 py-4 flex items-center gap-3">
+            <div class="w-8 h-8 bg-blue-400 rounded flex items-center justify-center">
+                <i class="fas fa-tower-broadcast text-white text-sm"></i>
+            </div>
+            <div>
+                <p class="text-white font-700 text-sm leading-tight" style="font-weight:700">VMO Clarity</p>
+                <p class="text-blue-300 text-xs">Arqiva Portfolio</p>
+            </div>
+        </div>
+
+        <nav class="flex-1 overflow-y-auto py-2">
+            <div class="atl-nav-group">
+                <p class="atl-nav-label">Overview</p>
+                <a href="#" class="atl-nav-item active" onclick="showSection('executive',this);return false">
+                    <i class="fas fa-chart-line"></i><span>Executive Dashboard</span>
+                </a>
+                <a href="#" class="atl-nav-item" onclick="showSection('portfolio',this);return false">
+                    <i class="fas fa-layer-group"></i><span>Portfolio View</span>
+                </a>
+                <a href="#" class="atl-nav-item" onclick="showSection('amp8',this);return false">
+                    <i class="fas fa-droplet"></i><span>AMP8 Tracker</span>
+                </a>
+                <a href="#" class="atl-nav-item" onclick="showSection('governance',this);return false">
+                    <i class="fas fa-shield-halved"></i><span>Governance Maturity</span>
+                </a>
+            </div>
+            <div class="atl-nav-group">
+                <p class="atl-nav-label">Delivery</p>
+                <a href="#" class="atl-nav-item" onclick="showSection('projects',this);return false">
+                    <i class="fas fa-list-check"></i><span>Projects</span>
+                </a>
+                <a href="#" class="atl-nav-item" onclick="showSection('demand',this);return false">
+                    <i class="fas fa-inbox"></i><span>Demand Intake</span>
+                </a>
+                <a href="#" class="atl-nav-item" onclick="showSection('delivery',this);return false">
+                    <i class="fas fa-route"></i><span>Delivery Control</span>
+                </a>
+                <a href="#" class="atl-nav-item" onclick="showSection('ridac',this);return false">
+                    <i class="fas fa-triangle-exclamation"></i><span>RIDAC Hub</span>
+                </a>
+            </div>
+            <div class="atl-nav-group">
+                <p class="atl-nav-label">Value</p>
+                <a href="#" class="atl-nav-item" onclick="showSection('value',this);return false">
+                    <i class="fas fa-gem"></i><span>Value Realisation</span>
+                </a>
+                <a href="#" class="atl-nav-item" onclick="showSection('process',this);return false">
+                    <i class="fas fa-arrows-spin"></i><span>Process Improvement</span>
+                </a>
+                <a href="#" class="atl-nav-item" onclick="showSection('capacity',this);return false">
+                    <i class="fas fa-users"></i><span>Capacity Heatmap</span>
+                </a>
+                <a href="#" class="atl-nav-item" onclick="showSection('ai',this);return false">
+                    <i class="fas fa-robot"></i><span>VMO Copilot</span>
+                </a>
+            </div>
+        </nav>
+
+        <div class="px-4 py-3 border-t border-blue-900">
+            <div class="flex items-center gap-2">
+                <div class="w-7 h-7 rounded-full bg-blue-400 flex items-center justify-center text-white text-xs font-bold">SC</div>
+                <div>
+                    <p class="text-white text-xs font-600" style="font-weight:600">Surya Chandrashekara</p>
+                    <p class="text-blue-300 text-xs">VMO Specialist</p>
                 </div>
             </div>
-            <nav class="flex-1 py-4">
-                <a href="#" class="sidebar-item active flex items-center gap-3 px-6 py-3 text-sm" onclick="showSection('executive', this)">
-                    <i class="fas fa-chart-line w-5"></i><span>Executive Dashboard</span>
-                </a>
-                <a href="#" class="sidebar-item flex items-center gap-3 px-6 py-3 text-sm" onclick="showSection('portfolio', this)">
-                    <i class="fas fa-folder-tree w-5"></i><span>Portfolio View</span>
-                </a>
-                <a href="#" class="sidebar-item flex items-center gap-3 px-6 py-3 text-sm" onclick="showSection('projects', this)">
-                    <i class="fas fa-list-check w-5"></i><span>Projects</span>
-                </a>
-                <a href="#" class="sidebar-item flex items-center gap-3 px-6 py-3 text-sm" onclick="showSection('demand', this)">
-                    <i class="fas fa-door-open w-5"></i><span>Demand Intake</span>
-                </a>
-                <a href="#" class="sidebar-item flex items-center gap-3 px-6 py-3 text-sm" onclick="showSection('delivery', this)">
-                    <i class="fas fa-tasks w-5"></i><span>Delivery Control</span>
-                </a>
-                <a href="#" class="sidebar-item flex items-center gap-3 px-6 py-3 text-sm" onclick="showSection('ridac', this)">
-                    <i class="fas fa-shield-halved w-5"></i><span>RIDAC Hub</span>
-                </a>
-                <a href="#" class="sidebar-item flex items-center gap-3 px-6 py-3 text-sm" onclick="showSection('value', this)">
-                    <i class="fas fa-gem w-5"></i><span>Value Realisation</span>
-                </a>
-                <a href="#" class="sidebar-item flex items-center gap-3 px-6 py-3 text-sm" onclick="showSection('process', this)">
-                    <i class="fas fa-arrows-spin w-5"></i><span>Process Improvement</span>
-                </a>
-                <a href="#" class="sidebar-item flex items-center gap-3 px-6 py-3 text-sm" onclick="showSection('capacity', this)">
-                    <i class="fas fa-users w-5"></i><span>Capacity Heatmap</span>
-                </a>
-                <a href="#" class="sidebar-item flex items-center gap-3 px-6 py-3 text-sm" onclick="showSection('ai', this)">
-                    <i class="fas fa-robot w-5"></i><span>VMO Copilot</span>
-                </a>
-            </nav>
-            <div class="p-4 border-t border-white/10">
-                <div class="bg-white/10 rounded-lg p-3">
-                    <p class="text-xs text-blue-200 mb-1">Arqiva Demo</p>
-                    <p class="text-xs">Built for Senior Planning & Value Management Specialist</p>
-                </div>
+        </div>
+    </aside>
+
+    <!-- MAIN -->
+    <main class="flex-1 flex flex-col overflow-hidden">
+        <!-- TOP BAR -->
+        <header class="bg-white border-b border-gray-200 px-6 py-3 flex items-center justify-between flex-shrink-0" style="border-color:#DFE1E6">
+            <div class="flex items-center gap-3">
+                <h2 id="page-title" class="text-base font-600 text-gray-800" style="font-weight:600;color:#172B4D">Executive Dashboard</h2>
+                <span id="connection-status" class="loz loz-green">Live Data</span>
             </div>
-        </aside>
+            <div class="flex items-center gap-3">
+                <button id="header-action-btn" onclick="openCreateProjectModal()" class="btn-atl-primary hidden">
+                    <i class="fas fa-plus mr-1 text-xs"></i> New Project
+                </button>
+                <button onclick="showSection('ai', document.querySelector(\'[onclick*=\\\"ai\\\"]\'))" class="btn-atl-subtle text-xs">
+                    <i class="fas fa-robot mr-1"></i> VMO Copilot
+                </button>
+            </div>
+        </header>
 
-        <main class="flex-1 overflow-y-auto">
-            <header class="bg-white border-b px-8 py-4 flex items-center justify-between sticky top-0 z-10">
-                <div class="flex items-center gap-4">
-                    <h2 id="page-title" class="text-xl font-semibold text-gray-800">Executive Dashboard</h2>
-                    <span id="connection-status" class="px-3 py-1 bg-green-100 text-green-700 rounded-full text-xs font-medium">Live Data</span>
+        <!-- CONTENT -->
+        <div class="flex-1 overflow-y-auto p-6">
+
+            <!-- ═══════════════════════════════════════════════
+                 EXECUTIVE DASHBOARD
+            ═══════════════════════════════════════════════ -->
+            <section id="executive" class="section-content active fade-in">
+                <!-- KPI row -->
+                <div class="grid grid-cols-4 gap-4 mb-6">
+                    <div class="kpi-card">
+                        <div class="flex items-center justify-between">
+                            <p class="kpi-label">Active Initiatives</p>
+                            <div class="kpi-icon" style="background:#DEEBFF"><i class="fas fa-rocket text-blue-700 text-sm"></i></div>
+                        </div>
+                        <p id="total-projects" class="kpi-value">—</p>
+                        <div id="status-badges" class="flex gap-1 mt-2"></div>
+                    </div>
+                    <div class="kpi-card">
+                        <div class="flex items-center justify-between">
+                            <p class="kpi-label">Total Investment</p>
+                            <div class="kpi-icon" style="background:#EAE6FF"><i class="fas fa-pound-sign text-purple-700 text-sm"></i></div>
+                        </div>
+                        <p id="total-budget" class="kpi-value">—</p>
+                        <p class="text-xs mt-2" style="color:#6B778C">£2.8B contracted order book</p>
+                    </div>
+                    <div class="kpi-card">
+                        <div class="flex items-center justify-between">
+                            <p class="kpi-label">At Risk</p>
+                            <div class="kpi-icon" style="background:#FFEBE6"><i class="fas fa-exclamation-triangle text-red-600 text-sm"></i></div>
+                        </div>
+                        <p id="at-risk" class="kpi-value" style="color:#DE350B">—</p>
+                        <p class="text-xs mt-2" style="color:#DE350B">Amber + Red projects</p>
+                    </div>
+                    <div class="kpi-card">
+                        <div class="flex items-center justify-between">
+                            <p class="kpi-label">Budget Variance</p>
+                            <div class="kpi-icon" style="background:#E3FCEF"><i class="fas fa-balance-scale text-green-700 text-sm"></i></div>
+                        </div>
+                        <p id="variance" class="kpi-value" style="color:#006644">—</p>
+                        <p class="text-xs mt-2" style="color:#6B778C">Budget vs actual spend</p>
+                    </div>
                 </div>
-                <div class="flex items-center gap-4">
-                    <button id="header-action-btn" onclick="openCreateProjectModal()" class="px-4 py-2 bg-blue-600 text-white rounded-lg text-sm font-medium hidden">
-                        <i class="fas fa-plus mr-2"></i>New Project
-                    </button>
-                    <div class="text-right">
-                        <p class="text-sm font-medium text-gray-800">Nicola Thapan</p>
-                        <p class="text-xs text-gray-500">Head of VMO</p>
+
+                <!-- Division split -->
+                <div class="grid grid-cols-2 gap-4 mb-6">
+                    <div class="kpi-card flex items-center gap-4">
+                        <div class="kpi-icon w-12 h-12 flex-shrink-0" style="background:#DEEBFF;width:48px;height:48px;border-radius:3px">
+                            <i class="fas fa-tower-broadcast text-blue-700"></i>
+                        </div>
+                        <div class="flex-1">
+                            <p class="text-xs font-600 mb-1" style="color:#6B778C;font-weight:600">MEDIA & BROADCAST</p>
+                            <div class="flex items-end gap-3">
+                                <span class="text-xl font-700" style="color:#172B4D;font-weight:700">£235M</span>
+                                <span class="loz loz-green text-xs mb-1">H1 FY26 Revenue</span>
+                            </div>
+                            <div class="atl-progress mt-2"><div class="atl-progress-fill bg-green-500" style="width:92%"></div></div>
+                            <p class="text-xs mt-1" style="color:#6B778C">92% portfolio health · 1,154 transmitter sites</p>
+                        </div>
                     </div>
-                    <div class="w-10 h-10 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center text-white font-bold">NT</div>
+                    <div class="kpi-card flex items-center gap-4">
+                        <div class="kpi-icon w-12 h-12 flex-shrink-0" style="background:#E3FCEF;width:48px;height:48px;border-radius:3px">
+                            <i class="fas fa-droplet text-green-700"></i>
+                        </div>
+                        <div class="flex-1">
+                            <p class="text-xs font-600 mb-1" style="color:#6B778C;font-weight:600">SMART UTILITIES NETWORKS</p>
+                            <div class="flex items-end gap-3">
+                                <span class="text-xl font-700" style="color:#172B4D;font-weight:700">£112M</span>
+                                <span class="loz loz-teal text-xs mb-1">+66% YoY</span>
+                            </div>
+                            <div class="atl-progress mt-2"><div class="atl-progress-fill bg-blue-500" style="width:72%"></div></div>
+                            <p class="text-xs mt-1" style="color:#6B778C">72% portfolio health · AMP8 growth engine</p>
+                        </div>
+                    </div>
                 </div>
-            </header>
 
-            <div class="p-8">
-                <!-- EXECUTIVE DASHBOARD -->
-                <section id="executive" class="section-content animate-fade-in">
-                    <div class="grid grid-cols-4 gap-6 mb-8">
-                        <div class="metric-card rounded-xl p-6 hover-lift">
-                            <div class="flex items-center justify-between mb-4">
-                                <div class="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
-                                    <i class="fas fa-rocket text-blue-600 text-xl"></i>
-                                </div>
-                                <span class="text-xs text-green-600 font-medium">Live</span>
+                <!-- Charts row -->
+                <div class="grid grid-cols-2 gap-4 mb-6">
+                    <div class="atl-card">
+                        <div class="atl-card-header"><p class="atl-card-title">Portfolio Health</p></div>
+                        <div class="p-4"><div class="chart-box"><canvas id="portfolioChart"></canvas></div></div>
+                    </div>
+                    <div class="atl-card">
+                        <div class="atl-card-header"><p class="atl-card-title">Health Trend — 6 Months</p></div>
+                        <div class="p-4"><div class="chart-box"><canvas id="healthTrendChart"></canvas></div></div>
+                    </div>
+                </div>
+
+                <!-- Initiative table -->
+                <div class="atl-card">
+                    <div class="atl-card-header">
+                        <p class="atl-card-title">Initiative Status Overview</p>
+                        <span class="loz loz-blue">Vision 2031 Aligned</span>
+                    </div>
+                    <table class="atl-table">
+                        <thead>
+                            <tr>
+                                <th>Initiative</th>
+                                <th>Manager</th>
+                                <th>V2031 Pillar</th>
+                                <th>Status</th>
+                                <th>Budget</th>
+                                <th>Forecast</th>
+                                <th>Variance</th>
+                            </tr>
+                        </thead>
+                        <tbody id="exec-projects-body"></tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- ═══════════════════════════════════════════════
+                 PORTFOLIO VIEW
+            ═══════════════════════════════════════════════ -->
+            <section id="portfolio" class="section-content fade-in">
+                <div class="grid grid-cols-2 gap-4 mb-6">
+                    <div class="atl-card">
+                        <div class="atl-card-header"><p class="atl-card-title">Budget Allocation by Division</p></div>
+                        <div class="p-4"><div class="chart-box"><canvas id="budgetChart"></canvas></div></div>
+                    </div>
+                    <div class="atl-card">
+                        <div class="atl-card-header"><p class="atl-card-title">Division Health Score</p></div>
+                        <div class="p-6 space-y-5">
+                            <div>
+                                <div class="flex justify-between text-sm mb-1"><span style="color:#172B4D;font-weight:500">Smart Utilities Networks</span><span style="color:#974F0C;font-weight:600">72%</span></div>
+                                <div class="atl-progress"><div class="atl-progress-fill" style="width:72%;background:#FF991F"></div></div>
+                                <p class="text-xs mt-1" style="color:#6B778C">2 Amber, 1 Red · rigger shortage risk</p>
                             </div>
-                            <p id="total-projects" class="text-3xl font-bold text-gray-800">—</p>
-                            <p class="text-sm text-gray-500">Active Initiatives</p>
-                            <div id="status-badges" class="mt-3 flex gap-2"></div>
-                        </div>
-                        <div class="metric-card rounded-xl p-6 hover-lift">
-                            <div class="flex items-center justify-between mb-4">
-                                <div class="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center">
-                                    <i class="fas fa-pound-sign text-purple-600 text-xl"></i>
-                                </div>
+                            <div>
+                                <div class="flex justify-between text-sm mb-1"><span style="color:#172B4D;font-weight:500">Media & Broadcast</span><span style="color:#006644;font-weight:600">92%</span></div>
+                                <div class="atl-progress"><div class="atl-progress-fill bg-green-500" style="width:92%"></div></div>
+                                <p class="text-xs mt-1" style="color:#6B778C">AWS migration on track, 45 channels migrated</p>
                             </div>
-                            <p id="total-budget" class="text-3xl font-bold text-gray-800">—</p>
-                            <p class="text-sm text-gray-500">Total Investment</p>
-                        </div>
-                        <div class="metric-card rounded-xl p-6 hover-lift">
-                            <div class="flex items-center justify-between mb-4">
-                                <div class="w-12 h-12 bg-red-100 rounded-lg flex items-center justify-center">
-                                    <i class="fas fa-exclamation-triangle text-red-600 text-xl"></i>
-                                </div>
-                                <span class="text-xs text-red-600 font-medium">Action required</span>
+                            <div>
+                                <div class="flex justify-between text-sm mb-1"><span style="color:#172B4D;font-weight:500">Enablement & Corporate</span><span style="color:#BF2600;font-weight:600">45%</span></div>
+                                <div class="atl-progress"><div class="atl-progress-fill" style="width:45%;background:#DE350B"></div></div>
+                                <p class="text-xs mt-1" style="color:#6B778C">CNI-SEC Red · 340 security clearance backlog</p>
                             </div>
-                            <p id="at-risk" class="text-3xl font-bold text-gray-800">—</p>
-                            <p class="text-sm text-gray-500">At Risk Projects</p>
-                        </div>
-                        <div class="metric-card rounded-xl p-6 hover-lift">
-                            <div class="flex items-center justify-between mb-4">
-                                <div class="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center">
-                                    <i class="fas fa-gem text-green-600 text-xl"></i>
-                                </div>
+                            <div>
+                                <div class="flex justify-between text-sm mb-1"><span style="color:#172B4D;font-weight:500">Infrastructure & Sites</span><span style="color:#974F0C;font-weight:600">68%</span></div>
+                                <div class="atl-progress"><div class="atl-progress-fill" style="width:68%;background:#FF991F"></div></div>
+                                <p class="text-xs mt-1" style="color:#6B778C">Emley Moor heritage delay</p>
                             </div>
-                            <p id="variance" class="text-3xl font-bold text-gray-800">—</p>
-                            <p class="text-sm text-gray-500">Budget Variance</p>
                         </div>
                     </div>
+                </div>
 
-                    <div class="grid grid-cols-2 gap-6 mb-8">
-                        <div class="bg-white rounded-xl p-6 shadow-sm">
-                            <h3 class="font-semibold text-gray-800 mb-4">Portfolio Health</h3>
-                            <div class="chart-container"><canvas id="portfolioChart"></canvas></div>
+                <!-- Vision 2031 pillars -->
+                <div class="atl-card">
+                    <div class="atl-card-header">
+                        <p class="atl-card-title">Vision 2031 Strategic Alignment</p>
+                        <span class="text-xs" style="color:#6B778C">4 pillars · £2.8B contracted order book</span>
+                    </div>
+                    <div class="grid grid-cols-4 gap-0">
+                        <div class="p-5 border-r" style="border-color:#EBECF0">
+                            <div class="w-9 h-9 rounded flex items-center justify-center mb-3" style="background:#EAE6FF"><i class="fas fa-tower-broadcast text-purple-700 text-sm"></i></div>
+                            <h4 class="text-sm font-600 mb-1" style="color:#172B4D;font-weight:600">Broadcast Leader</h4>
+                            <p class="text-xs mb-3" style="color:#6B778C">Undisputed UK TV & radio leader</p>
+                            <p class="text-xl font-700 mb-1" style="color:#172B4D;font-weight:700">£40M</p>
+                            <div class="flex gap-1"><span class="loz loz-amber">1A</span><span class="loz loz-gray">SITE-EM</span></div>
                         </div>
-                        <div class="bg-white rounded-xl p-6 shadow-sm">
-                            <h3 class="font-semibold text-gray-800 mb-4">Project Health Trend (6 Months)</h3>
-                            <div class="chart-container"><canvas id="healthTrendChart"></canvas></div>
+                        <div class="p-5 border-r" style="border-color:#EBECF0">
+                            <div class="w-9 h-9 rounded flex items-center justify-center mb-3" style="background:#E6FCFF"><i class="fas fa-cloud text-teal-700 text-sm"></i></div>
+                            <h4 class="text-sm font-600 mb-1" style="color:#172B4D;font-weight:600">Cloud Media</h4>
+                            <p class="text-xs mb-3" style="color:#6B778C">Global media to cloud transition</p>
+                            <p class="text-xl font-700 mb-1" style="color:#172B4D;font-weight:700">£35M</p>
+                            <div class="flex gap-1"><span class="loz loz-green">2G</span><span class="loz loz-gray">AWS</span></div>
+                        </div>
+                        <div class="p-5 border-r" style="border-color:#EBECF0">
+                            <div class="w-9 h-9 rounded flex items-center justify-center mb-3" style="background:#E3FCEF"><i class="fas fa-droplet text-green-700 text-sm"></i></div>
+                            <h4 class="text-sm font-600 mb-1" style="color:#172B4D;font-weight:600">Smart Utilities</h4>
+                            <p class="text-xs mb-3" style="color:#6B778C">UK's leading smart utilities platform</p>
+                            <p class="text-xl font-700 mb-1" style="color:#172B4D;font-weight:700">£50M</p>
+                            <div class="flex gap-1"><span class="loz loz-green">1G</span><span class="loz loz-amber">1A</span><span class="loz loz-red">1R</span></div>
+                        </div>
+                        <div class="p-5">
+                            <div class="w-9 h-9 rounded flex items-center justify-center mb-3" style="background:#FFFAE6"><i class="fas fa-satellite text-yellow-700 text-sm"></i></div>
+                            <h4 class="text-sm font-600 mb-1" style="color:#172B4D;font-weight:600">New Connectivity</h4>
+                            <p class="text-xs mb-3" style="color:#6B778C">LEO satellite, IoT, 4G/5G</p>
+                            <p class="text-xl font-700 mb-1" style="color:#172B4D;font-weight:700">£25M</p>
+                            <div class="flex gap-1"><span class="loz loz-green">1G</span><span class="loz loz-gray">4G</span></div>
                         </div>
                     </div>
+                </div>
+            </section>
 
-                    <div class="bg-white rounded-xl shadow-sm overflow-hidden">
-                        <div class="px-6 py-4 border-b">
-                            <h3 class="font-semibold text-gray-800">Initiative Status Overview</h3>
-                        </div>
-                        <div id="exec-projects-table">
-                            <table class="w-full">
-                                <thead class="bg-gray-50">
-                                    <tr>
-                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Initiative</th>
-                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Manager</th>
-                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Status</th>
-                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Budget</th>
-                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Forecast</th>
-                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Variance</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="exec-projects-body" class="divide-y divide-gray-100"></tbody>
-                            </table>
-                        </div>
+            <!-- ═══════════════════════════════════════════════
+                 AMP8 CONTRACT TRACKER
+            ═══════════════════════════════════════════════ -->
+            <section id="amp8" class="section-content fade-in">
+                <div class="grid grid-cols-3 gap-4 mb-6">
+                    <div class="kpi-card">
+                        <p class="kpi-label">AMP8 Contract Value</p>
+                        <p class="kpi-value" style="color:#006644">£500M+</p>
+                        <p class="text-xs mt-2" style="color:#6B778C">5 water utility contracts mobilised</p>
                     </div>
-                </section>
+                    <div class="kpi-card">
+                        <p class="kpi-label">Meters Committed</p>
+                        <p class="kpi-value" style="color:#0052CC">4.0M+</p>
+                        <p class="text-xs mt-2" style="color:#6B778C">AMP8 2025–2030 period</p>
+                    </div>
+                    <div class="kpi-card">
+                        <p class="kpi-label">Meters Delivered</p>
+                        <p class="kpi-value" style="color:#974F0C">0.63M</p>
+                        <p class="text-xs mt-2" style="color:#6B778C">~16% of AMP8 commitment · H1 FY26</p>
+                    </div>
+                </div>
 
-                <!-- PORTFOLIO VIEW -->
-                <section id="portfolio" class="section-content hidden">
-                    <div class="grid grid-cols-2 gap-6 mb-8">
-                        <div class="bg-white rounded-xl p-6 shadow-sm">
-                            <h3 class="font-semibold text-gray-800 mb-4">Portfolio Budget Allocation</h3>
-                            <div class="chart-container"><canvas id="budgetChart"></canvas></div>
-                        </div>
-                        <div class="bg-white rounded-xl p-6 shadow-sm">
-                            <h3 class="font-semibold text-gray-800 mb-4">Portfolio Health Score</h3>
-                            <div class="space-y-4">
+                <div class="atl-card mb-4">
+                    <div class="atl-card-header">
+                        <p class="atl-card-title">AMP8 Water Contract Delivery Progress</p>
+                        <span class="loz loz-teal">Smart Utilities Growth Engine</span>
+                    </div>
+                    <div class="p-6">
+                        <!-- United Utilities -->
+                        <div class="amp8-row">
+                            <div class="flex items-center justify-between mb-2">
                                 <div>
-                                    <div class="flex justify-between text-sm mb-1"><span>Smart Utilities Networks</span><span class="font-medium">72%</span></div>
-                                    <div class="w-full bg-gray-200 rounded-full h-3"><div class="bg-amber-500 h-3 rounded-full" style="width:72%"></div></div>
-                                    <p class="text-xs text-gray-500 mt-1">2 Amber projects, 1 Red risk</p>
+                                    <span class="text-sm font-600" style="font-weight:600;color:#172B4D">United Utilities</span>
+                                    <span class="ml-2 loz loz-blue">Primary Contractor</span>
+                                    <span class="ml-1 loz loz-gray">15+ yr · NW England</span>
                                 </div>
-                                <div>
-                                    <div class="flex justify-between text-sm mb-1"><span>Media & Broadcast</span><span class="font-medium">92%</span></div>
-                                    <div class="w-full bg-gray-200 rounded-full h-3"><div class="bg-green-500 h-3 rounded-full" style="width:92%"></div></div>
-                                    <p class="text-xs text-gray-500 mt-1">On track, AWS migration progressing</p>
-                                </div>
-                                <div>
-                                    <div class="flex justify-between text-sm mb-1"><span>Enablement & Corporate</span><span class="font-medium">45%</span></div>
-                                    <div class="w-full bg-gray-200 rounded-full h-3"><div class="bg-red-500 h-3 rounded-full" style="width:45%"></div></div>
-                                    <p class="text-xs text-gray-500 mt-1">CNI-SEC Red, security vetting blocked</p>
-                                </div>
-                                <div>
-                                    <div class="flex justify-between text-sm mb-1"><span>Infrastructure & Sites</span><span class="font-medium">68%</span></div>
-                                    <div class="w-full bg-gray-200 rounded-full h-3"><div class="bg-amber-500 h-3 rounded-full" style="width:68%"></div></div>
-                                    <p class="text-xs text-gray-500 mt-1">Heritage delay, Emley Moor at risk</p>
-                                </div>
+                                <span class="text-sm font-600" style="color:#0052CC;font-weight:600">0.1M / 1.1M (9%)</span>
                             </div>
+                            <div class="atl-progress"><div class="atl-progress-fill" style="width:9%;background:#0052CC"></div></div>
+                            <p class="text-xs mt-1" style="color:#6B778C">Potential further 2.0M meters during AMP9 & AMP10</p>
+                        </div>
+                        <!-- Anglian Water -->
+                        <div class="amp8-row">
+                            <div class="flex items-center justify-between mb-2">
+                                <div>
+                                    <span class="text-sm font-600" style="font-weight:600;color:#172B4D">Anglian Water</span>
+                                    <span class="ml-2 loz loz-gray">20 yr (2025–2045)</span>
+                                </div>
+                                <span class="text-sm font-600" style="color:#0052CC;font-weight:600">0.3M / 1.1M (27%)</span>
+                            </div>
+                            <div class="atl-progress"><div class="atl-progress-fill" style="width:27%;background:#0052CC"></div></div>
+                            <p class="text-xs mt-1" style="color:#6B778C">Phase 2 delivery (PRJ-AMP8-AN) on track</p>
+                        </div>
+                        <!-- Affinity Water -->
+                        <div class="amp8-row">
+                            <div class="flex items-center justify-between mb-2">
+                                <div>
+                                    <span class="text-sm font-600" style="font-weight:600;color:#172B4D">Affinity Water</span>
+                                    <span class="ml-2 loz loz-green">Ahead of Schedule</span>
+                                    <span class="ml-1 loz loz-gray">15 yr</span>
+                                </div>
+                                <span class="text-sm font-600" style="color:#006644;font-weight:600">0.1M / 0.4M (25%)</span>
+                            </div>
+                            <div class="atl-progress"><div class="atl-progress-fill" style="width:25%;background:#00875A"></div></div>
+                            <p class="text-xs mt-1" style="color:#6B778C">Delivery ahead of contractual milestones</p>
+                        </div>
+                        <!-- Thames Water -->
+                        <div class="amp8-row">
+                            <div class="flex items-center justify-between mb-2">
+                                <div>
+                                    <span class="text-sm font-600" style="font-weight:600;color:#172B4D">Thames Water</span>
+                                    <span class="ml-2 loz loz-gray">Ongoing since 2015</span>
+                                </div>
+                                <span class="text-sm font-600" style="color:#974F0C;font-weight:600">1.2M+ continuing</span>
+                            </div>
+                            <div class="atl-progress"><div class="atl-progress-fill" style="width:60%;background:#FF991F"></div></div>
+                            <p class="text-xs mt-1" style="color:#6B778C">Long-running partnership, ongoing deployment</p>
+                        </div>
+                        <!-- Portsmouth Water -->
+                        <div class="amp8-row">
+                            <div class="flex items-center justify-between mb-2">
+                                <div>
+                                    <span class="text-sm font-600" style="font-weight:600;color:#172B4D">Portsmouth Water</span>
+                                    <span class="ml-2 loz loz-amber">Trials</span>
+                                    <span class="ml-1 loz loz-gray">20 yr (8 deliver + 12 support)</span>
+                                </div>
+                                <span class="text-sm font-600" style="color:#974F0C;font-weight:600">2,700 / 157,900 (2%)</span>
+                            </div>
+                            <div class="atl-progress"><div class="atl-progress-fill" style="width:2%;background:#FF991F"></div></div>
+                            <p class="text-xs mt-1" style="color:#6B778C">Trial phase complete, full rollout pending</p>
+                        </div>
+                        <!-- Northumbrian -->
+                        <div class="amp8-row" style="border-bottom:none">
+                            <div class="flex items-center justify-between mb-2">
+                                <div>
+                                    <span class="text-sm font-600" style="font-weight:600;color:#172B4D">Northumbrian Water</span>
+                                    <span class="ml-2 loz loz-gray">Under Negotiation</span>
+                                    <span class="ml-1 loz loz-gray">15 yr proposed</span>
+                                </div>
+                                <span class="text-sm font-600" style="color:#6B778C;font-weight:600">50,000 proposed</span>
+                            </div>
+                            <div class="atl-progress"><div class="atl-progress-fill" style="width:0%;background:#DFE1E6"></div></div>
+                            <p class="text-xs mt-1" style="color:#6B778C">Contract negotiation in progress</p>
                         </div>
                     </div>
-                    <div class="bg-white rounded-xl p-6 shadow-sm">
-                        <h3 class="font-semibold text-gray-800 mb-4">Portfolio Strategic Alignment</h3>
-                        <div class="grid grid-cols-4 gap-4">
-                            <div class="border rounded-lg p-4">
-                                <div class="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center mb-3"><i class="fas fa-droplet text-blue-600"></i></div>
-                                <h4 class="font-medium text-gray-800">Smart Utilities</h4>
-                                <p class="text-xs text-gray-500 mt-1">Reduce leakage 30ML/day</p>
-                                <div class="mt-3 flex items-center gap-2"><span class="text-2xl font-bold">£50M</span><span class="text-xs text-gray-500">budget</span></div>
-                                <div class="mt-2 flex gap-1">
-                                    <span class="px-2 py-1 bg-green-100 text-green-700 rounded text-xs">1G</span>
-                                    <span class="px-2 py-1 bg-amber-100 text-amber-700 rounded text-xs">1A</span>
-                                    <span class="px-2 py-1 bg-red-100 text-red-700 rounded text-xs">1R</span>
-                                </div>
-                            </div>
-                            <div class="border rounded-lg p-4">
-                                <div class="w-10 h-10 bg-purple-100 rounded-lg flex items-center justify-center mb-3"><i class="fas fa-tower-broadcast text-purple-600"></i></div>
-                                <h4 class="font-medium text-gray-800">Media & Broadcast</h4>
-                                <p class="text-xs text-gray-500 mt-1">Double media revenue</p>
-                                <div class="mt-3 flex items-center gap-2"><span class="text-2xl font-bold">£35M</span><span class="text-xs text-gray-500">budget</span></div>
-                                <div class="mt-2 flex gap-1"><span class="px-2 py-1 bg-green-100 text-green-700 rounded text-xs">2G</span></div>
-                            </div>
-                            <div class="border rounded-lg p-4">
-                                <div class="w-10 h-10 bg-red-100 rounded-lg flex items-center justify-center mb-3"><i class="fas fa-shield-halved text-red-600"></i></div>
-                                <h4 class="font-medium text-gray-800">Enablement</h4>
-                                <p class="text-xs text-gray-500 mt-1">Protect CNI infrastructure</p>
-                                <div class="mt-3 flex items-center gap-2"><span class="text-2xl font-bold">£25M</span><span class="text-xs text-gray-500">budget</span></div>
-                                <div class="mt-2 flex gap-1"><span class="px-2 py-1 bg-red-100 text-red-700 rounded text-xs">1R</span></div>
-                            </div>
-                            <div class="border rounded-lg p-4">
-                                <div class="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center mb-3"><i class="fas fa-map-pin text-green-600"></i></div>
-                                <h4 class="font-medium text-gray-800">Infrastructure</h4>
-                                <p class="text-xs text-gray-500 mt-1">Protect 1,800+ sites</p>
-                                <div class="mt-3 flex items-center gap-2"><span class="text-2xl font-bold">£40M</span><span class="text-xs text-gray-500">budget</span></div>
-                                <div class="mt-2 flex gap-1"><span class="px-2 py-1 bg-amber-100 text-amber-700 rounded text-xs">1A</span></div>
-                            </div>
-                        </div>
-                    </div>
-                </section>
+                </div>
 
-                <!-- PROJECTS (Live CRUD) -->
-                <section id="projects" class="section-content hidden">
-                    <div class="bg-white rounded-xl shadow-sm overflow-hidden">
-                        <div class="px-6 py-4 border-b flex items-center justify-between">
-                            <h3 class="font-semibold text-gray-800">All Projects</h3>
-                            <div class="flex items-center gap-3">
-                                <select id="filter-status" onchange="loadProjects()" class="form-select text-sm w-40">
-                                    <option value="all">All Status</option>
-                                    <option value="Green">Green</option>
-                                    <option value="Amber">Amber</option>
-                                    <option value="Red">Red</option>
-                                </select>
-                                <button onclick="openCreateProjectModal()" class="btn-primary text-sm"><i class="fas fa-plus mr-2"></i>New Project</button>
+                <div class="atl-card">
+                    <div class="atl-card-header"><p class="atl-card-title">Managed Sensors Pipeline</p></div>
+                    <div class="p-5 grid grid-cols-3 gap-4">
+                        <div class="p-4 rounded" style="background:#E3FCEF;border:1px solid #ABF5D1">
+                            <i class="fas fa-water text-green-700 mb-2"></i>
+                            <p class="text-sm font-600" style="color:#006644;font-weight:600">Water Quality Monitoring</p>
+                            <p class="text-xs mt-1" style="color:#006644">Leveraging smart network infrastructure</p>
+                            <span class="loz loz-teal mt-2 inline-block">In Development</span>
+                        </div>
+                        <div class="p-4 rounded" style="background:#E3FCEF;border:1px solid #ABF5D1">
+                            <i class="fas fa-arrow-up text-green-700 mb-2"></i>
+                            <p class="text-sm font-600" style="color:#006644;font-weight:600">Sewer Level Monitoring</p>
+                            <p class="text-xs mt-1" style="color:#006644">Early flood prevention alerts</p>
+                            <span class="loz loz-teal mt-2 inline-block">In Development</span>
+                        </div>
+                        <div class="p-4 rounded" style="background:#FFFAE6;border:1px solid #FFE380">
+                            <i class="fas fa-gauge text-yellow-700 mb-2"></i>
+                            <p class="text-sm font-600" style="color:#974F0C;font-weight:600">Pressure Measurement</p>
+                            <p class="text-xs mt-1" style="color:#974F0C">Network integrity monitoring</p>
+                            <span class="loz loz-amber mt-2 inline-block">Planned</span>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ═══════════════════════════════════════════════
+                 GOVERNANCE MATURITY
+            ═══════════════════════════════════════════════ -->
+            <section id="governance" class="section-content fade-in">
+                <div class="grid grid-cols-3 gap-4 mb-6">
+                    <div class="kpi-card">
+                        <p class="kpi-label">P3O Maturity Level</p>
+                        <p class="kpi-value" style="color:#0052CC">Level 3</p>
+                        <p class="text-xs mt-2" style="color:#6B778C">Defined — advancing to Managed</p>
+                    </div>
+                    <div class="kpi-card">
+                        <p class="kpi-label">MoP Compliance</p>
+                        <p class="kpi-value" style="color:#006644">78%</p>
+                        <p class="text-xs mt-2" style="color:#6B778C">5 of 5 principles adopted</p>
+                    </div>
+                    <div class="kpi-card">
+                        <p class="kpi-label">Governance Score</p>
+                        <p class="kpi-value" style="color:#974F0C">84%</p>
+                        <p class="text-xs mt-2" style="color:#6B778C">Up from 61% at PMO baseline (Apr 2023)</p>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-2 gap-4 mb-4">
+                    <div class="atl-card">
+                        <div class="atl-card-header"><p class="atl-card-title">P3O / MoP Maturity Radar</p></div>
+                        <div class="p-4"><div class="radar-box"><canvas id="governanceRadar"></canvas></div></div>
+                    </div>
+                    <div class="atl-card">
+                        <div class="atl-card-header"><p class="atl-card-title">Framework Implementation Status</p></div>
+                        <div class="p-5 space-y-4">
+                            <div>
+                                <div class="flex justify-between text-sm mb-1"><span style="color:#172B4D;font-weight:500">Governance Framework Redesign</span><span class="loz loz-green">Advanced</span></div>
+                                <div class="atl-progress"><div class="atl-progress-fill bg-green-500" style="width:85%"></div></div>
+                            </div>
+                            <div>
+                                <div class="flex justify-between text-sm mb-1"><span style="color:#172B4D;font-weight:500">ServiceNow SPM Adoption</span><span class="loz loz-blue">In Progress</span></div>
+                                <div class="atl-progress"><div class="atl-progress-fill" style="width:60%;background:#0052CC"></div></div>
+                            </div>
+                            <div>
+                                <div class="flex justify-between text-sm mb-1"><span style="color:#172B4D;font-weight:500">Benefits Realisation Management</span><span class="loz loz-amber">Developing</span></div>
+                                <div class="atl-progress"><div class="atl-progress-fill" style="width:40%;background:#FF991F"></div></div>
+                            </div>
+                            <div>
+                                <div class="flex justify-between text-sm mb-1"><span style="color:#172B4D;font-weight:500">Executive Reporting Enhancement</span><span class="loz loz-green">Active</span></div>
+                                <div class="atl-progress"><div class="atl-progress-fill bg-green-500" style="width:75%"></div></div>
+                            </div>
+                            <div>
+                                <div class="flex justify-between text-sm mb-1"><span style="color:#172B4D;font-weight:500">AI-Enhanced Decision Support</span><span class="loz loz-purple">Pilot</span></div>
+                                <div class="atl-progress"><div class="atl-progress-fill" style="width:20%;background:#6554C0"></div></div>
+                            </div>
+                            <div>
+                                <div class="flex justify-between text-sm mb-1"><span style="color:#172B4D;font-weight:500">Process Standardisation</span><span class="loz loz-green">Advanced</span></div>
+                                <div class="atl-progress"><div class="atl-progress-fill bg-green-500" style="width:80%"></div></div>
                             </div>
                         </div>
-                        <table class="w-full">
-                            <thead class="bg-gray-50">
-                                <tr>
-                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Project</th>
-                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Manager</th>
-                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Status</th>
-                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Budget</th>
-                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Actions</th>
-                                </tr>
-                            </thead>
-                            <tbody id="projects-table-body" class="divide-y divide-gray-100"></tbody>
-                        </table>
                     </div>
-                </section>
+                </div>
 
-                <!-- DEMAND INTAKE -->
-                <section id="demand" class="section-content hidden">
-                    <div class="grid grid-cols-3 gap-6 mb-8">
-                        <div class="bg-white rounded-xl p-6 shadow-sm col-span-2">
-                            <h3 class="font-semibold text-gray-800 mb-4">Value Scoring Breakdown</h3>
-                            <div class="chart-container"><canvas id="valueScoringChart"></canvas></div>
+                <div class="atl-card">
+                    <div class="atl-card-header"><p class="atl-card-title">MoP Five Principles — Arqiva Alignment</p></div>
+                    <div class="grid grid-cols-5 gap-0">
+                        <div class="p-4 text-center border-r" style="border-color:#EBECF0">
+                            <div class="w-10 h-10 rounded-full bg-green-100 flex items-center justify-center mx-auto mb-2"><i class="fas fa-check text-green-600 text-sm"></i></div>
+                            <p class="text-xs font-600" style="font-weight:600;color:#172B4D">Senior Mgmt Commitment</p>
+                            <p class="text-xs mt-1" style="color:#6B778C">Shuja Khan / Polus Capital backing</p>
                         </div>
-                        <div class="bg-white rounded-xl p-6 shadow-sm">
-                            <h3 class="font-semibold text-gray-800 mb-4">Submit New Demand</h3>
+                        <div class="p-4 text-center border-r" style="border-color:#EBECF0">
+                            <div class="w-10 h-10 rounded-full bg-green-100 flex items-center justify-center mx-auto mb-2"><i class="fas fa-check text-green-600 text-sm"></i></div>
+                            <p class="text-xs font-600" style="font-weight:600;color:#172B4D">Governance Alignment</p>
+                            <p class="text-xs mt-1" style="color:#6B778C">VMO within corporate function</p>
+                        </div>
+                        <div class="p-4 text-center border-r" style="border-color:#EBECF0">
+                            <div class="w-10 h-10 rounded-full bg-green-100 flex items-center justify-center mx-auto mb-2"><i class="fas fa-check text-green-600 text-sm"></i></div>
+                            <p class="text-xs font-600" style="font-weight:600;color:#172B4D">Strategy Alignment</p>
+                            <p class="text-xs mt-1" style="color:#6B778C">Vision 2031 four pillars</p>
+                        </div>
+                        <div class="p-4 text-center border-r" style="border-color:#EBECF0">
+                            <div class="w-10 h-10 rounded-full bg-green-100 flex items-center justify-center mx-auto mb-2"><i class="fas fa-check text-green-600 text-sm"></i></div>
+                            <p class="text-xs font-600" style="font-weight:600;color:#172B4D">Portfolio Office</p>
+                            <p class="text-xs mt-1" style="color:#6B778C">VMO established Apr 2023</p>
+                        </div>
+                        <div class="p-4 text-center">
+                            <div class="w-10 h-10 rounded-full bg-amber-100 flex items-center justify-center mx-auto mb-2"><i class="fas fa-spinner text-amber-600 text-sm"></i></div>
+                            <p class="text-xs font-600" style="font-weight:600;color:#172B4D">Energised Change Culture</p>
+                            <p class="text-xs mt-1" style="color:#6B778C">Change champions programme</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ═══════════════════════════════════════════════
+                 PROJECTS (live CRUD)
+            ═══════════════════════════════════════════════ -->
+            <section id="projects" class="section-content fade-in">
+                <div class="atl-card">
+                    <div class="atl-card-header">
+                        <p class="atl-card-title">All Projects</p>
+                        <div class="flex items-center gap-2">
+                            <select id="filter-status" onchange="loadProjects()" class="atl-select text-sm" style="width:140px;padding:5px 10px">
+                                <option value="all">All Status</option>
+                                <option value="Green">Green</option>
+                                <option value="Amber">Amber</option>
+                                <option value="Red">Red</option>
+                            </select>
+                            <button onclick="openCreateProjectModal()" class="btn-atl-primary"><i class="fas fa-plus mr-1 text-xs"></i> New Project</button>
+                        </div>
+                    </div>
+                    <table class="atl-table">
+                        <thead>
+                            <tr>
+                                <th>Project</th>
+                                <th>Manager</th>
+                                <th>V2031 Pillar</th>
+                                <th>Status</th>
+                                <th>Budget</th>
+                                <th>RAG Reason</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="projects-table-body"></tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- ═══════════════════════════════════════════════
+                 DEMAND INTAKE (live)
+            ═══════════════════════════════════════════════ -->
+            <section id="demand" class="section-content fade-in">
+                <div class="grid grid-cols-3 gap-4 mb-4">
+                    <div class="atl-card col-span-2">
+                        <div class="atl-card-header"><p class="atl-card-title">VMO 4-Lens Value Scoring</p></div>
+                        <div class="p-4"><div class="chart-box"><canvas id="valueScoringChart"></canvas></div></div>
+                    </div>
+                    <div class="atl-card">
+                        <div class="atl-card-header"><p class="atl-card-title">Submit New Demand</p></div>
+                        <div class="p-4">
                             <form id="demand-form" onsubmit="submitDemand(event)" class="space-y-3">
                                 <div>
-                                    <label class="form-label">Title</label>
-                                    <input type="text" id="demand-title" class="form-input" required placeholder="Demand title">
+                                    <label class="atl-label">Title</label>
+                                    <input type="text" id="demand-title" class="atl-input" required placeholder="Demand title">
                                 </div>
                                 <div>
-                                    <label class="form-label">Business Area</label>
-                                    <input type="text" id="demand-area" class="form-input" required placeholder="e.g. Smart Utilities">
+                                    <label class="atl-label">Business Area</label>
+                                    <input type="text" id="demand-area" class="atl-input" placeholder="e.g. Smart Utilities">
                                 </div>
                                 <div>
-                                    <label class="form-label">Expected Benefit (£)</label>
-                                    <input type="number" id="demand-benefit" class="form-input" required>
+                                    <label class="atl-label">Expected Benefit (£)</label>
+                                    <input type="number" id="demand-benefit" class="atl-input" required>
                                 </div>
                                 <div>
-                                    <label class="form-label">Strategic Alignment: <span id="alignment-value">5</span></label>
-                                    <input type="range" id="demand-alignment" min="1" max="10" value="5" oninput="updateDemandScore()" class="w-full">
+                                    <label class="atl-label">Strategic Alignment <span id="alignment-value" class="text-blue-600">5</span>/10</label>
+                                    <input type="range" id="demand-alignment" min="1" max="10" value="5" oninput="updateDemandScore()" class="w-full accent-blue-600">
                                 </div>
                                 <div>
-                                    <label class="form-label">Regulatory: <span id="regulatory-value">5</span></label>
-                                    <input type="range" id="demand-regulatory" min="1" max="10" value="5" oninput="updateDemandScore()" class="w-full">
+                                    <label class="atl-label">Regulatory Impact <span id="regulatory-value" class="text-blue-600">5</span>/10</label>
+                                    <input type="range" id="demand-regulatory" min="1" max="10" value="5" oninput="updateDemandScore()" class="w-full accent-blue-600">
                                 </div>
                                 <div>
-                                    <label class="form-label">Feasibility: <span id="feasibility-value">5</span></label>
-                                    <input type="range" id="demand-feasibility" min="1" max="10" value="5" oninput="updateDemandScore()" class="w-full">
+                                    <label class="atl-label">Feasibility <span id="feasibility-value" class="text-blue-600">5</span>/10</label>
+                                    <input type="range" id="demand-feasibility" min="1" max="10" value="5" oninput="updateDemandScore()" class="w-full accent-blue-600">
                                 </div>
                                 <div>
-                                    <label class="form-label">Commercial: <span id="commercial-value">5</span></label>
-                                    <input type="range" id="demand-commercial" min="1" max="10" value="5" oninput="updateDemandScore()" class="w-full">
+                                    <label class="atl-label">Commercial Value <span id="commercial-value" class="text-blue-600">5</span>/10</label>
+                                    <input type="range" id="demand-commercial" min="1" max="10" value="5" oninput="updateDemandScore()" class="w-full accent-blue-600">
                                 </div>
-                                <div class="p-3 bg-blue-50 rounded-lg text-center">
-                                    <p class="text-xs text-gray-500">VMO Score</p>
-                                    <p id="vmo-score" class="text-3xl font-bold text-blue-600">5.00</p>
+                                <div class="p-3 rounded text-center" style="background:#DEEBFF">
+                                    <p class="text-xs font-600" style="color:#0052CC;font-weight:600">VMO SCORE</p>
+                                    <p id="vmo-score" class="text-3xl font-700" style="color:#0052CC;font-weight:700">5.00</p>
                                 </div>
-                                <button type="submit" class="btn-primary w-full">Submit Demand</button>
+                                <button type="submit" class="btn-atl-primary w-full">Submit Demand</button>
                             </form>
                         </div>
                     </div>
-                    <div class="bg-white rounded-xl shadow-sm overflow-hidden">
-                        <div class="px-6 py-4 border-b"><h3 class="font-semibold text-gray-800">Demand Pipeline</h3></div>
-                        <div id="demand-pipeline" class="p-6 space-y-4"></div>
-                    </div>
-                </section>
+                </div>
+                <div class="atl-card">
+                    <div class="atl-card-header"><p class="atl-card-title">Demand Pipeline</p></div>
+                    <div id="demand-pipeline" class="p-4 space-y-3"></div>
+                </div>
+            </section>
 
-                <!-- DELIVERY CONTROL -->
-                <section id="delivery" class="section-content hidden">
-                    <div class="grid grid-cols-2 gap-6 mb-8">
-                        <div class="bg-white rounded-xl p-6 shadow-sm">
-                            <h3 class="font-semibold text-gray-800 mb-4">Methodology-Agnostic Portfolio Gantt</h3>
-                            <div class="space-y-4">
-                                <div>
-                                    <div class="flex items-center justify-between text-sm mb-2"><span class="font-medium">PRJ-AMP8-UU (Waterfall)</span><span class="text-amber-600">Amber</span></div>
-                                    <div class="flex gap-1">
-                                        <div class="flex-1 h-8 bg-green-500 rounded-l text-xs text-white flex items-center justify-center">Feasibility</div>
-                                        <div class="flex-1 h-8 bg-green-500 text-xs text-white flex items-center justify-center">Audit</div>
-                                        <div class="flex-1 h-8 bg-amber-500 text-xs text-white flex items-center justify-center">Rigging</div>
-                                        <div class="flex-1 h-8 bg-gray-200 rounded-r text-xs text-gray-500 flex items-center justify-center">Commission</div>
-                                    </div>
-                                </div>
-                                <div>
-                                    <div class="flex items-center justify-between text-sm mb-2"><span class="font-medium">PRJ-M&B-AWS (Hybrid)</span><span class="text-green-600">Green</span></div>
-                                    <div class="flex gap-1">
-                                        <div class="flex-1 h-8 bg-green-500 rounded-l text-xs text-white flex items-center justify-center">Sprint 1-3</div>
-                                        <div class="flex-1 h-8 bg-green-500 text-xs text-white flex items-center justify-center">Sprint 4-6</div>
-                                        <div class="flex-1 h-8 bg-blue-500 text-xs text-white flex items-center justify-center">Sprint 7-9</div>
-                                        <div class="flex-1 h-8 bg-gray-200 rounded-r text-xs text-gray-500 flex items-center justify-center">Release 2</div>
-                                    </div>
-                                </div>
-                                <div>
-                                    <div class="flex items-center justify-between text-sm mb-2"><span class="font-medium">PRJ-CNI-SEC (Agile)</span><span class="text-red-600">Red</span></div>
-                                    <div class="flex gap-1">
-                                        <div class="flex-1 h-8 bg-green-500 rounded-l text-xs text-white flex items-center justify-center">Sprint 1</div>
-                                        <div class="flex-1 h-8 bg-red-500 text-xs text-white flex items-center justify-center">Sprint 2</div>
-                                        <div class="flex-1 h-8 bg-gray-200 text-xs text-gray-500 flex items-center justify-center">Sprint 3</div>
-                                        <div class="flex-1 h-8 bg-gray-200 rounded-r text-xs text-gray-500 flex items-center justify-center">Sprint 4</div>
-                                    </div>
+            <!-- ═══════════════════════════════════════════════
+                 DELIVERY CONTROL
+            ═══════════════════════════════════════════════ -->
+            <section id="delivery" class="section-content fade-in">
+                <div class="grid grid-cols-2 gap-4 mb-4">
+                    <div class="atl-card">
+                        <div class="atl-card-header"><p class="atl-card-title">Portfolio Gantt Overview</p></div>
+                        <div class="p-5 space-y-5">
+                            <div>
+                                <div class="flex items-center justify-between text-sm mb-2"><span class="font-600" style="font-weight:600">PRJ-AMP8-UU</span><span class="loz loz-amber">Amber</span></div>
+                                <div class="flex gap-1">
+                                    <div class="flex-1 h-7 bg-green-500 rounded-l text-xs text-white flex items-center justify-center" style="font-size:11px">Feasibility</div>
+                                    <div class="flex-1 h-7 bg-green-500 text-xs text-white flex items-center justify-center" style="font-size:11px">Site Audit</div>
+                                    <div class="flex-1 h-7 bg-amber-500 text-xs text-white flex items-center justify-center" style="font-size:11px">Rigging ⚠</div>
+                                    <div class="flex-1 h-7 rounded-r text-xs flex items-center justify-center" style="background:#DFE1E6;color:#6B778C;font-size:11px">Commission</div>
                                 </div>
                             </div>
-                        </div>
-                        <div class="bg-white rounded-xl p-6 shadow-sm">
-                            <h3 class="font-semibold text-gray-800 mb-4">Milestone Status</h3>
-                            <div class="space-y-3">
-                                <div class="flex items-center justify-between p-3 border rounded-lg">
-                                    <div><p class="text-sm font-medium">Site Access Audit Complete</p><p class="text-xs text-gray-500">PRJ-AMP8-UU | Planned: 01 Mar</p></div>
-                                    <span class="px-2 py-1 bg-green-100 text-green-700 rounded text-xs">Completed 15 Mar</span>
+                            <div>
+                                <div class="flex items-center justify-between text-sm mb-2"><span class="font-600" style="font-weight:600">PRJ-M&B-AWS</span><span class="loz loz-green">Green</span></div>
+                                <div class="flex gap-1">
+                                    <div class="flex-1 h-7 bg-green-500 rounded-l text-xs text-white flex items-center justify-center" style="font-size:11px">Sp 1–3 ✓</div>
+                                    <div class="flex-1 h-7 bg-green-500 text-xs text-white flex items-center justify-center" style="font-size:11px">Sp 4–6 ✓</div>
+                                    <div class="flex-1 h-7 text-xs text-white flex items-center justify-center" style="background:#0052CC;font-size:11px">Sp 7–9</div>
+                                    <div class="flex-1 h-7 rounded-r text-xs flex items-center justify-center" style="background:#DFE1E6;color:#6B778C;font-size:11px">Release 2</div>
                                 </div>
-                                <div class="flex items-center justify-between p-3 border rounded-lg border-amber-300">
-                                    <div><p class="text-sm font-medium">Rigging Mobilisation</p><p class="text-xs text-gray-500">PRJ-AMP8-UU | Planned: 01 Apr</p></div>
-                                    <span class="px-2 py-1 bg-amber-100 text-amber-700 rounded text-xs">Delayed 35%</span>
-                                </div>
-                                <div class="flex items-center justify-between p-3 border rounded-lg border-red-300">
-                                    <div><p class="text-sm font-medium">Government API Integration</p><p class="text-xs text-gray-500">PRJ-CNI-SEC | Planned: 30 Jun</p></div>
-                                    <span class="px-2 py-1 bg-red-100 text-red-700 rounded text-xs">Delayed 15%</span>
-                                </div>
-                                <div class="flex items-center justify-between p-3 border rounded-lg">
-                                    <div><p class="text-sm font-medium">45 Channels Migrated (Phase 1)</p><p class="text-xs text-gray-500">PRJ-M&B-AWS | Planned: 30 Jun</p></div>
-                                    <span class="px-2 py-1 bg-blue-100 text-blue-700 rounded text-xs">In Progress 78%</span>
+                            </div>
+                            <div>
+                                <div class="flex items-center justify-between text-sm mb-2"><span class="font-600" style="font-weight:600">PRJ-CNI-SEC</span><span class="loz loz-red">Red</span></div>
+                                <div class="flex gap-1">
+                                    <div class="flex-1 h-7 bg-green-500 rounded-l text-xs text-white flex items-center justify-center" style="font-size:11px">Sprint 1</div>
+                                    <div class="flex-1 h-7 bg-red-500 text-xs text-white flex items-center justify-center" style="font-size:11px">Sprint 2 ✕</div>
+                                    <div class="flex-1 h-7 text-xs flex items-center justify-center" style="background:#DFE1E6;color:#6B778C;font-size:11px">Sprint 3</div>
+                                    <div class="flex-1 h-7 rounded-r text-xs flex items-center justify-center" style="background:#DFE1E6;color:#6B778C;font-size:11px">Sprint 4</div>
                                 </div>
                             </div>
                         </div>
                     </div>
-                </section>
+                    <div class="atl-card">
+                        <div class="atl-card-header"><p class="atl-card-title">Milestone Status</p></div>
+                        <div class="p-4 space-y-2">
+                            <div class="flex items-center justify-between p-3 rounded" style="border:1px solid #ABF5D1;background:#E3FCEF">
+                                <div><p class="text-sm font-600" style="font-weight:500">Site Access Audit Complete</p><p class="text-xs" style="color:#6B778C">PRJ-AMP8-UU · Planned 01 Mar</p></div>
+                                <span class="loz loz-green">Done 15 Mar</span>
+                            </div>
+                            <div class="flex items-center justify-between p-3 rounded" style="border:1px solid #FFE380;background:#FFFAE6">
+                                <div><p class="text-sm font-600" style="font-weight:500">Rigging Mobilisation</p><p class="text-xs" style="color:#6B778C">PRJ-AMP8-UU · Planned 01 Apr</p></div>
+                                <span class="loz loz-amber">Delayed 35%</span>
+                            </div>
+                            <div class="flex items-center justify-between p-3 rounded" style="border:1px solid #FFBDAD;background:#FFEBE6">
+                                <div><p class="text-sm font-600" style="font-weight:500">Government API Integration</p><p class="text-xs" style="color:#6B778C">PRJ-CNI-SEC · Planned 30 Jun</p></div>
+                                <span class="loz loz-red">Blocked</span>
+                            </div>
+                            <div class="flex items-center justify-between p-3 rounded" style="border:1px solid #B3D4FF;background:#DEEBFF">
+                                <div><p class="text-sm font-600" style="font-weight:500">45 Channels Migrated (Phase 1)</p><p class="text-xs" style="color:#6B778C">PRJ-M&B-AWS · Planned 30 Jun</p></div>
+                                <span class="loz loz-blue">78% Done</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
 
-                <!-- RIDAC HUB -->
-                <section id="ridac" class="section-content hidden">
-                    <div class="flex gap-4 mb-6">
-                        <button onclick="filterRIDAC('all')" class="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg text-sm font-medium">All</button>
-                        <button onclick="filterRIDAC('Risk')" class="px-4 py-2 bg-red-100 text-red-700 rounded-lg text-sm font-medium">Risks</button>
-                        <button onclick="filterRIDAC('Issue')" class="px-4 py-2 bg-orange-100 text-orange-700 rounded-lg text-sm font-medium">Issues</button>
-                        <button onclick="filterRIDAC('Decision')" class="px-4 py-2 bg-blue-100 text-blue-700 rounded-lg text-sm font-medium">Decisions</button>
-                        <button onclick="filterRIDAC('Action')" class="px-4 py-2 bg-green-100 text-green-700 rounded-lg text-sm font-medium">Actions</button>
-                        <button onclick="filterRIDAC('Change')" class="px-4 py-2 bg-purple-100 text-purple-700 rounded-lg text-sm font-medium">Changes</button>
-                        <button onclick="openCreateRIDACModal()" class="ml-auto btn-primary text-sm"><i class="fas fa-plus mr-2"></i>Add Item</button>
-                    </div>
-                    <div id="ridac-container" class="space-y-4"></div>
-                </section>
+            <!-- ═══════════════════════════════════════════════
+                 RIDAC HUB (live)
+            ═══════════════════════════════════════════════ -->
+            <section id="ridac" class="section-content fade-in">
+                <div class="flex items-center gap-2 mb-4 flex-wrap">
+                    <button onclick="filterRIDAC('all')" class="btn-atl-subtle text-xs">All</button>
+                    <button onclick="filterRIDAC('Risk')" class="btn-sm btn-sm-red">Risk</button>
+                    <button onclick="filterRIDAC('Issue')" style="background:#FFF0E6;color:#974F0C" class="btn-sm">Issue</button>
+                    <button onclick="filterRIDAC('Decision')" style="background:#DEEBFF;color:#0052CC" class="btn-sm">Decision</button>
+                    <button onclick="filterRIDAC('Action')" style="background:#E3FCEF;color:#006644" class="btn-sm">Action</button>
+                    <button onclick="filterRIDAC('Change')" style="background:#EAE6FF;color:#403294" class="btn-sm">Change</button>
+                    <button onclick="openCreateRIDACModal()" class="btn-atl-primary ml-auto"><i class="fas fa-plus mr-1 text-xs"></i> Add Item</button>
+                </div>
+                <div id="ridac-container" class="space-y-3"></div>
+            </section>
 
-                <!-- VALUE REALISATION -->
-                <section id="value" class="section-content hidden">
-                    <div class="grid grid-cols-3 gap-6 mb-8">
-                        <div class="bg-white rounded-xl p-6 shadow-sm">
-                            <h3 class="font-semibold text-gray-800 mb-4">Benefit Realisation</h3>
-                            <div id="benefits-list" class="space-y-4"></div>
+            <!-- ═══════════════════════════════════════════════
+                 VALUE REALISATION (live)
+            ═══════════════════════════════════════════════ -->
+            <section id="value" class="section-content fade-in">
+                <div class="grid grid-cols-3 gap-4 mb-4">
+                    <div class="atl-card">
+                        <div class="atl-card-header"><p class="atl-card-title">Benefit Realisation</p></div>
+                        <div id="benefits-list" class="p-4 space-y-3"></div>
+                    </div>
+                    <div class="atl-card col-span-2">
+                        <div class="atl-card-header"><p class="atl-card-title">Planned vs Actual Benefits</p></div>
+                        <div class="p-4"><div class="chart-box"><canvas id="benefitChart"></canvas></div></div>
+                    </div>
+                </div>
+                <div class="atl-card">
+                    <div class="atl-card-header"><p class="atl-card-title">Continuous Improvement Feedback Loop</p></div>
+                    <div class="grid grid-cols-3 gap-0">
+                        <div class="p-5 text-center border-r" style="border-color:#EBECF0">
+                            <div class="w-12 h-12 rounded-full bg-blue-100 flex items-center justify-center mx-auto mb-3"><i class="fas fa-comments text-blue-600"></i></div>
+                            <h4 class="text-sm font-600 mb-1" style="font-weight:600;color:#172B4D">Stakeholder Feedback</h4>
+                            <p class="text-xs" style="color:#6B778C">Field reports, surveys, team retrospectives</p>
+                            <p class="text-xs mt-2 font-600" style="color:#0052CC;font-weight:600">340 items this quarter</p>
                         </div>
-                        <div class="bg-white rounded-xl p-6 shadow-sm col-span-2">
-                            <h3 class="font-semibold text-gray-800 mb-4">Planned vs Actual Benefits</h3>
-                            <div class="chart-container"><canvas id="benefitChart"></canvas></div>
+                        <div class="p-5 text-center border-r" style="border-color:#EBECF0">
+                            <div class="w-12 h-12 rounded-full bg-amber-100 flex items-center justify-center mx-auto mb-3"><i class="fas fa-sliders text-amber-600"></i></div>
+                            <h4 class="text-sm font-600 mb-1" style="font-weight:600;color:#172B4D">VMO Process Adjustment</h4>
+                            <p class="text-xs" style="color:#6B778C">Root cause analysis, improvement design</p>
+                            <p class="text-xs mt-2 font-600" style="color:#974F0C;font-weight:600">12 changes implemented</p>
+                        </div>
+                        <div class="p-5 text-center">
+                            <div class="w-12 h-12 rounded-full bg-green-100 flex items-center justify-center mx-auto mb-3"><i class="fas fa-chart-line text-green-600"></i></div>
+                            <h4 class="text-sm font-600 mb-1" style="font-weight:600;color:#172B4D">Metric Refresh</h4>
+                            <p class="text-xs" style="color:#6B778C">Real-time KPI updates, automated alerts</p>
+                            <p class="text-xs mt-2 font-600" style="color:#006644;font-weight:600">Updated daily from Supabase</p>
                         </div>
                     </div>
-                    <div class="bg-white rounded-xl p-6 shadow-sm">
-                        <h3 class="font-semibold text-gray-800 mb-4">Continuous Improvement Feedback Loop</h3>
-                        <div class="flex items-center justify-between">
-                            <div class="flex-1 text-center p-4">
-                                <div class="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-3"><i class="fas fa-comments text-blue-600 text-xl"></i></div>
-                                <h4 class="font-medium text-gray-800">Stakeholder Feedback</h4>
-                                <p class="text-xs text-gray-500 mt-1">Field reports, customer surveys, team retrospectives</p>
-                                <div class="mt-2 text-xs text-blue-600 font-medium">340 feedback items this quarter</div>
-                            </div>
-                            <div class="text-2xl text-gray-300">→</div>
-                            <div class="flex-1 text-center p-4">
-                                <div class="w-16 h-16 bg-amber-100 rounded-full flex items-center justify-center mx-auto mb-3"><i class="fas fa-sliders text-amber-600 text-xl"></i></div>
-                                <h4 class="font-medium text-gray-800">VMO Process Adjustment</h4>
-                                <p class="text-xs text-gray-500 mt-1">Analyse patterns, identify root causes, design improvements</p>
-                                <div class="mt-2 text-xs text-amber-600 font-medium">12 process changes implemented</div>
-                            </div>
-                            <div class="text-2xl text-gray-300">→</div>
-                            <div class="flex-1 text-center p-4">
-                                <div class="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-3"><i class="fas fa-chart-line text-green-600 text-xl"></i></div>
-                                <h4 class="font-medium text-gray-800">Dashboard Metric Updates</h4>
-                                <p class="text-xs text-gray-500 mt-1">Real-time KPI refresh, automated alerts, executive reporting</p>
-                                <div class="mt-2 text-xs text-green-600 font-medium">Metrics updated daily</div>
-                            </div>
-                        </div>
-                    </div>
-                </section>
+                </div>
+            </section>
 
-                <!-- PROCESS IMPROVEMENT -->
-                <section id="process" class="section-content hidden">
-                    <div class="grid grid-cols-2 gap-6 mb-8">
-                        <div class="bg-white rounded-xl p-6 shadow-sm">
-                            <h3 class="font-semibold text-gray-800 mb-4">Process Improvement Pipeline</h3>
-                            <div class="space-y-3">
-                                <div class="flex items-center gap-3 p-3 bg-green-50 rounded-lg border border-green-200">
-                                    <div class="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center"><i class="fas fa-check text-green-600"></i></div>
-                                    <div class="flex-1"><p class="text-sm font-medium">Contract Approval Process</p><p class="text-xs text-gray-500">60% faster | 15 days → 6 days</p></div>
-                                    <span class="px-2 py-1 bg-green-100 text-green-700 rounded text-xs">Validated</span>
-                                </div>
-                                <div class="flex items-center gap-3 p-3 bg-green-50 rounded-lg border border-green-200">
-                                    <div class="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center"><i class="fas fa-check text-green-600"></i></div>
-                                    <div class="flex-1"><p class="text-sm font-medium">Field Service Dispatch</p><p class="text-xs text-gray-500">130% productivity gain | 4hrs → 2hrs</p></div>
-                                    <span class="px-2 py-1 bg-green-100 text-green-700 rounded text-xs">Validated</span>
-                                </div>
-                                <div class="flex items-center gap-3 p-3 bg-amber-50 rounded-lg border border-amber-200">
-                                    <div class="w-10 h-10 bg-amber-100 rounded-full flex items-center justify-center"><i class="fas fa-spinner text-amber-600"></i></div>
-                                    <div class="flex-1"><p class="text-sm font-medium">Security Clearance Onboarding</p><p class="text-xs text-gray-500">60% reduction target | 20 weeks → 8 weeks</p></div>
-                                    <span class="px-2 py-1 bg-amber-100 text-amber-700 rounded text-xs">Implementing</span>
-                                </div>
-                                <div class="flex items-center gap-3 p-3 bg-blue-50 rounded-lg border border-blue-200">
-                                    <div class="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center"><i class="fas fa-lightbulb text-blue-600"></i></div>
-                                    <div class="flex-1"><p class="text-sm font-medium">Project Status Reporting</p><p class="text-xs text-gray-500">85% reduction target | 8hrs → 1hr</p></div>
-                                    <span class="px-2 py-1 bg-blue-100 text-blue-700 rounded text-xs">Proposed</span>
-                                </div>
+            <!-- ═══════════════════════════════════════════════
+                 PROCESS IMPROVEMENT
+            ═══════════════════════════════════════════════ -->
+            <section id="process" class="section-content fade-in">
+                <div class="grid grid-cols-2 gap-4">
+                    <div class="atl-card">
+                        <div class="atl-card-header"><p class="atl-card-title">Improvement Pipeline</p></div>
+                        <div class="p-4 space-y-3">
+                            <div class="flex items-center gap-3 p-3 rounded" style="background:#E3FCEF;border:1px solid #ABF5D1">
+                                <div class="w-9 h-9 rounded-full bg-green-200 flex items-center justify-center flex-shrink-0"><i class="fas fa-check text-green-700 text-xs"></i></div>
+                                <div class="flex-1"><p class="text-sm font-600" style="font-weight:500">Contract Approval Process</p><p class="text-xs" style="color:#006644">60% faster · 15 days → 6 days</p></div>
+                                <span class="loz loz-green">Validated</span>
+                            </div>
+                            <div class="flex items-center gap-3 p-3 rounded" style="background:#E3FCEF;border:1px solid #ABF5D1">
+                                <div class="w-9 h-9 rounded-full bg-green-200 flex items-center justify-center flex-shrink-0"><i class="fas fa-check text-green-700 text-xs"></i></div>
+                                <div class="flex-1"><p class="text-sm font-600" style="font-weight:500">Field Service Dispatch</p><p class="text-xs" style="color:#006644">130% productivity gain · 4hrs → 2hrs</p></div>
+                                <span class="loz loz-green">Validated</span>
+                            </div>
+                            <div class="flex items-center gap-3 p-3 rounded" style="background:#FFFAE6;border:1px solid #FFE380">
+                                <div class="w-9 h-9 rounded-full bg-amber-200 flex items-center justify-center flex-shrink-0"><i class="fas fa-spinner text-amber-700 text-xs"></i></div>
+                                <div class="flex-1"><p class="text-sm font-600" style="font-weight:500">Security Clearance Onboarding</p><p class="text-xs" style="color:#974F0C">60% reduction target · 20w → 8w</p></div>
+                                <span class="loz loz-amber">Implementing</span>
+                            </div>
+                            <div class="flex items-center gap-3 p-3 rounded" style="background:#DEEBFF;border:1px solid #B3D4FF">
+                                <div class="w-9 h-9 rounded-full bg-blue-200 flex items-center justify-center flex-shrink-0"><i class="fas fa-lightbulb text-blue-700 text-xs"></i></div>
+                                <div class="flex-1"><p class="text-sm font-600" style="font-weight:500">Project Status Reporting</p><p class="text-xs" style="color:#0052CC">85% reduction target · 8hrs → 1hr</p></div>
+                                <span class="loz loz-blue">Proposed</span>
                             </div>
                         </div>
-                        <div class="bg-white rounded-xl p-6 shadow-sm">
-                            <h3 class="font-semibold text-gray-800 mb-4">Improvement Impact</h3>
-                            <div class="chart-container"><canvas id="improvementChart"></canvas></div>
-                        </div>
                     </div>
-                </section>
+                    <div class="atl-card">
+                        <div class="atl-card-header"><p class="atl-card-title">Before vs After Impact</p></div>
+                        <div class="p-4"><div class="chart-box"><canvas id="improvementChart"></canvas></div></div>
+                    </div>
+                </div>
+            </section>
 
-                <!-- CAPACITY HEATMAP -->
-                <section id="capacity" class="section-content hidden">
-                    <div class="grid grid-cols-2 gap-6 mb-8">
-                        <div class="bg-white rounded-xl p-6 shadow-sm">
-                            <h3 class="font-semibold text-gray-800 mb-4">Resource Capacity Heatmap</h3>
-                            <div class="space-y-4">
-                                <div>
-                                    <div class="flex justify-between text-sm mb-2"><span class="font-medium">Cloud Engineering</span><span class="text-red-600 font-medium">95% - Overallocated</span></div>
-                                    <div class="w-full bg-gray-200 rounded-full h-4"><div class="bg-gradient-to-r from-green-500 via-amber-500 to-red-500 h-4 rounded-full" style="width:95%"></div></div>
-                                    <p class="text-xs text-gray-500 mt-1">AWS Architects: 2/5 available</p>
-                                </div>
-                                <div>
-                                    <div class="flex justify-between text-sm mb-2"><span class="font-medium">Field Operations</span><span class="text-amber-600 font-medium">88% - At Risk</span></div>
-                                    <div class="w-full bg-gray-200 rounded-full h-4"><div class="bg-gradient-to-r from-green-500 via-amber-500 to-red-500 h-4 rounded-full" style="width:88%"></div></div>
-                                    <p class="text-xs text-gray-500 mt-1">RF Riggers: 3 vacancies unfilled</p>
-                                </div>
-                                <div>
-                                    <div class="flex justify-between text-sm mb-2"><span class="font-medium">Offshore DevOps</span><span class="text-red-600 font-medium">100% - Overallocated</span></div>
-                                    <div class="w-full bg-gray-200 rounded-full h-4"><div class="bg-gradient-to-r from-green-500 via-amber-500 to-red-500 h-4 rounded-full" style="width:100%"></div></div>
-                                    <p class="text-xs text-gray-500 mt-1">SC Cleared: 100% utilised</p>
-                                </div>
-                                <div>
-                                    <div class="flex justify-between text-sm mb-2"><span class="font-medium">Security Vetting</span><span class="text-green-600 font-medium">75% - Available</span></div>
-                                    <div class="w-full bg-gray-200 rounded-full h-4"><div class="bg-green-400 h-4 rounded-full" style="width:75%"></div></div>
-                                    <p class="text-xs text-gray-500 mt-1">Capacity for new projects</p>
-                                </div>
-                                <div>
-                                    <div class="flex justify-between text-sm mb-2"><span class="font-medium">Smart Utilities PMO</span><span class="text-amber-600 font-medium">90% - At Risk</span></div>
-                                    <div class="w-full bg-gray-200 rounded-full h-4"><div class="bg-gradient-to-r from-green-500 via-amber-500 to-red-500 h-4 rounded-full" style="width:90%"></div></div>
-                                    <p class="text-xs text-gray-500 mt-1">Peak load during AMP8 delivery</p>
-                                </div>
+            <!-- ═══════════════════════════════════════════════
+                 CAPACITY HEATMAP
+            ═══════════════════════════════════════════════ -->
+            <section id="capacity" class="section-content fade-in">
+                <div class="grid grid-cols-2 gap-4">
+                    <div class="atl-card">
+                        <div class="atl-card-header"><p class="atl-card-title">Resource Utilisation</p></div>
+                        <div class="p-5 space-y-4">
+                            <div>
+                                <div class="flex justify-between text-sm mb-1"><span style="font-weight:500">Cloud Engineering (AWS Architects)</span><span class="loz loz-red">95% — Over</span></div>
+                                <div class="atl-progress"><div class="atl-progress-fill" style="width:95%;background:#DE350B"></div></div>
+                                <p class="text-xs mt-1" style="color:#6B778C">2 of 5 architects available</p>
                             </div>
-                        </div>
-                        <div class="bg-white rounded-xl p-6 shadow-sm">
-                            <h3 class="font-semibold text-gray-800 mb-4">Critical Bottlenecks</h3>
-                            <div class="space-y-4">
-                                <div class="p-4 bg-red-50 rounded-lg border border-red-200">
-                                    <div class="flex items-center gap-2 mb-2"><i class="fas fa-triangle-exclamation text-red-600"></i><span class="font-medium text-red-700">Critical</span></div>
-                                    <p class="text-sm font-medium">AWS Solutions Architect shortage</p>
-                                    <p class="text-xs text-gray-600 mt-1">2 certified architects available vs 5 required. Sprint velocity at risk.</p>
-                                    <div class="mt-2 flex gap-2"><span class="px-2 py-1 bg-white rounded text-xs">PRJ-M&B-AWS</span></div>
-                                </div>
-                                <div class="p-4 bg-amber-50 rounded-lg border border-amber-200">
-                                    <div class="flex items-center gap-2 mb-2"><i class="fas fa-exclamation-circle text-amber-600"></i><span class="font-medium text-amber-700">High</span></div>
-                                    <p class="text-sm font-medium">RF Rigger vacancies</p>
-                                    <p class="text-xs text-gray-600 mt-1">3 unfilled positions for 6 weeks. Directly impacting AMP8 rollout.</p>
-                                    <div class="mt-2 flex gap-2"><span class="px-2 py-1 bg-white rounded text-xs">PRJ-AMP8-UU</span></div>
-                                </div>
-                                <div class="p-4 bg-amber-50 rounded-lg border border-amber-200">
-                                    <div class="flex items-center gap-2 mb-2"><i class="fas fa-exclamation-circle text-amber-600"></i><span class="font-medium text-amber-700">High</span></div>
-                                    <p class="text-sm font-medium">SC Cleared DevOps at capacity</p>
-                                    <p class="text-xs text-gray-600 mt-1">100% utilised. Cannot take additional CNI security work.</p>
-                                    <div class="mt-2 flex gap-2"><span class="px-2 py-1 bg-white rounded text-xs">PRJ-CNI-SEC</span></div>
-                                </div>
+                            <div>
+                                <div class="flex justify-between text-sm mb-1"><span style="font-weight:500">Field Operations (RF Riggers)</span><span class="loz loz-amber">88% — Risk</span></div>
+                                <div class="atl-progress"><div class="atl-progress-fill" style="width:88%;background:#FF991F"></div></div>
+                                <p class="text-xs mt-1" style="color:#6B778C">3 vacancies unfilled · AMP8 impact</p>
+                            </div>
+                            <div>
+                                <div class="flex justify-between text-sm mb-1"><span style="font-weight:500">Offshore DevOps (SC Cleared)</span><span class="loz loz-red">100% — Over</span></div>
+                                <div class="atl-progress"><div class="atl-progress-fill" style="width:100%;background:#DE350B"></div></div>
+                                <p class="text-xs mt-1" style="color:#6B778C">Cannot take additional CNI work</p>
+                            </div>
+                            <div>
+                                <div class="flex justify-between text-sm mb-1"><span style="font-weight:500">Security Vetting Team</span><span class="loz loz-green">75% — OK</span></div>
+                                <div class="atl-progress"><div class="atl-progress-fill bg-green-500" style="width:75%"></div></div>
+                                <p class="text-xs mt-1" style="color:#6B778C">Capacity available for new projects</p>
+                            </div>
+                            <div>
+                                <div class="flex justify-between text-sm mb-1"><span style="font-weight:500">Smart Utilities PMO</span><span class="loz loz-amber">90% — Risk</span></div>
+                                <div class="atl-progress"><div class="atl-progress-fill" style="width:90%;background:#FF991F"></div></div>
+                                <p class="text-xs mt-1" style="color:#6B778C">Peak load during AMP8 delivery</p>
                             </div>
                         </div>
                     </div>
-                </section>
+                    <div class="atl-card">
+                        <div class="atl-card-header"><p class="atl-card-title">Critical Bottlenecks</p></div>
+                        <div class="p-4 space-y-3">
+                            <div class="p-4 rounded" style="background:#FFEBE6;border:1px solid #FFBDAD">
+                                <div class="flex items-center gap-2 mb-1"><span class="loz loz-red">Critical</span></div>
+                                <p class="text-sm font-600" style="font-weight:500">AWS Solutions Architect shortage</p>
+                                <p class="text-xs mt-1" style="color:#6B778C">2 certified vs 5 required. Sprint velocity at risk for PRJ-M&B-AWS.</p>
+                            </div>
+                            <div class="p-4 rounded" style="background:#FFFAE6;border:1px solid #FFE380">
+                                <div class="flex items-center gap-2 mb-1"><span class="loz loz-amber">High</span></div>
+                                <p class="text-sm font-600" style="font-weight:500">RF Rigger vacancies — 3 unfilled</p>
+                                <p class="text-xs mt-1" style="color:#6B778C">6 weeks unfilled. Directly impacting PRJ-AMP8-UU rollout pace.</p>
+                            </div>
+                            <div class="p-4 rounded" style="background:#FFFAE6;border:1px solid #FFE380">
+                                <div class="flex items-center gap-2 mb-1"><span class="loz loz-amber">High</span></div>
+                                <p class="text-sm font-600" style="font-weight:500">SC Cleared DevOps at 100% utilisation</p>
+                                <p class="text-xs mt-1" style="color:#6B778C">Cannot absorb additional CNI security demand until Q3.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
 
-                <!-- VMO COPILOT -->
-                <section id="ai" class="section-content hidden">
-                    <div class="grid grid-cols-2 gap-6 mb-8">
-                        <div class="bg-white rounded-xl p-6 shadow-sm">
-                            <div class="flex items-center gap-3 mb-4">
-                                <div class="w-12 h-12 bg-gradient-to-br from-blue-500 to-purple-600 rounded-lg flex items-center justify-center"><i class="fas fa-robot text-white text-xl"></i></div>
-                                <div><h3 class="font-semibold text-gray-800">VMO Copilot</h3><p class="text-xs text-gray-500">AI-Powered Decision Support</p></div>
+            <!-- ═══════════════════════════════════════════════
+                 VMO COPILOT
+            ═══════════════════════════════════════════════ -->
+            <section id="ai" class="section-content fade-in">
+                <div class="grid grid-cols-2 gap-4 mb-4">
+                    <div class="atl-card">
+                        <div class="atl-card-header">
+                            <div class="flex items-center gap-2">
+                                <div class="w-8 h-8 rounded" style="background:linear-gradient(135deg,#0052CC,#6554C0);display:flex;align-items:center;justify-content:center"><i class="fas fa-robot text-white text-xs"></i></div>
+                                <div><p class="atl-card-title">VMO Executive Summary</p><p class="text-xs" style="color:#6B778C">Auto-generated from live Supabase data</p></div>
                             </div>
-                            <div class="space-y-4">
-                                <div class="p-4 bg-blue-50 rounded-lg border border-blue-200">
-                                    <p class="text-sm font-medium text-blue-800 mb-2"><i class="fas fa-wand-magic-sparkles mr-1"></i> Executive Summary Generator</p>
-                                    <p class="text-xs text-blue-600">Auto-generates weekly executive summaries from Jira sprint data, ServiceNow deployment logs, and financial actuals.</p>
-                                    <div class="mt-2 flex gap-2"><span class="px-2 py-1 bg-white rounded text-xs">Saves 6 hours/week</span><span class="px-2 py-1 bg-white rounded text-xs">85% accuracy</span></div>
-                                </div>
-                                <div class="p-4 bg-purple-50 rounded-lg border border-purple-200">
-                                    <p class="text-sm font-medium text-purple-800 mb-2"><i class="fas fa-brain mr-1"></i> Risk Prediction Engine</p>
-                                    <p class="text-xs text-purple-600">Analyses leading indicators to predict project failure probability.</p>
-                                    <div class="mt-2">
-                                        <div class="flex justify-between text-xs mb-1"><span>PRJ-CNI-SEC failure probability</span><span class="font-bold text-red-600">82%</span></div>
-                                        <div class="w-full bg-gray-200 rounded-full h-2"><div class="bg-red-500 h-2 rounded-full" style="width:82%"></div></div>
-                                    </div>
-                                </div>
-                                <div class="p-4 bg-green-50 rounded-lg border border-green-200">
-                                    <p class="text-sm font-medium text-green-800 mb-2"><i class="fas fa-file-lines mr-1"></i> Intake Summarizer</p>
-                                    <textarea class="w-full p-2 border rounded text-xs" rows="3" placeholder="Paste business case here..."></textarea>
-                                    <button class="mt-2 px-3 py-1 bg-green-600 text-white rounded text-xs">Generate Summary</button>
-                                </div>
-                            </div>
+                            <button onclick="generateSummary()" class="btn-atl-primary text-xs"><i class="fas fa-wand-magic-sparkles mr-1"></i> Generate</button>
                         </div>
-                        <div class="bg-white rounded-xl p-6 shadow-sm">
-                            <h3 class="font-semibold text-gray-800 mb-4">AI-Generated Insights</h3>
-                            <div class="space-y-4">
-                                <div class="p-4 border rounded-lg">
-                                    <div class="flex items-center gap-2 mb-2"><i class="fas fa-lightbulb text-amber-500"></i><span class="font-medium text-sm">Pattern Detection</span></div>
-                                    <p class="text-xs text-gray-600">"3 of 4 Amber/Red projects share common factor: SC clearance delays. Recommend prioritising vetting process automation."</p>
-                                </div>
-                                <div class="p-4 border rounded-lg">
-                                    <div class="flex items-center gap-2 mb-2"><i class="fas fa-chart-line text-blue-500"></i><span class="font-medium text-sm">Trend Analysis</span></div>
-                                    <p class="text-xs text-gray-600">"Budget variance trending negative across Smart Utilities portfolio. Average -8.3% vs -2.1% for Media & Broadcast."</p>
-                                </div>
-                                <div class="p-4 border rounded-lg">
-                                    <div class="flex items-center gap-2 mb-2"><i class="fas fa-link text-purple-500"></i><span class="font-medium text-sm">Dependency Alert</span></div>
-                                    <p class="text-xs text-gray-600">"PRJ-M&B-AWS depends on PRJ-CNI-SEC for SC-cleared engineers. If CNI-SEC slips 6 weeks, AWS migration could delay 3 weeks."</p>
-                                </div>
-                                <div class="p-4 border rounded-lg border-amber-300 bg-amber-50">
-                                    <div class="flex items-center gap-2 mb-2"><i class="fas fa-triangle-exclamation text-amber-600"></i><span class="font-medium text-sm">Early Warning</span></div>
-                                    <p class="text-xs text-amber-700">"PRJ-SITE-EM heritage delay has 73% probability of cascading to PRJ-AMP8-UU. Recommend parallel tracking."</p>
-                                </div>
+                        <div class="p-4">
+                            <div id="copilot-summary" class="copilot-summary">
+                                Click <strong>Generate</strong> to produce an AI-style executive summary from live portfolio data — replicating the ServiceNow Now Assist summarisation capability Arqiva is piloting.
+                            </div>
+                            <div class="mt-3 flex gap-2 flex-wrap">
+                                <span class="loz loz-blue">Mirrors Now Assist SPM</span>
+                                <span class="loz loz-purple">Saves 6 hrs/week</span>
+                                <span class="loz loz-gray">85% accuracy</span>
                             </div>
                         </div>
                     </div>
-                </section>
+                    <div class="atl-card">
+                        <div class="atl-card-header"><p class="atl-card-title">AI-Generated Insights</p></div>
+                        <div class="p-4 space-y-3">
+                            <div class="p-3 rounded" style="border:1px solid #EBECF0">
+                                <div class="flex items-center gap-2 mb-1"><i class="fas fa-lightbulb text-amber-500 text-sm"></i><span class="text-sm font-600" style="font-weight:500">Pattern Detection</span></div>
+                                <p class="text-xs" style="color:#6B778C">"3 of 4 Amber/Red projects share a common root cause: SC clearance delays. Recommend prioritising vetting process automation via ServiceNow."</p>
+                            </div>
+                            <div class="p-3 rounded" style="border:1px solid #EBECF0">
+                                <div class="flex items-center gap-2 mb-1"><i class="fas fa-chart-line text-blue-500 text-sm"></i><span class="text-sm font-600" style="font-weight:500">Trend Analysis</span></div>
+                                <p class="text-xs" style="color:#6B778C">"Budget variance trending negative across Smart Utilities portfolio. Average -8.3% vs -2.1% for Media & Broadcast — review rigger procurement pipeline."</p>
+                            </div>
+                            <div class="p-3 rounded" style="border:1px solid #EBECF0">
+                                <div class="flex items-center gap-2 mb-1"><i class="fas fa-link text-purple-500 text-sm"></i><span class="text-sm font-600" style="font-weight:500">Dependency Alert</span></div>
+                                <p class="text-xs" style="color:#6B778C">"PRJ-M&B-AWS depends on PRJ-CNI-SEC for SC-cleared engineers. CNI-SEC slip of 6 weeks could delay AWS migration by 3 weeks."</p>
+                            </div>
+                            <div class="p-3 rounded" style="background:#FFFAE6;border:1px solid #FFE380">
+                                <div class="flex items-center gap-2 mb-1"><i class="fas fa-triangle-exclamation text-amber-600 text-sm"></i><span class="text-sm font-600" style="font-weight:500;color:#974F0C">Early Warning</span></div>
+                                <p class="text-xs" style="color:#974F0C">"PRJ-SITE-EM heritage delay has 73% probability of cascading to PRJ-AMP8-UU. Recommend parallel workstream and weekly senior escalation."</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="atl-card">
+                    <div class="atl-card-header"><p class="atl-card-title">ServiceNow AI Platform Integration Status</p></div>
+                    <div class="grid grid-cols-4 gap-0">
+                        <div class="p-4 border-r" style="border-color:#EBECF0">
+                            <div class="flex items-center gap-2 mb-2"><span class="loz loz-green">Live</span></div>
+                            <p class="text-sm font-600" style="font-weight:500">Now Assist for CSM</p>
+                            <p class="text-xs mt-1" style="color:#6B778C">Case summarisation · knowledge articles · customer notes</p>
+                        </div>
+                        <div class="p-4 border-r" style="border-color:#EBECF0">
+                            <div class="flex items-center gap-2 mb-2"><span class="loz loz-green">Live</span></div>
+                            <p class="text-sm font-600" style="font-weight:500">GenAI Field Routing</p>
+                            <p class="text-xs mt-1" style="color:#6B778C">130% productivity · task volume doubled</p>
+                        </div>
+                        <div class="p-4 border-r" style="border-color:#EBECF0">
+                            <div class="flex items-center gap-2 mb-2"><span class="loz loz-purple">Pilot</span></div>
+                            <p class="text-sm font-600" style="font-weight:500">Now Assist for SPM</p>
+                            <p class="text-xs mt-1" style="color:#6B778C">Portfolio insights · automated reporting · this dashboard</p>
+                        </div>
+                        <div class="p-4">
+                            <div class="flex items-center gap-2 mb-2"><span class="loz loz-amber">Planned</span></div>
+                            <p class="text-sm font-600" style="font-weight:500">AI Contract Marketplace</p>
+                            <p class="text-xs mt-1" style="color:#6B778C">Supplier bidding · auto bid generation · SPM integration</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+        </div><!-- /content -->
+    </main>
+</div>
+
+<script>
+const API_BASE = '/api';
+let charts = {};
+
+const V2031_PILLARS = {
+    'PRJ-AMP8-UU': { label: 'Smart Utilities', cls: 'v2031-utilities' },
+    'PRJ-AMP8-AN': { label: 'Smart Utilities', cls: 'v2031-utilities' },
+    'PRJ-M&B-AWS': { label: 'Cloud Media', cls: 'v2031-cloud' },
+    'PRJ-CNI-SEC': { label: 'Broadcast Leader', cls: 'v2031-broadcast' },
+    'PRJ-SITE-EM': { label: 'Broadcast Leader', cls: 'v2031-broadcast' },
+    'PRJ-UTIL-4G': { label: 'New Connectivity', cls: 'v2031-connectivity' }
+};
+
+function getPillarBadge(code) {
+    const p = V2031_PILLARS[code];
+    if (!p) return '<span class="loz loz-gray">—</span>';
+    return `<span class="loz ${p.cls}" style="border-radius:3px">${p.label}</span>`;
+}
+
+function formatCurrency(val) {
+    if (!val && val !== 0) return '—';
+    if (val >= 1000000) return '£' + (val / 1000000).toFixed(1) + 'M';
+    if (val >= 1000) return '£' + (val / 1000).toFixed(0) + 'K';
+    return '£' + val.toFixed(0);
+}
+
+function getStatusLoz(status) {
+    const map = { Green: 'loz-green', Amber: 'loz-amber', Red: 'loz-red' };
+    return `<span class="loz ${map[status] || 'loz-gray'}">${status}</span>`;
+}
+
+function showToast(msg, type = 'success') {
+    const t = document.getElementById('toast');
+    t.textContent = msg;
+    t.className = `atl-toast atl-toast-${type} show`;
+    setTimeout(() => t.classList.remove('show'), 3000);
+}
+
+function closeModal() { document.getElementById('modal').classList.remove('active'); }
+
+function openModal(html) {
+    document.getElementById('modal-body').innerHTML = html;
+    document.getElementById('modal').classList.add('active');
+}
+
+function showSection(id, el) {
+    document.querySelectorAll('.section-content').forEach(s => { s.classList.remove('active'); });
+    const sec = document.getElementById(id);
+    if (sec) { sec.classList.add('active'); sec.classList.add('fade-in'); }
+    document.querySelectorAll('.atl-nav-item').forEach(n => n.classList.remove('active'));
+    if (el) el.classList.add('active');
+    else {
+        document.querySelectorAll('.atl-nav-item').forEach(n => {
+            if (n.getAttribute('onclick') && n.getAttribute('onclick').includes(`'${id}'`)) n.classList.add('active');
+        });
+    }
+    const titles = {
+        executive: 'Executive Dashboard', portfolio: 'Portfolio View', amp8: 'AMP8 Contract Tracker',
+        governance: 'Governance Maturity', projects: 'Projects', demand: 'Demand Intake',
+        delivery: 'Delivery Control', ridac: 'RIDAC Hub', value: 'Value Realisation',
+        process: 'Process Improvement', capacity: 'Capacity Heatmap', ai: 'VMO Copilot'
+    };
+    document.getElementById('page-title').textContent = titles[id] || id;
+    document.getElementById('header-action-btn').classList.toggle('hidden', id !== 'projects');
+
+    if (id === 'executive') loadDashboardStats();
+    if (id === 'portfolio') initPortfolioCharts();
+    if (id === 'governance') initGovernanceChart();
+    if (id === 'projects') loadProjects();
+    if (id === 'demand') { loadDemands(); initDemandChart(); }
+    if (id === 'ridac') loadRIDAC('all');
+    if (id === 'value') loadBenefits();
+    if (id === 'process') initProcessChart();
+}
+
+async function apiCall(endpoint, method = 'GET', body = null) {
+    try {
+        const options = { method, headers: { 'Content-Type': 'application/json' } };
+        if (body) options.body = JSON.stringify(body);
+        const res = await fetch(`${API_BASE}${endpoint}`, options);
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        return await res.json();
+    } catch (e) {
+        console.error('API Error:', e);
+        const el = document.getElementById('connection-status');
+        el.textContent = 'Offline'; el.className = 'loz loz-red';
+        return null;
+    }
+}
+
+// ── EXECUTIVE ──────────────────────────────────────
+async function loadDashboardStats() {
+    const data = await apiCall('/dashboard/stats');
+    if (!data) return;
+    document.getElementById('total-projects').textContent = data.total_projects || 0;
+    document.getElementById('total-budget').textContent = formatCurrency(data.total_budget);
+    document.getElementById('at-risk').textContent = (data.amber || 0) + (data.red || 0);
+    document.getElementById('variance').textContent = formatCurrency(data.variance);
+    document.getElementById('status-badges').innerHTML = `
+        <span class="loz loz-green">${data.green || 0}G</span>
+        <span class="loz loz-amber">${data.amber || 0}A</span>
+        <span class="loz loz-red">${data.red || 0}R</span>`;
+    initPortfolioChart(data.green || 0, data.amber || 0, data.red || 0);
+    loadExecProjectsTable();
+}
+
+async function loadExecProjectsTable() {
+    const data = await apiCall('/projects');
+    if (!data || !data.projects) return;
+    document.getElementById('exec-projects-body').innerHTML = data.projects.map(p => {
+        const variance = (p.budget || 0) - (p.forecast_cost || 0);
+        return `<tr>
+            <td><p style="font-weight:500">${p.project_code}</p><p class="text-xs" style="color:#6B778C">${p.project_name}</p></td>
+            <td>${p.delivery_manager}</td>
+            <td>${getPillarBadge(p.project_code)}</td>
+            <td>${getStatusLoz(p.status)}</td>
+            <td>${formatCurrency(p.budget)}</td>
+            <td>${formatCurrency(p.forecast_cost)}</td>
+            <td style="color:${variance >= 0 ? '#006644' : '#DE350B'};font-weight:500">${variance >= 0 ? '+' : ''}${formatCurrency(variance)}</td>
+        </tr>`;
+    }).join('');
+}
+
+function initPortfolioChart(g, a, r) {
+    if (charts.portfolio) charts.portfolio.destroy();
+    charts.portfolio = new Chart(document.getElementById('portfolioChart').getContext('2d'), {
+        type: 'doughnut',
+        data: { labels: ['Green', 'Amber', 'Red'], datasets: [{ data: [g, a, r], backgroundColor: ['#00875A', '#FF991F', '#DE350B'], borderWidth: 0, hoverOffset: 6 }] },
+        options: { responsive: true, maintainAspectRatio: false, cutout: '65%', plugins: { legend: { position: 'bottom', labels: { font: { size: 12 } } } } }
+    });
+    if (!charts.healthTrend) {
+        charts.healthTrend = new Chart(document.getElementById('healthTrendChart').getContext('2d'), {
+            type: 'line',
+            data: { labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'], datasets: [
+                { label: 'Green', data: [4,4,3,3,2,g], borderColor: '#00875A', backgroundColor: 'rgba(0,135,90,0.08)', tension: 0.4, fill: true },
+                { label: 'Amber', data: [1,1,2,2,3,a], borderColor: '#FF991F', backgroundColor: 'rgba(255,153,31,0.08)', tension: 0.4, fill: true },
+                { label: 'Red', data: [0,0,1,1,1,r], borderColor: '#DE350B', backgroundColor: 'rgba(222,53,11,0.08)', tension: 0.4, fill: true }
+            ]},
+            options: { responsive: true, maintainAspectRatio: false, scales: { y: { beginAtZero: true, ticks: { font: { size: 11 } } } }, plugins: { legend: { labels: { font: { size: 11 } } } } }
+        });
+    }
+}
+
+// ── PORTFOLIO ──────────────────────────────────────
+function initPortfolioCharts() {
+    if (charts.budget) return;
+    charts.budget = new Chart(document.getElementById('budgetChart').getContext('2d'), {
+        type: 'bar',
+        data: { labels: ['Smart Utilities', 'Media & Broadcast', 'Enablement', 'Infrastructure'],
+            datasets: [
+                { label: 'Budget', data: [50000000,35000000,25000000,40000000], backgroundColor: '#0052CC' },
+                { label: 'Actual', data: [17000000,12000000,450000,3000000], backgroundColor: '#00875A' },
+                { label: 'Forecast', data: [30400000,17500000,3800000,4800000], backgroundColor: '#FF991F' }
+            ]},
+        options: { responsive: true, maintainAspectRatio: false, scales: { y: { beginAtZero: true, ticks: { font: { size: 11 } } } }, plugins: { legend: { labels: { font: { size: 11 } } } } }
+    });
+}
+
+// ── GOVERNANCE ─────────────────────────────────────
+function initGovernanceChart() {
+    if (charts.governance) return;
+    charts.governance = new Chart(document.getElementById('governanceRadar').getContext('2d'), {
+        type: 'radar',
+        data: {
+            labels: ['Benefits Mgmt', 'Demand Governance', 'Delivery Oversight', 'Resource Planning', 'Data Quality', 'AI Readiness'],
+            datasets: [
+                { label: 'Arqiva VMO (Current)', data: [65, 78, 80, 70, 72, 30], borderColor: '#0052CC', backgroundColor: 'rgba(0,82,204,0.15)', pointBackgroundColor: '#0052CC' },
+                { label: 'P3O Level 4 Benchmark', data: [85, 85, 85, 85, 85, 70], borderColor: '#DFE1E6', backgroundColor: 'rgba(223,225,230,0.1)', borderDash: [5,5], pointBackgroundColor: '#6B778C' }
+            ]
+        },
+        options: { responsive: true, maintainAspectRatio: false, scales: { r: { beginAtZero: true, max: 100, ticks: { font: { size: 10 } }, pointLabels: { font: { size: 11 } } } }, plugins: { legend: { labels: { font: { size: 11 } } } } }
+    });
+}
+
+// ── PROJECTS CRUD ──────────────────────────────────
+async function loadProjects() {
+    const filter = document.getElementById('filter-status')?.value || 'all';
+    const data = await apiCall('/projects');
+    if (!data || !data.projects) return;
+    let projects = data.projects;
+    if (filter !== 'all') projects = projects.filter(p => p.status === filter);
+    document.getElementById('projects-table-body').innerHTML = projects.map(p => `<tr>
+        <td><p style="font-weight:500">${p.project_code}</p><p class="text-xs" style="color:#6B778C">${p.project_name}</p></td>
+        <td class="text-sm">${p.delivery_manager}</td>
+        <td>${getPillarBadge(p.project_code)}</td>
+        <td>${getStatusLoz(p.status)}</td>
+        <td class="text-sm">${formatCurrency(p.budget)}</td>
+        <td class="text-xs" style="color:#6B778C;max-width:200px">${p.rag_reason || '—'}</td>
+        <td>
+            <button onclick='editProject("${p.project_id}", ${JSON.stringify(p).replace(/'/g,"&#39;")})' class="btn-sm btn-sm-blue mr-1">Edit</button>
+            <button onclick="deleteProject('${p.project_id}')" class="btn-sm btn-sm-red">Delete</button>
+        </td>
+    </tr>`).join('');
+}
+
+function openCreateProjectModal() {
+    openModal(`<div class="atl-modal-header"><h3 class="text-base font-600" style="font-weight:600;color:#172B4D">Create New Project</h3></div>
+    <div class="atl-modal-body">
+        <form onsubmit="createProject(event)">
+            <div class="grid grid-cols-2 gap-4 mb-3">
+                <div><label class="atl-label">Project Code</label><input type="text" id="new-code" class="atl-input" required placeholder="PRJ-XXX"></div>
+                <div><label class="atl-label">Project Name</label><input type="text" id="new-name" class="atl-input" required></div>
             </div>
-        </main>
-    </div>
+            <div class="mb-3"><label class="atl-label">Delivery Manager</label><input type="text" id="new-manager" class="atl-input" required></div>
+            <div class="grid grid-cols-2 gap-4 mb-3">
+                <div><label class="atl-label">Status</label><select id="new-status" class="atl-select"><option>Green</option><option>Amber</option><option>Red</option></select></div>
+                <div><label class="atl-label">Budget (£)</label><input type="number" id="new-budget" class="atl-input" required></div>
+            </div>
+            <div class="atl-modal-footer" style="padding:0;margin-top:16px;border:none">
+                <button type="submit" class="btn-atl-success">Create Project</button>
+                <button type="button" onclick="closeModal()" class="btn-atl-subtle">Cancel</button>
+            </div>
+        </form>
+    </div>`);
+}
 
-    <script>
-        const API_BASE = '/api';
-        let charts = {};
+async function createProject(e) {
+    e.preventDefault();
+    await apiCall('/projects', 'POST', {
+        project_code: document.getElementById('new-code').value,
+        project_name: document.getElementById('new-name').value,
+        delivery_manager: document.getElementById('new-manager').value,
+        status: document.getElementById('new-status').value,
+        budget: parseFloat(document.getElementById('new-budget').value),
+        expected_benefit: 0
+    });
+    closeModal(); loadProjects(); showToast('Project created');
+}
 
-        function formatCurrency(val) {
-            if (!val && val !== 0) return '—';
-            if (val >= 1000000) return '£' + (val / 1000000).toFixed(1) + 'M';
-            if (val >= 1000) return '£' + (val / 1000).toFixed(0) + 'K';
-            return '£' + val.toFixed(0);
-        }
+function editProject(id, p) {
+    openModal(`<div class="atl-modal-header"><h3 class="text-base font-600" style="font-weight:600;color:#172B4D">Edit: ${p.project_code}</h3></div>
+    <div class="atl-modal-body">
+        <form onsubmit="updateProject(event,'${id}')">
+            <div class="mb-3"><label class="atl-label">Project Name</label><input type="text" id="edit-name" class="atl-input" value="${p.project_name}"></div>
+            <div class="mb-3"><label class="atl-label">Delivery Manager</label><input type="text" id="edit-manager" class="atl-input" value="${p.delivery_manager}"></div>
+            <div class="mb-3"><label class="atl-label">Status</label>
+                <select id="edit-status" class="atl-select">
+                    <option ${p.status==='Green'?'selected':''}>Green</option>
+                    <option ${p.status==='Amber'?'selected':''}>Amber</option>
+                    <option ${p.status==='Red'?'selected':''}>Red</option>
+                </select>
+            </div>
+            <div class="mb-3"><label class="atl-label">RAG Reason</label><textarea id="edit-rag" class="atl-textarea">${p.rag_reason || ''}</textarea></div>
+            <div style="display:flex;gap:8px;margin-top:16px">
+                <button type="submit" class="btn-atl-success">Save Changes</button>
+                <button type="button" onclick="closeModal()" class="btn-atl-subtle">Cancel</button>
+            </div>
+        </form>
+    </div>`);
+}
 
-        function getStatusBadge(status) {
-            const map = { Green: 'status-green', Amber: 'status-amber', Red: 'status-red' };
-            return `<span class="px-2 py-1 ${map[status] || 'bg-gray-100'} rounded-full text-xs font-medium">${status}</span>`;
-        }
+async function updateProject(e, id) {
+    e.preventDefault();
+    await apiCall(`/projects/${id}`, 'PUT', {
+        project_name: document.getElementById('edit-name').value,
+        delivery_manager: document.getElementById('edit-manager').value,
+        status: document.getElementById('edit-status').value,
+        rag_reason: document.getElementById('edit-rag').value
+    });
+    closeModal(); loadProjects(); showToast('Project updated');
+}
 
-        function showToast(msg, type = 'success') {
-            const t = document.getElementById('toast');
-            t.textContent = msg;
-            t.className = `toast toast-${type} show`;
-            setTimeout(() => t.classList.remove('show'), 3000);
-        }
+async function deleteProject(id) {
+    if (!confirm('Delete this project?')) return;
+    await apiCall(`/projects/${id}`, 'DELETE');
+    loadProjects(); showToast('Project deleted', 'error');
+}
 
-        function closeModal() {
-            document.getElementById('modal').classList.remove('active');
-        }
+// ── DEMAND ─────────────────────────────────────────
+function updateDemandScore() {
+    const a = parseFloat(document.getElementById('demand-alignment').value);
+    const r = parseFloat(document.getElementById('demand-regulatory').value);
+    const f = parseFloat(document.getElementById('demand-feasibility').value);
+    const c = parseFloat(document.getElementById('demand-commercial').value);
+    document.getElementById('alignment-value').textContent = a;
+    document.getElementById('regulatory-value').textContent = r;
+    document.getElementById('feasibility-value').textContent = f;
+    document.getElementById('commercial-value').textContent = c;
+    document.getElementById('vmo-score').textContent = ((a*0.30)+(r*0.25)+(f*0.20)+(c*0.25)).toFixed(2);
+}
 
-        function showSection(sectionId, element) {
-            document.querySelectorAll('.section-content').forEach(s => s.classList.add('hidden'));
-            document.getElementById(sectionId).classList.remove('hidden');
-            document.querySelectorAll('.sidebar-item').forEach(s => s.classList.remove('active'));
-            if (element) element.classList.add('active');
+async function submitDemand(e) {
+    e.preventDefault();
+    const a = parseFloat(document.getElementById('demand-alignment').value);
+    const r = parseFloat(document.getElementById('demand-regulatory').value);
+    const f = parseFloat(document.getElementById('demand-feasibility').value);
+    const c = parseFloat(document.getElementById('demand-commercial').value);
+    await apiCall('/demands', 'POST', {
+        demand_code: 'D' + Date.now(),
+        title: document.getElementById('demand-title').value,
+        business_area: document.getElementById('demand-area').value,
+        expected_benefit: parseFloat(document.getElementById('demand-benefit').value),
+        strategic_alignment: a, regulatory_score: r, feasibility_score: f, commercial_score: c,
+        vmo_score: (a*0.30)+(r*0.25)+(f*0.20)+(c*0.25), stage: 'Draft'
+    });
+    document.getElementById('demand-form').reset();
+    updateDemandScore(); loadDemands(); showToast('Demand submitted');
+}
 
-            const titles = {
-                'executive': 'Executive Dashboard', 'portfolio': 'Portfolio View', 'projects': 'Projects',
-                'demand': 'Demand Intake', 'delivery': 'Delivery Control', 'ridac': 'RIDAC Hub',
-                'value': 'Value Realisation', 'process': 'Process Improvement',
-                'capacity': 'Capacity Heatmap', 'ai': 'VMO Copilot'
-            };
-            document.getElementById('page-title').textContent = titles[sectionId];
-            document.getElementById('header-action-btn').classList.toggle('hidden', sectionId !== 'projects');
-
-            if (sectionId === 'executive') loadDashboardStats();
-            if (sectionId === 'portfolio') initPortfolioCharts();
-            if (sectionId === 'projects') loadProjects();
-            if (sectionId === 'demand') { loadDemands(); initDemandChart(); }
-            if (sectionId === 'ridac') loadRIDAC('all');
-            if (sectionId === 'value') loadBenefits();
-            if (sectionId === 'process') initProcessChart();
-        }
-
-        async function apiCall(endpoint, method = 'GET', body = null) {
-            try {
-                const options = { method, headers: { 'Content-Type': 'application/json' } };
-                if (body) options.body = JSON.stringify(body);
-                const response = await fetch(`${API_BASE}${endpoint}`, options);
-                if (!response.ok) throw new Error(`HTTP ${response.status}`);
-                return await response.json();
-            } catch (error) {
-                console.error('API Error:', error);
-                document.getElementById('connection-status').textContent = 'Offline';
-                document.getElementById('connection-status').className = 'px-3 py-1 bg-red-100 text-red-700 rounded-full text-xs font-medium';
-                return null;
-            }
-        }
-
-        // EXECUTIVE DASHBOARD
-        async function loadDashboardStats() {
-            const data = await apiCall('/dashboard/stats');
-            if (!data) return;
-
-            document.getElementById('total-projects').textContent = data.total_projects || 0;
-            document.getElementById('total-budget').textContent = formatCurrency(data.total_budget);
-            document.getElementById('at-risk').textContent = (data.amber || 0) + (data.red || 0);
-            document.getElementById('variance').textContent = formatCurrency(data.variance);
-            document.getElementById('status-badges').innerHTML = `
-                <span class="px-2 py-1 bg-green-100 text-green-700 rounded text-xs">${data.green || 0} Green</span>
-                <span class="px-2 py-1 bg-amber-100 text-amber-700 rounded text-xs">${data.amber || 0} Amber</span>
-                <span class="px-2 py-1 bg-red-100 text-red-700 rounded text-xs">${data.red || 0} Red</span>
-            `;
-            initPortfolioChart(data.green || 0, data.amber || 0, data.red || 0);
-            loadExecProjectsTable();
-        }
-
-        async function loadExecProjectsTable() {
-            const data = await apiCall('/projects');
-            if (!data || !data.projects) return;
-            const tbody = document.getElementById('exec-projects-body');
-            tbody.innerHTML = data.projects.map(p => {
-                const variance = (p.budget || 0) - (p.forecast_cost || 0);
-                return `<tr class="hover:bg-gray-50">
-                    <td class="px-6 py-4"><p class="font-medium text-gray-800">${p.project_code}</p><p class="text-xs text-gray-500">${p.project_name}</p></td>
-                    <td class="px-6 py-4 text-sm">${p.delivery_manager}</td>
-                    <td class="px-6 py-4">${getStatusBadge(p.status)}</td>
-                    <td class="px-6 py-4 text-sm">${formatCurrency(p.budget)}</td>
-                    <td class="px-6 py-4 text-sm">${formatCurrency(p.forecast_cost)}</td>
-                    <td class="px-6 py-4 text-sm ${variance >= 0 ? 'text-green-600' : 'text-red-600'}">${variance >= 0 ? '+' : ''}${formatCurrency(variance)}</td>
-                </tr>`;
-            }).join('');
-        }
-
-        function initPortfolioChart(green, amber, red) {
-            if (charts.portfolio) charts.portfolio.destroy();
-            const ctx = document.getElementById('portfolioChart').getContext('2d');
-            charts.portfolio = new Chart(ctx, {
-                type: 'doughnut',
-                data: { labels: ['Green', 'Amber', 'Red'], datasets: [{ data: [green, amber, red], backgroundColor: ['#22c55e', '#f59e0b', '#ef4444'], borderWidth: 0 }] },
-                options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom' } } }
-            });
-            if (!charts.healthTrend) {
-                const ctx2 = document.getElementById('healthTrendChart').getContext('2d');
-                charts.healthTrend = new Chart(ctx2, {
-                    type: 'line',
-                    data: { labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'], datasets: [
-                        { label: 'Green', data: [4,4,3,3,2,green], borderColor: '#22c55e', tension: 0.4 },
-                        { label: 'Amber', data: [1,1,2,2,3,amber], borderColor: '#f59e0b', tension: 0.4 },
-                        { label: 'Red', data: [0,0,1,1,1,red], borderColor: '#ef4444', tension: 0.4 }
-                    ]},
-                    options: { responsive: true, maintainAspectRatio: false, scales: { y: { beginAtZero: true } } }
-                });
-            }
-        }
-
-        // PORTFOLIO
-        function initPortfolioCharts() {
-            if (charts.budget) return;
-            const ctx = document.getElementById('budgetChart').getContext('2d');
-            charts.budget = new Chart(ctx, {
-                type: 'bar',
-                data: { labels: ['Smart Utilities', 'Media & Broadcast', 'Enablement', 'Infrastructure'], datasets: [
-                    { label: 'Budget', data: [50000000,35000000,25000000,40000000], backgroundColor: '#3b82f6' },
-                    { label: 'Actual', data: [17000000,12000000,450000,3000000], backgroundColor: '#22c55e' },
-                    { label: 'Forecast', data: [30400000,17500000,3800000,4800000], backgroundColor: '#f59e0b' }
-                ]},
-                options: { responsive: true, maintainAspectRatio: false, scales: { y: { beginAtZero: true } } }
-            });
-        }
-
-        // PROJECTS CRUD
-        async function loadProjects() {
-            const filter = document.getElementById('filter-status') ? document.getElementById('filter-status').value : 'all';
-            const data = await apiCall('/projects');
-            if (!data || !data.projects) return;
-            let projects = data.projects;
-            if (filter !== 'all') projects = projects.filter(p => p.status === filter);
-            const tbody = document.getElementById('projects-table-body');
-            tbody.innerHTML = projects.map(p => `
-                <tr class="hover:bg-gray-50">
-                    <td class="px-6 py-4"><p class="font-medium text-gray-800">${p.project_code}</p><p class="text-xs text-gray-500">${p.project_name}</p></td>
-                    <td class="px-6 py-4 text-sm">${p.delivery_manager}</td>
-                    <td class="px-6 py-4">${getStatusBadge(p.status)}</td>
-                    <td class="px-6 py-4 text-sm">${formatCurrency(p.budget)}</td>
-                    <td class="px-6 py-4">
-                        <button onclick="editProject('${p.project_id}', ${JSON.stringify(p).replace(/"/g, '&quot;')})" class="action-btn edit-btn">Edit</button>
-                        <button onclick="deleteProject('${p.project_id}')" class="action-btn delete-btn">Delete</button>
-                    </td>
-                </tr>`).join('');
-        }
-
-        function openCreateProjectModal() {
-            document.getElementById('modal-body').innerHTML = `
-                <div class="p-6">
-                    <div class="flex items-center justify-between mb-4">
-                        <h3 class="text-lg font-semibold">Create New Project</h3>
-                        <button onclick="closeModal()" class="text-gray-400 hover:text-gray-600"><i class="fas fa-times"></i></button>
-                    </div>
-                    <form onsubmit="createProject(event)">
-                        <div class="grid grid-cols-2 gap-4">
-                            <div class="form-group"><label class="form-label">Project Code</label><input type="text" id="new-code" class="form-input" required placeholder="PRJ-XXX"></div>
-                            <div class="form-group"><label class="form-label">Project Name</label><input type="text" id="new-name" class="form-input" required></div>
-                        </div>
-                        <div class="form-group"><label class="form-label">Delivery Manager</label><input type="text" id="new-manager" class="form-input" required></div>
-                        <div class="grid grid-cols-2 gap-4">
-                            <div class="form-group"><label class="form-label">Status</label><select id="new-status" class="form-select"><option>Green</option><option>Amber</option><option>Red</option></select></div>
-                            <div class="form-group"><label class="form-label">Budget (£)</label><input type="number" id="new-budget" class="form-input" required></div>
-                        </div>
-                        <div class="flex gap-3 mt-4"><button type="submit" class="btn-success">Create</button><button type="button" onclick="closeModal()" class="btn-primary" style="background:#6b7280">Cancel</button></div>
-                    </form>
-                </div>`;
-            document.getElementById('modal').classList.add('active');
-        }
-
-        async function createProject(e) {
-            e.preventDefault();
-            await apiCall('/projects', 'POST', {
-                project_code: document.getElementById('new-code').value,
-                project_name: document.getElementById('new-name').value,
-                delivery_manager: document.getElementById('new-manager').value,
-                status: document.getElementById('new-status').value,
-                budget: parseFloat(document.getElementById('new-budget').value),
-                expected_benefit: 0
-            });
-            closeModal(); loadProjects(); showToast('Project created!');
-        }
-
-        function editProject(id, p) {
-            document.getElementById('modal-body').innerHTML = `
-                <div class="p-6">
-                    <div class="flex items-center justify-between mb-4">
-                        <h3 class="text-lg font-semibold">Edit Project: ${p.project_code}</h3>
-                        <button onclick="closeModal()" class="text-gray-400 hover:text-gray-600"><i class="fas fa-times"></i></button>
-                    </div>
-                    <form onsubmit="updateProject(event, '${id}')">
-                        <div class="form-group"><label class="form-label">Project Name</label><input type="text" id="edit-name" class="form-input" value="${p.project_name}"></div>
-                        <div class="form-group"><label class="form-label">Delivery Manager</label><input type="text" id="edit-manager" class="form-input" value="${p.delivery_manager}"></div>
-                        <div class="form-group"><label class="form-label">Status</label>
-                            <select id="edit-status" class="form-select">
-                                <option ${p.status==='Green'?'selected':''}>Green</option>
-                                <option ${p.status==='Amber'?'selected':''}>Amber</option>
-                                <option ${p.status==='Red'?'selected':''}>Red</option>
-                            </select>
-                        </div>
-                        <div class="form-group"><label class="form-label">RAG Reason</label><textarea id="edit-rag" class="form-textarea">${p.rag_reason || ''}</textarea></div>
-                        <div class="flex gap-3 mt-4"><button type="submit" class="btn-success">Save</button><button type="button" onclick="closeModal()" class="btn-primary" style="background:#6b7280">Cancel</button></div>
-                    </form>
-                </div>`;
-            document.getElementById('modal').classList.add('active');
-        }
-
-        async function updateProject(e, id) {
-            e.preventDefault();
-            await apiCall(`/projects/${id}`, 'PUT', {
-                project_name: document.getElementById('edit-name').value,
-                delivery_manager: document.getElementById('edit-manager').value,
-                status: document.getElementById('edit-status').value,
-                rag_reason: document.getElementById('edit-rag').value
-            });
-            closeModal(); loadProjects(); showToast('Project updated!');
-        }
-
-        async function deleteProject(id) {
-            if (!confirm('Delete this project?')) return;
-            await apiCall(`/projects/${id}`, 'DELETE');
-            loadProjects(); showToast('Project deleted', 'error');
-        }
-
-        // DEMAND INTAKE
-        function updateDemandScore() {
-            const a = parseFloat(document.getElementById('demand-alignment').value);
-            const r = parseFloat(document.getElementById('demand-regulatory').value);
-            const f = parseFloat(document.getElementById('demand-feasibility').value);
-            const c = parseFloat(document.getElementById('demand-commercial').value);
-            document.getElementById('alignment-value').textContent = a;
-            document.getElementById('regulatory-value').textContent = r;
-            document.getElementById('feasibility-value').textContent = f;
-            document.getElementById('commercial-value').textContent = c;
-            document.getElementById('vmo-score').textContent = ((a*0.30)+(r*0.25)+(f*0.20)+(c*0.25)).toFixed(2);
-        }
-
-        async function submitDemand(e) {
-            e.preventDefault();
-            const a = parseFloat(document.getElementById('demand-alignment').value);
-            const r = parseFloat(document.getElementById('demand-regulatory').value);
-            const f = parseFloat(document.getElementById('demand-feasibility').value);
-            const c = parseFloat(document.getElementById('demand-commercial').value);
-            await apiCall('/demands', 'POST', {
-                demand_code: 'D' + Date.now(),
-                title: document.getElementById('demand-title').value,
-                business_area: document.getElementById('demand-area').value,
-                expected_benefit: parseFloat(document.getElementById('demand-benefit').value),
-                strategic_alignment: a, regulatory_score: r, feasibility_score: f, commercial_score: c,
-                vmo_score: (a*0.30)+(r*0.25)+(f*0.20)+(c*0.25), stage: 'Draft'
-            });
-            document.getElementById('demand-form').reset();
-            updateDemandScore();
-            loadDemands();
-            showToast('Demand submitted!');
-        }
-
-        async function loadDemands() {
-            const data = await apiCall('/demands');
-            if (!data || !data.demands) return;
-            document.getElementById('demand-pipeline').innerHTML = data.demands.map(d => `
-                <div class="border rounded-lg p-4 hover-lift">
-                    <div class="flex items-start justify-between">
-                        <div>
-                            <div class="flex items-center gap-2 mb-1">
-                                <span class="px-2 py-1 ${d.stage==='Approved'?'bg-green-100 text-green-700':d.stage==='Screening'?'bg-amber-100 text-amber-700':'bg-gray-100 text-gray-700'} rounded text-xs">${d.stage}</span>
-                                <span class="px-2 py-1 bg-blue-100 text-blue-700 rounded text-xs">${d.business_area}</span>
-                            </div>
-                            <h4 class="font-medium text-gray-800">${d.title}</h4>
-                            <p class="text-xs text-gray-500">Benefit: ${formatCurrency(d.expected_benefit)}</p>
-                        </div>
-                        <div class="text-right">
-                            <p class="text-2xl font-bold text-blue-600">${d.vmo_score ? parseFloat(d.vmo_score).toFixed(2) : '0.00'}</p>
-                            <p class="text-xs text-gray-500">VMO Score</p>
-                        </div>
-                    </div>
-                </div>`).join('');
-        }
-
-        function initDemandChart() {
-            if (charts.valueScoring) return;
-            const ctx = document.getElementById('valueScoringChart').getContext('2d');
-            charts.valueScoring = new Chart(ctx, {
-                type: 'radar',
-                data: { labels: ['Strategic Alignment', 'Regulatory', 'Feasibility', 'Commercial'], datasets: [
-                    { label: 'D001 (UU Smart Meters)', data: [9.5,9.0,7.5,9.0], borderColor: '#3b82f6', backgroundColor: 'rgba(59,130,246,0.2)' },
-                    { label: 'D002 (AWS Cloud)', data: [9.0,6.0,8.5,8.5], borderColor: '#8b5cf6', backgroundColor: 'rgba(139,92,246,0.2)' },
-                    { label: 'D004 (Security Vetting)', data: [8.5,10.0,6.0,7.5], borderColor: '#ef4444', backgroundColor: 'rgba(239,68,68,0.2)' }
-                ]},
-                options: { responsive: true, maintainAspectRatio: false, scales: { r: { beginAtZero: true, max: 10 } } }
-            });
-        }
-
-        // RIDAC
-        async function loadRIDAC(filter = 'all') {
-            const data = await apiCall('/ridac');
-            if (!data || !data.ridac) return;
-            let items = data.ridac;
-            if (filter !== 'all') items = items.filter(r => r.type === filter);
-            const colors = { Risk: 'bg-red-100 text-red-700', Issue: 'bg-orange-100 text-orange-700', Decision: 'bg-blue-100 text-blue-700', Action: 'bg-green-100 text-green-700', Change: 'bg-purple-100 text-purple-700' };
-            document.getElementById('ridac-container').innerHTML = items.map(r => {
-                const border = (r.impact === 'Critical' || r.impact === 'High') ? 'risk-high' : r.impact === 'Medium' ? 'risk-medium' : 'risk-low';
-                return `<div class="bg-white rounded-xl p-6 shadow-sm ${border}">
-                    <div class="flex items-start justify-between">
-                        <div class="flex-1">
-                            <div class="flex items-center gap-2 mb-2">
-                                <span class="px-2 py-1 ${colors[r.type] || 'bg-gray-100'} rounded text-xs font-bold">${r.type.toUpperCase()}</span>
-                                <span class="px-2 py-1 bg-gray-100 rounded text-xs">${r.ridac_code}</span>
-                                <span class="px-2 py-1 bg-gray-100 rounded text-xs">${r.impact || 'Medium'}</span>
-                                <span class="px-2 py-1 ${r.status==='Escalated'?'bg-red-100 text-red-700':'bg-amber-100 text-amber-700'} rounded text-xs">${r.status}</span>
-                            </div>
-                            <h4 class="font-medium text-gray-800">${r.title}</h4>
-                            <p class="text-sm text-gray-500 mt-1">Owner: ${r.owner} | Target: ${r.target_date || 'TBD'}</p>
-                            <p class="text-sm text-gray-600 mt-2">${r.description}</p>
-                            <div class="mt-3 p-3 bg-gray-50 rounded-lg">
-                                <p class="text-sm font-medium text-gray-700">Action Required:</p>
-                                <p class="text-sm text-gray-600">${r.action_required}</p>
-                            </div>
-                        </div>
-                    </div>
-                </div>`;
-            }).join('');
-        }
-
-        function filterRIDAC(type) { loadRIDAC(type); }
-
-        function openCreateRIDACModal() {
-            document.getElementById('modal-body').innerHTML = `
-                <div class="p-6">
-                    <div class="flex items-center justify-between mb-4">
-                        <h3 class="text-lg font-semibold">Add RIDAC Item</h3>
-                        <button onclick="closeModal()" class="text-gray-400 hover:text-gray-600"><i class="fas fa-times"></i></button>
-                    </div>
-                    <form onsubmit="createRIDAC(event)">
-                        <div class="grid grid-cols-2 gap-4">
-                            <div class="form-group"><label class="form-label">Type</label><select id="new-ridac-type" class="form-select"><option>Risk</option><option>Issue</option><option>Decision</option><option>Action</option><option>Change</option></select></div>
-                            <div class="form-group"><label class="form-label">Code</label><input type="text" id="new-ridac-code" class="form-input" placeholder="R007"></div>
-                        </div>
-                        <div class="form-group"><label class="form-label">Title</label><input type="text" id="new-ridac-title" class="form-input" required></div>
-                        <div class="form-group"><label class="form-label">Description</label><textarea id="new-ridac-desc" class="form-textarea" required></textarea></div>
-                        <div class="form-group"><label class="form-label">Owner</label><input type="text" id="new-ridac-owner" class="form-input" required></div>
-                        <div class="form-group"><label class="form-label">Action Required</label><textarea id="new-ridac-action" class="form-textarea" required></textarea></div>
-                        <div class="flex gap-3 mt-4"><button type="submit" class="btn-success">Add</button><button type="button" onclick="closeModal()" class="btn-primary" style="background:#6b7280">Cancel</button></div>
-                    </form>
-                </div>`;
-            document.getElementById('modal').classList.add('active');
-        }
-
-        async function createRIDAC(e) {
-            e.preventDefault();
-            await apiCall('/ridac', 'POST', {
-                ridac_code: document.getElementById('new-ridac-code').value,
-                type: document.getElementById('new-ridac-type').value,
-                title: document.getElementById('new-ridac-title').value,
-                description: document.getElementById('new-ridac-desc').value,
-                owner: document.getElementById('new-ridac-owner').value,
-                action_required: document.getElementById('new-ridac-action').value,
-                impact: 'Medium', status: 'Active'
-            });
-            closeModal(); loadRIDAC('all'); showToast('RIDAC item added!');
-        }
-
-        // BENEFITS
-        async function loadBenefits() {
-            const data = await apiCall('/benefits');
-            if (!data || !data.benefits) return;
-            const container = document.getElementById('benefits-list');
-            container.innerHTML = data.benefits.map(b => {
-                const pct = b.expected_value > 0 ? (b.realised_value / b.expected_value * 100) : 0;
-                return `<div class="border rounded-lg p-4">
+async function loadDemands() {
+    const data = await apiCall('/demands');
+    if (!data || !data.demands) return;
+    document.getElementById('demand-pipeline').innerHTML = data.demands.map(d => `
+        <div class="p-4 rounded" style="border:1px solid #EBECF0;background:#fff">
+            <div class="flex items-start justify-between">
+                <div>
                     <div class="flex items-center gap-2 mb-1">
-                        <span class="px-2 py-1 bg-blue-100 text-blue-700 rounded text-xs">${b.benefit_type}</span>
-                        <span class="px-2 py-1 ${b.status==='On Track'?'bg-green-100 text-green-700':'bg-amber-100 text-amber-700'} rounded text-xs">${b.status}</span>
+                        <span class="loz ${d.stage==='Approved'?'loz-green':d.stage==='Screening'?'loz-amber':'loz-gray'}">${d.stage}</span>
+                        <span class="loz loz-blue">${d.business_area}</span>
                     </div>
-                    <h4 class="font-medium text-gray-800 text-sm">${b.benefit_name}</h4>
-                    <div class="mt-2">
-                        <div class="flex justify-between text-xs mb-1"><span>${pct.toFixed(1)}% realised</span><span>${formatCurrency(b.realised_value)} / ${formatCurrency(b.expected_value)}</span></div>
-                        <div class="w-full bg-gray-200 rounded-full h-2"><div class="bg-green-500 h-2 rounded-full" style="width:${Math.min(pct,100)}%"></div></div>
+                    <h4 class="text-sm font-600" style="font-weight:500;color:#172B4D">${d.title}</h4>
+                    <p class="text-xs mt-1" style="color:#6B778C">Expected benefit: ${formatCurrency(d.expected_benefit)}</p>
+                </div>
+                <div class="text-right ml-4">
+                    <p class="text-2xl font-700" style="color:#0052CC;font-weight:700">${d.vmo_score ? parseFloat(d.vmo_score).toFixed(2) : '0.00'}</p>
+                    <p class="text-xs" style="color:#6B778C">VMO Score</p>
+                </div>
+            </div>
+        </div>`).join('');
+}
+
+function initDemandChart() {
+    if (charts.valueScoring) return;
+    charts.valueScoring = new Chart(document.getElementById('valueScoringChart').getContext('2d'), {
+        type: 'radar',
+        data: { labels: ['Strategic Alignment', 'Regulatory', 'Feasibility', 'Commercial'],
+            datasets: [
+                { label: 'UU Smart Meters', data: [9.5,9.0,7.5,9.0], borderColor: '#0052CC', backgroundColor: 'rgba(0,82,204,0.15)' },
+                { label: 'AWS Cloud Playout', data: [9.0,6.0,8.5,8.5], borderColor: '#6554C0', backgroundColor: 'rgba(101,84,192,0.15)' },
+                { label: 'CNI Security', data: [8.5,10.0,6.0,7.5], borderColor: '#DE350B', backgroundColor: 'rgba(222,53,11,0.1)' }
+            ]},
+        options: { responsive: true, maintainAspectRatio: false, scales: { r: { beginAtZero: true, max: 10 } } }
+    });
+}
+
+// ── RIDAC ──────────────────────────────────────────
+async function loadRIDAC(filter = 'all') {
+    const data = await apiCall('/ridac');
+    if (!data || !data.ridac) return;
+    let items = data.ridac;
+    if (filter !== 'all') items = items.filter(r => r.type === filter);
+    const borderMap = { Risk: 'ridac-risk', Issue: 'ridac-issue', Decision: 'ridac-decision', Action: 'ridac-action', Change: 'ridac-change' };
+    const lozMap = { Risk: 'loz-red', Issue: 'loz-amber', Decision: 'loz-blue', Action: 'loz-green', Change: 'loz-purple' };
+    document.getElementById('ridac-container').innerHTML = items.map(r => `
+        <div class="atl-card p-4 ${borderMap[r.type] || ''}">
+            <div class="flex items-start justify-between">
+                <div class="flex-1">
+                    <div class="flex items-center gap-2 mb-2 flex-wrap">
+                        <span class="loz ${lozMap[r.type] || 'loz-gray'}">${r.type}</span>
+                        <span class="loz loz-gray">${r.ridac_code}</span>
+                        <span class="loz ${r.impact==='Critical'||r.impact==='High'?'loz-red':r.impact==='Medium'?'loz-amber':'loz-green'}">${r.impact || 'Medium'}</span>
+                        <span class="loz ${r.status==='Escalated'?'loz-red':'loz-amber'}">${r.status}</span>
                     </div>
-                    <button onclick="editBenefit('${b.benefit_id}', ${JSON.stringify(b).replace(/"/g,'&quot;')})" class="action-btn edit-btn mt-2">Update</button>
-                </div>`;
-            }).join('');
+                    <h4 class="text-sm font-600 mb-1" style="font-weight:500;color:#172B4D">${r.title}</h4>
+                    <p class="text-xs mb-2" style="color:#6B778C">Owner: ${r.owner} · Target: ${r.target_date || 'TBD'}</p>
+                    <p class="text-sm mb-2" style="color:#172B4D">${r.description}</p>
+                    <div class="p-2 rounded text-xs" style="background:#F4F5F7;color:#42526E"><strong>Action:</strong> ${r.action_required}</div>
+                </div>
+            </div>
+        </div>`).join('');
+}
 
-            if (!charts.benefit) {
-                const ctx = document.getElementById('benefitChart').getContext('2d');
-                charts.benefit = new Chart(ctx, {
-                    type: 'bar',
-                    data: { labels: data.benefits.map(b => b.benefit_name.substring(0,20)), datasets: [
-                        { label: 'Expected', data: data.benefits.map(b => b.expected_value), backgroundColor: '#3b82f6' },
-                        { label: 'Realised', data: data.benefits.map(b => b.realised_value), backgroundColor: '#22c55e' }
-                    ]},
-                    options: { responsive: true, maintainAspectRatio: false, scales: { y: { beginAtZero: true } } }
-                });
-            }
-        }
+function filterRIDAC(t) { loadRIDAC(t); }
 
-        function editBenefit(id, b) {
-            document.getElementById('modal-body').innerHTML = `
-                <div class="p-6">
-                    <div class="flex items-center justify-between mb-4">
-                        <h3 class="text-lg font-semibold">Update: ${b.benefit_name}</h3>
-                        <button onclick="closeModal()" class="text-gray-400 hover:text-gray-600"><i class="fas fa-times"></i></button>
-                    </div>
-                    <form onsubmit="updateBenefit(event, '${id}')">
-                        <div class="form-group"><label class="form-label">Realised Value (£)</label><input type="number" id="edit-realised" class="form-input" value="${b.realised_value}"></div>
-                        <div class="form-group"><label class="form-label">Status</label>
-                            <select id="edit-benefit-status" class="form-select">
-                                <option ${b.status==='On Track'?'selected':''}>On Track</option>
-                                <option ${b.status==='At Risk'?'selected':''}>At Risk</option>
-                                <option ${b.status==='Delayed'?'selected':''}>Delayed</option>
-                            </select>
-                        </div>
-                        <div class="flex gap-3 mt-4"><button type="submit" class="btn-success">Update</button><button type="button" onclick="closeModal()" class="btn-primary" style="background:#6b7280">Cancel</button></div>
-                    </form>
-                </div>`;
-            document.getElementById('modal').classList.add('active');
-        }
+function openCreateRIDACModal() {
+    openModal(`<div class="atl-modal-header"><h3 class="text-base font-600" style="font-weight:600;color:#172B4D">Add RIDAC Item</h3></div>
+    <div class="atl-modal-body">
+        <form onsubmit="createRIDAC(event)">
+            <div class="grid grid-cols-2 gap-4 mb-3">
+                <div><label class="atl-label">Type</label><select id="new-ridac-type" class="atl-select"><option>Risk</option><option>Issue</option><option>Decision</option><option>Action</option><option>Change</option></select></div>
+                <div><label class="atl-label">Code</label><input type="text" id="new-ridac-code" class="atl-input" placeholder="R007"></div>
+            </div>
+            <div class="mb-3"><label class="atl-label">Title</label><input type="text" id="new-ridac-title" class="atl-input" required></div>
+            <div class="mb-3"><label class="atl-label">Description</label><textarea id="new-ridac-desc" class="atl-textarea" required></textarea></div>
+            <div class="mb-3"><label class="atl-label">Owner</label><input type="text" id="new-ridac-owner" class="atl-input" required></div>
+            <div class="mb-3"><label class="atl-label">Action Required</label><textarea id="new-ridac-action" class="atl-textarea" required></textarea></div>
+            <div style="display:flex;gap:8px;margin-top:16px">
+                <button type="submit" class="btn-atl-success">Add Item</button>
+                <button type="button" onclick="closeModal()" class="btn-atl-subtle">Cancel</button>
+            </div>
+        </form>
+    </div>`);
+}
 
-        async function updateBenefit(e, id) {
-            e.preventDefault();
-            await apiCall(`/benefits/${id}`, 'PATCH', {
-                realised_value: parseFloat(document.getElementById('edit-realised').value),
-                status: document.getElementById('edit-benefit-status').value
-            });
-            closeModal();
-            charts.benefit = null;
-            loadBenefits();
-            showToast('Benefit updated!');
-        }
+async function createRIDAC(e) {
+    e.preventDefault();
+    await apiCall('/ridac', 'POST', {
+        ridac_code: document.getElementById('new-ridac-code').value,
+        type: document.getElementById('new-ridac-type').value,
+        title: document.getElementById('new-ridac-title').value,
+        description: document.getElementById('new-ridac-desc').value,
+        owner: document.getElementById('new-ridac-owner').value,
+        action_required: document.getElementById('new-ridac-action').value,
+        impact: 'Medium', status: 'Active'
+    });
+    closeModal(); loadRIDAC('all'); showToast('RIDAC item added');
+}
 
-        // PROCESS CHART
-        function initProcessChart() {
-            if (charts.improvement) return;
-            const ctx = document.getElementById('improvementChart').getContext('2d');
-            charts.improvement = new Chart(ctx, {
-                type: 'bar',
-                data: { labels: ['Contract Approval', 'Field Dispatch', 'Security Vetting', 'Status Reporting'], datasets: [
-                    { label: 'Before (Days)', data: [15,4,20,8], backgroundColor: '#ef4444' },
-                    { label: 'After (Days)', data: [6,2,8,1], backgroundColor: '#22c55e' }
+// ── BENEFITS ───────────────────────────────────────
+async function loadBenefits() {
+    const data = await apiCall('/benefits');
+    if (!data || !data.benefits) return;
+    document.getElementById('benefits-list').innerHTML = data.benefits.map(b => {
+        const pct = b.expected_value > 0 ? (b.realised_value / b.expected_value * 100) : 0;
+        return `<div class="p-3 rounded" style="border:1px solid #EBECF0">
+            <div class="flex items-center gap-1 mb-1">
+                <span class="loz loz-blue">${b.benefit_type}</span>
+                <span class="loz ${b.status==='On Track'?'loz-green':'loz-amber'}">${b.status}</span>
+            </div>
+            <p class="text-sm font-600 mb-2" style="font-weight:500;color:#172B4D">${b.benefit_name}</p>
+            <div class="flex justify-between text-xs mb-1" style="color:#6B778C"><span>${pct.toFixed(1)}% realised</span><span>${formatCurrency(b.realised_value)} / ${formatCurrency(b.expected_value)}</span></div>
+            <div class="atl-progress"><div class="atl-progress-fill bg-green-500" style="width:${Math.min(pct,100)}%"></div></div>
+            <button onclick='editBenefit("${b.benefit_id}", ${JSON.stringify(b).replace(/'/g,"&#39;")})' class="btn-sm btn-sm-blue mt-2">Update</button>
+        </div>`;
+    }).join('');
+
+    if (!charts.benefit) {
+        charts.benefit = new Chart(document.getElementById('benefitChart').getContext('2d'), {
+            type: 'bar',
+            data: { labels: data.benefits.map(b => b.benefit_name.substring(0,22)),
+                datasets: [
+                    { label: 'Expected', data: data.benefits.map(b => b.expected_value), backgroundColor: '#0052CC' },
+                    { label: 'Realised', data: data.benefits.map(b => b.realised_value), backgroundColor: '#00875A' }
                 ]},
-                options: { responsive: true, maintainAspectRatio: false, indexAxis: 'y' }
-            });
-        }
+            options: { responsive: true, maintainAspectRatio: false, scales: { y: { beginAtZero: true } }, plugins: { legend: { labels: { font: { size: 11 } } } } }
+        });
+    }
+}
 
-        document.addEventListener('DOMContentLoaded', function() { loadDashboardStats(); });
-    </script>
+function editBenefit(id, b) {
+    openModal(`<div class="atl-modal-header"><h3 class="text-base font-600" style="font-weight:600;color:#172B4D">Update Benefit</h3></div>
+    <div class="atl-modal-body">
+        <p class="text-sm mb-4" style="color:#6B778C">${b.benefit_name}</p>
+        <form onsubmit="updateBenefit(event,'${id}')">
+            <div class="mb-3"><label class="atl-label">Realised Value (£)</label><input type="number" id="edit-realised" class="atl-input" value="${b.realised_value}"></div>
+            <div class="mb-3"><label class="atl-label">Status</label>
+                <select id="edit-benefit-status" class="atl-select">
+                    <option ${b.status==='On Track'?'selected':''}>On Track</option>
+                    <option ${b.status==='At Risk'?'selected':''}>At Risk</option>
+                    <option ${b.status==='Delayed'?'selected':''}>Delayed</option>
+                </select>
+            </div>
+            <div style="display:flex;gap:8px;margin-top:16px">
+                <button type="submit" class="btn-atl-success">Update</button>
+                <button type="button" onclick="closeModal()" class="btn-atl-subtle">Cancel</button>
+            </div>
+        </form>
+    </div>`);
+}
+
+async function updateBenefit(e, id) {
+    e.preventDefault();
+    await apiCall(`/benefits/${id}`, 'PATCH', {
+        realised_value: parseFloat(document.getElementById('edit-realised').value),
+        status: document.getElementById('edit-benefit-status').value
+    });
+    closeModal(); charts.benefit = null; loadBenefits(); showToast('Benefit updated');
+}
+
+// ── PROCESS CHART ──────────────────────────────────
+function initProcessChart() {
+    if (charts.improvement) return;
+    charts.improvement = new Chart(document.getElementById('improvementChart').getContext('2d'), {
+        type: 'bar',
+        data: { labels: ['Contract Approval', 'Field Dispatch', 'Security Vetting', 'Status Reporting'],
+            datasets: [
+                { label: 'Before (Days)', data: [15,4,20,8], backgroundColor: '#DE350B' },
+                { label: 'After (Days)', data: [6,2,8,1], backgroundColor: '#00875A' }
+            ]},
+        options: { responsive: true, maintainAspectRatio: false, indexAxis: 'y', scales: { x: { beginAtZero: true } }, plugins: { legend: { labels: { font: { size: 11 } } } } }
+    });
+}
+
+// ── VMO COPILOT — live summary ─────────────────────
+async function generateSummary() {
+    const el = document.getElementById('copilot-summary');
+    el.innerHTML = '<i class="fas fa-spinner fa-spin mr-2" style="color:#0052CC"></i> Generating from live data…';
+    const [stats, ridacData, benefitData] = await Promise.all([
+        apiCall('/dashboard/stats'),
+        apiCall('/ridac'),
+        apiCall('/benefits')
+    ]);
+    if (!stats) { el.textContent = 'Unable to connect to data source.'; return; }
+
+    const atRisk = (stats.amber || 0) + (stats.red || 0);
+    const escalated = (ridacData?.ridac || []).filter(r => r.status === 'Escalated').length;
+    const openRisks = (ridacData?.ridac || []).filter(r => r.type === 'Risk' && r.status !== 'Closed').length;
+    const benefitOnTrack = (benefitData?.benefits || []).filter(b => b.status === 'On Track').length;
+    const totalBenefits = (benefitData?.benefits || []).length;
+    const variance = stats.variance || 0;
+    const varianceDir = variance >= 0 ? 'favourable' : 'adverse';
+
+    const date = new Date().toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
+
+    el.innerHTML = `<strong>VMO Portfolio Summary — ${date}</strong><br><br>
+The Arqiva portfolio comprises <strong>${stats.total_projects} active initiatives</strong> with a total investment of <strong>${formatCurrency(stats.total_budget)}</strong>.
+Portfolio health stands at <strong>${stats.green} Green, ${stats.amber} Amber, ${stats.red} Red</strong> — with <strong>${atRisk} project${atRisk !== 1 ? 's' : ''} requiring attention</strong>.
+Budget variance is <strong>${formatCurrency(Math.abs(variance))} ${varianceDir}</strong> versus plan.<br><br>
+The RIDAC register contains <strong>${openRisks} open risk${openRisks !== 1 ? 's' : ''}</strong>${escalated ? `, of which <strong>${escalated} escalated</strong> and require Steering Committee visibility` : ''}.
+Benefits realisation shows <strong>${benefitOnTrack} of ${totalBenefits} tracked benefits on track</strong> against committed value.<br><br>
+<strong>Recommended actions:</strong> (1) Escalate PRJ-CNI-SEC API blocker to Steering Committee; (2) Resolve RF rigger vacancies impacting AMP8-UU delivery; (3) Review SC-cleared DevOps capacity before accepting new CNI demand.`;
+}
+
+document.addEventListener('DOMContentLoaded', () => loadDashboardStats());
+</script>
 </body>
 </html>
