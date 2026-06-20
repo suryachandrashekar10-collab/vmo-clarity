@@ -1704,10 +1704,30 @@ async function loadExecProjectsTable() {
 
 function initPortfolioChart(g, a, r) {
     if (charts.portfolio) charts.portfolio.destroy();
+    const total = g + a + r;
+    const healthPct = total > 0 ? Math.round((g / total) * 100) : 0;
+    // Centre label plugin
+    const centreLabel = {
+        id: 'centreLabel',
+        beforeDraw(chart) {
+            const { ctx, chartArea: { width, height, top } } = chart;
+            ctx.save();
+            const cx = width / 2, cy = top + height / 2;
+            ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+            ctx.font = 'bold 22px Inter, sans-serif';
+            ctx.fillStyle = '#172B4D';
+            ctx.fillText(healthPct + '%', cx, cy - 8);
+            ctx.font = '11px Inter, sans-serif';
+            ctx.fillStyle = '#6B778C';
+            ctx.fillText('Portfolio Health', cx, cy + 14);
+            ctx.restore();
+        }
+    };
     charts.portfolio = new Chart(document.getElementById('portfolioChart').getContext('2d'), {
         type: 'doughnut',
         data: { labels: ['Green', 'Amber', 'Red'], datasets: [{ data: [g, a, r], backgroundColor: ['#00875A', '#FF991F', '#DE350B'], borderWidth: 0, hoverOffset: 6 }] },
-        options: { responsive: true, maintainAspectRatio: false, cutout: '65%', plugins: { legend: { position: 'bottom', labels: { font: { size: 12 } } } } }
+        options: { responsive: true, maintainAspectRatio: false, cutout: '68%', plugins: { legend: { position: 'bottom', labels: { font: { size: 12 }, color: '#6B778C', padding: 16 } } } },
+        plugins: [centreLabel]
     });
     if (!charts.healthTrend) {
         const g2 = 'rgba(0,0,0,0.04)';
