@@ -23,12 +23,12 @@
         .atl-nav-item i { width: 16px; text-align: center; font-size: 13px; }
 
         /* Atlassian cards */
-        .atl-card { background: #fff; border-radius: 3px; box-shadow: 0 1px 1px rgba(9,30,66,0.25), 0 0 0 1px rgba(9,30,66,0.08); }
-        .atl-card-header { padding: 16px 20px; border-bottom: 1px solid #EBECF0; display: flex; align-items: center; justify-content: space-between; }
+        .atl-card { background: #fff; border-radius: 12px; box-shadow: 0 2px 8px rgba(9,30,66,0.08), 0 0 0 1px rgba(9,30,66,0.04); }
+        .atl-card-header { padding: 16px 20px; border-bottom: 1px solid #F4F5F7; display: flex; align-items: center; justify-content: space-between; }
         .atl-card-title { font-size: 14px; font-weight: 600; color: #172B4D; }
 
-        /* Atlassian lozenges */
-        .loz { display: inline-flex; align-items: center; padding: 2px 8px; border-radius: 3px; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.04em; }
+        /* Lozenges - pill shape */
+        .loz { display: inline-flex; align-items: center; padding: 3px 10px; border-radius: 20px; font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.04em; }
         .loz-green { background: #E3FCEF; color: #006644; }
         .loz-amber { background: #FFFAE6; color: #974F0C; }
         .loz-red { background: #FFEBE6; color: #BF2600; }
@@ -37,57 +37,57 @@
         .loz-gray { background: #F4F5F7; color: #42526E; }
         .loz-teal { background: #E6FCFF; color: #006C8A; }
 
-        /* Atlassian buttons */
-        .btn-atl-primary { background: #0052CC; color: #fff; border: none; padding: 6px 14px; border-radius: 3px; font-size: 13px; font-weight: 500; cursor: pointer; transition: background 0.15s; }
+        /* Buttons */
+        .btn-atl-primary { background: #0052CC; color: #fff; border: none; padding: 7px 16px; border-radius: 8px; font-size: 13px; font-weight: 500; cursor: pointer; transition: background 0.15s; }
         .btn-atl-primary:hover { background: #0065FF; }
-        .btn-atl-success { background: #00875A; color: #fff; border: none; padding: 6px 14px; border-radius: 3px; font-size: 13px; font-weight: 500; cursor: pointer; }
-        .btn-atl-danger { background: #DE350B; color: #fff; border: none; padding: 6px 14px; border-radius: 3px; font-size: 13px; font-weight: 500; cursor: pointer; }
-        .btn-atl-subtle { background: #F4F5F7; color: #42526E; border: none; padding: 6px 14px; border-radius: 3px; font-size: 13px; font-weight: 500; cursor: pointer; }
+        .btn-atl-success { background: #00875A; color: #fff; border: none; padding: 7px 16px; border-radius: 8px; font-size: 13px; font-weight: 500; cursor: pointer; }
+        .btn-atl-danger { background: #DE350B; color: #fff; border: none; padding: 7px 16px; border-radius: 8px; font-size: 13px; font-weight: 500; cursor: pointer; }
+        .btn-atl-subtle { background: #F4F5F7; color: #42526E; border: none; padding: 7px 16px; border-radius: 8px; font-size: 13px; font-weight: 500; cursor: pointer; }
         .btn-atl-subtle:hover { background: #EBECF0; }
-        .btn-sm { padding: 3px 8px; font-size: 12px; border-radius: 3px; border: none; cursor: pointer; font-weight: 500; }
+        .btn-sm { padding: 4px 10px; font-size: 12px; border-radius: 6px; border: none; cursor: pointer; font-weight: 500; }
         .btn-sm-blue { background: #DEEBFF; color: #0052CC; }
         .btn-sm-red { background: #FFEBE6; color: #BF2600; }
 
-        /* Atlassian forms */
-        .atl-input { width: 100%; padding: 6px 10px; border: 2px solid #DFE1E6; border-radius: 3px; font-size: 14px; color: #172B4D; background: #FAFBFC; transition: border-color 0.15s; }
-        .atl-input:focus { outline: none; border-color: #4C9AFF; background: #fff; box-shadow: 0 0 0 2px rgba(76,154,255,0.2); }
-        .atl-select { width: 100%; padding: 6px 10px; border: 2px solid #DFE1E6; border-radius: 3px; font-size: 14px; color: #172B4D; background: #FAFBFC; }
-        .atl-label { display: block; font-size: 12px; font-weight: 600; color: #6B778C; margin-bottom: 4px; text-transform: uppercase; letter-spacing: 0.04em; }
-        .atl-textarea { width: 100%; padding: 6px 10px; border: 2px solid #DFE1E6; border-radius: 3px; font-size: 14px; color: #172B4D; background: #FAFBFC; min-height: 80px; resize: vertical; }
+        /* Forms */
+        .atl-input { width: 100%; padding: 7px 12px; border: 1.5px solid #DFE1E6; border-radius: 8px; font-size: 14px; color: #172B4D; background: #FAFBFC; transition: border-color 0.15s; }
+        .atl-input:focus { outline: none; border-color: #4C9AFF; background: #fff; box-shadow: 0 0 0 3px rgba(76,154,255,0.15); }
+        .atl-select { width: 100%; padding: 7px 12px; border: 1.5px solid #DFE1E6; border-radius: 8px; font-size: 14px; color: #172B4D; background: #FAFBFC; }
+        .atl-label { display: block; font-size: 11px; font-weight: 600; color: #6B778C; margin-bottom: 4px; text-transform: uppercase; letter-spacing: 0.05em; }
+        .atl-textarea { width: 100%; padding: 7px 12px; border: 1.5px solid #DFE1E6; border-radius: 8px; font-size: 14px; color: #172B4D; background: #FAFBFC; min-height: 80px; resize: vertical; }
 
-        /* Atlassian table */
+        /* Table */
         .atl-table { width: 100%; border-collapse: collapse; }
-        .atl-table thead th { background: #F4F5F7; padding: 8px 16px; text-align: left; font-size: 11px; font-weight: 700; color: #6B778C; text-transform: uppercase; letter-spacing: 0.06em; border-bottom: 2px solid #DFE1E6; }
-        .atl-table tbody td { padding: 10px 16px; border-bottom: 1px solid #EBECF0; font-size: 13px; color: #172B4D; }
-        .atl-table tbody tr:hover { background: #F4F5F7; }
+        .atl-table thead th { background: #FAFBFC; padding: 9px 16px; text-align: left; font-size: 11px; font-weight: 700; color: #6B778C; text-transform: uppercase; letter-spacing: 0.06em; border-bottom: 1px solid #F4F5F7; }
+        .atl-table tbody td { padding: 11px 16px; border-bottom: 1px solid #F4F5F7; font-size: 13px; color: #172B4D; }
+        .atl-table tbody tr:hover { background: #FAFBFC; }
         .atl-table tbody tr:last-child td { border-bottom: none; }
 
         /* KPI cards */
-        .kpi-card { background: #fff; border-radius: 3px; padding: 20px; box-shadow: 0 1px 1px rgba(9,30,66,0.25), 0 0 0 1px rgba(9,30,66,0.08); }
+        .kpi-card { background: #fff; border-radius: 12px; padding: 20px; box-shadow: 0 2px 8px rgba(9,30,66,0.08), 0 0 0 1px rgba(9,30,66,0.04); }
         .kpi-value { font-size: 28px; font-weight: 700; color: #172B4D; line-height: 1; margin: 8px 0 4px; }
         .kpi-label { font-size: 12px; color: #6B778C; font-weight: 500; }
-        .kpi-icon { width: 36px; height: 36px; border-radius: 3px; display: flex; align-items: center; justify-content: center; font-size: 15px; }
+        .kpi-icon { width: 36px; height: 36px; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 15px; }
 
         /* Chart container */
         .chart-box { position: relative; height: 260px; }
 
         /* Modal */
-        .atl-modal { display: none; position: fixed; inset: 0; background: rgba(9,30,66,0.54); z-index: 100; align-items: center; justify-content: center; }
+        .atl-modal { display: none; position: fixed; inset: 0; background: rgba(9,30,66,0.4); z-index: 100; align-items: center; justify-content: center; }
         .atl-modal.active { display: flex; }
-        .atl-modal-content { background: #fff; border-radius: 3px; width: 90%; max-width: 600px; max-height: 90vh; overflow-y: auto; box-shadow: 0 8px 16px rgba(9,30,66,0.31); }
-        .atl-modal-header { padding: 20px 24px 16px; border-bottom: 1px solid #EBECF0; }
+        .atl-modal-content { background: #fff; border-radius: 16px; width: 90%; max-width: 600px; max-height: 90vh; overflow-y: auto; box-shadow: 0 20px 40px rgba(9,30,66,0.2); }
+        .atl-modal-header { padding: 20px 24px 16px; border-bottom: 1px solid #F4F5F7; }
         .atl-modal-body { padding: 20px 24px; }
-        .atl-modal-footer { padding: 16px 24px; border-top: 1px solid #EBECF0; display: flex; gap: 8px; }
+        .atl-modal-footer { padding: 16px 24px; border-top: 1px solid #F4F5F7; display: flex; gap: 8px; }
 
         /* Toast */
-        .atl-toast { position: fixed; bottom: 24px; right: 24px; padding: 12px 18px; border-radius: 3px; color: #fff; font-size: 13px; font-weight: 500; z-index: 200; transform: translateY(80px); transition: transform 0.25s; box-shadow: 0 4px 8px rgba(9,30,66,0.31); }
+        .atl-toast { position: fixed; bottom: 24px; right: 24px; padding: 12px 20px; border-radius: 10px; color: #fff; font-size: 13px; font-weight: 500; z-index: 200; transform: translateY(80px); transition: transform 0.25s; box-shadow: 0 8px 24px rgba(9,30,66,0.2); }
         .atl-toast.show { transform: translateY(0); }
         .atl-toast-success { background: #00875A; }
         .atl-toast-error { background: #DE350B; }
 
         /* Progress bar */
-        .atl-progress { background: #DFE1E6; border-radius: 3px; height: 6px; }
-        .atl-progress-fill { height: 6px; border-radius: 3px; transition: width 0.4s; }
+        .atl-progress { background: #F4F5F7; border-radius: 99px; height: 6px; }
+        .atl-progress-fill { height: 6px; border-radius: 99px; transition: width 0.4s; }
 
         /* Section */
         .section-content { display: none; }
@@ -121,21 +121,23 @@
         .fade-in { animation: fadeIn 0.3s ease; }
 
         /* Tab navigation (Aneto-inspired) */
-        .tab-nav { display: flex; border-bottom: 2px solid #DFE1E6; margin-bottom: 20px; gap: 0; }
-        .tab-btn { padding: 10px 20px; font-size: 13px; font-weight: 500; color: #6B778C; cursor: pointer; border: none; background: none; border-bottom: 2px solid transparent; margin-bottom: -2px; transition: all 0.15s; }
-        .tab-btn:hover { color: #172B4D; background: #F4F5F7; }
-        .tab-btn.active { color: #0052CC; border-bottom-color: #0052CC; font-weight: 600; }
+        .tab-nav { display: flex; border-bottom: 1px solid #F4F5F7; margin-bottom: 20px; gap: 4px; }
+        .tab-btn { padding: 10px 18px; font-size: 13px; font-weight: 500; color: #6B778C; cursor: pointer; border: none; background: none; border-bottom: 2px solid transparent; margin-bottom: -1px; transition: all 0.15s; border-radius: 6px 6px 0 0; }
+        .tab-btn:hover { color: #172B4D; background: #F8F9FA; }
+        .tab-btn.active { color: #0052CC; border-bottom-color: #0052CC; font-weight: 600; background: #F0F4FF; }
         .tab-panel { display: none; }
         .tab-panel.active { display: block; }
 
-        /* EVM metric cards (Aneto-style) */
-        .evm-card { background: #fff; border-radius: 3px; padding: 16px 20px; box-shadow: 0 1px 1px rgba(9,30,66,0.25), 0 0 0 1px rgba(9,30,66,0.08); border-top: 3px solid transparent; }
-        .evm-card.over { border-top-color: #00875A; }
-        .evm-card.on { border-top-color: #FF991F; }
-        .evm-card.under { border-top-color: #DE350B; }
-        .evm-metric { font-size: 32px; font-weight: 700; line-height: 1; margin: 6px 0 4px; }
-        .evm-label { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; color: #6B778C; }
+        /* EVM metric cards (Aneto-style with dot indicator) */
+        .evm-card { background: #fff; border-radius: 12px; padding: 20px 22px; box-shadow: 0 2px 8px rgba(9,30,66,0.08), 0 0 0 1px rgba(9,30,66,0.04); }
+        .evm-metric { font-size: 34px; font-weight: 700; line-height: 1; margin: 8px 0 6px; }
+        .evm-label { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: #6B778C; }
         .evm-sub { font-size: 12px; color: #6B778C; margin-top: 4px; }
+        .evm-dot { display: inline-block; width: 8px; height: 8px; border-radius: 50%; margin-right: 6px; flex-shrink: 0; }
+        .evm-dot-green { background: #00875A; }
+        .evm-dot-amber { background: #FF991F; }
+        .evm-dot-red { background: #DE350B; }
+        .evm-dot-blue { background: #0052CC; }
 
         /* Performance grouping rows */
         .perf-group-header { padding: 8px 16px; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; }
@@ -275,7 +277,7 @@
                             <p class="kpi-label">Active Initiatives</p>
                             <div class="kpi-icon" style="background:#DEEBFF"><i class="fas fa-rocket text-blue-700 text-sm"></i></div>
                         </div>
-                        <p id="total-projects" class="kpi-value">—</p>
+                        <p id="total-projects" class="kpi-value">-</p>
                         <div id="status-badges" class="flex gap-1 mt-2"></div>
                     </div>
                     <div class="kpi-card">
@@ -283,7 +285,7 @@
                             <p class="kpi-label">Total Investment</p>
                             <div class="kpi-icon" style="background:#EAE6FF"><i class="fas fa-pound-sign text-purple-700 text-sm"></i></div>
                         </div>
-                        <p id="total-budget" class="kpi-value">—</p>
+                        <p id="total-budget" class="kpi-value">-</p>
                         <p class="text-xs mt-2" style="color:#6B778C">£2.8B contracted order book</p>
                     </div>
                     <div class="kpi-card">
@@ -291,7 +293,7 @@
                             <p class="kpi-label">At Risk</p>
                             <div class="kpi-icon" style="background:#FFEBE6"><i class="fas fa-exclamation-triangle text-red-600 text-sm"></i></div>
                         </div>
-                        <p id="at-risk" class="kpi-value" style="color:#DE350B">—</p>
+                        <p id="at-risk" class="kpi-value" style="color:#DE350B">-</p>
                         <p class="text-xs mt-2" style="color:#DE350B">Amber + Red projects</p>
                     </div>
                     <div class="kpi-card">
@@ -299,7 +301,7 @@
                             <p class="kpi-label">Budget Variance</p>
                             <div class="kpi-icon" style="background:#E3FCEF"><i class="fas fa-balance-scale text-green-700 text-sm"></i></div>
                         </div>
-                        <p id="variance" class="kpi-value" style="color:#006644">—</p>
+                        <p id="variance" class="kpi-value" style="color:#006644">-</p>
                         <p class="text-xs mt-2" style="color:#6B778C">Budget vs actual spend</p>
                     </div>
                 </div>
@@ -343,7 +345,7 @@
                         <div class="p-4"><div class="chart-box"><canvas id="portfolioChart"></canvas></div></div>
                     </div>
                     <div class="atl-card">
-                        <div class="atl-card-header"><p class="atl-card-title">Health Trend — 6 Months</p></div>
+                        <div class="atl-card-header"><p class="atl-card-title">Health Trend - 6 Months</p></div>
                         <div class="p-4"><div class="chart-box"><canvas id="healthTrendChart"></canvas></div></div>
                     </div>
                 </div>
@@ -373,38 +375,50 @@
 
                 <!-- TAB: EVM PERFORMANCE -->
                 <div id="exec-tab-evm" class="tab-panel">
-                    <!-- Portfolio EVM summary cards -->
+                    <!-- Aneto-style metric cards with dot indicators -->
                     <div class="grid grid-cols-4 gap-4 mb-6">
-                        <div class="evm-card on">
-                            <p class="evm-label">Portfolio CPI</p>
-                            <p class="evm-metric" style="color:#974F0C">0.89</p>
-                            <p class="evm-sub">EV/AC · Amber — cost overrun trend</p>
+                        <div class="evm-card">
+                            <p class="evm-label">Cost Performance Index</p>
+                            <div class="flex items-center mt-2 mb-1">
+                                <span class="evm-dot evm-dot-amber"></span>
+                                <span class="evm-metric" style="color:#974F0C">CPI 0.89</span>
+                            </div>
+                            <p class="evm-sub">Earning 89p per £1 spent · Amber</p>
                         </div>
-                        <div class="evm-card under">
-                            <p class="evm-label">Portfolio SPI</p>
-                            <p class="evm-metric" style="color:#DE350B">0.82</p>
-                            <p class="evm-sub">EV/PV · Behind planned progress</p>
+                        <div class="evm-card">
+                            <p class="evm-label">Schedule Performance Index</p>
+                            <div class="flex items-center mt-2 mb-1">
+                                <span class="evm-dot evm-dot-red"></span>
+                                <span class="evm-metric" style="color:#DE350B">SPI 0.82</span>
+                            </div>
+                            <p class="evm-sub">Behind plan · 82% of work on schedule</p>
                         </div>
-                        <div class="evm-card under">
-                            <p class="evm-label">Portfolio TCPI</p>
-                            <p class="evm-metric" style="color:#DE350B">1.15</p>
-                            <p class="evm-sub">Required future efficiency to meet BAC</p>
+                        <div class="evm-card">
+                            <p class="evm-label">To Complete Performance Index</p>
+                            <div class="flex items-center mt-2 mb-1">
+                                <span class="evm-dot evm-dot-red"></span>
+                                <span class="evm-metric" style="color:#DE350B">TCPI 1.15</span>
+                            </div>
+                            <p class="evm-sub">Must earn £1.15 per £1 to recover BAC</p>
                         </div>
-                        <div class="evm-card on">
-                            <p class="evm-label">Portfolio EAC</p>
-                            <p class="evm-metric" style="color:#172B4D">£73.2M</p>
-                            <p class="evm-sub">vs BAC £67.5M · VAC –£5.7M</p>
+                        <div class="evm-card">
+                            <p class="evm-label">Estimate at Completion</p>
+                            <div class="flex items-center mt-2 mb-1">
+                                <span class="evm-dot evm-dot-amber"></span>
+                                <span class="evm-metric" style="color:#172B4D">£73.2M</span>
+                            </div>
+                            <p class="evm-sub">BAC £67.5M · VAC –£5.7M overrun</p>
                         </div>
                     </div>
 
-                    <!-- EVM Analysis Table (Aneto-style) -->
+                    <!-- EVM Analysis Table -->
                     <div class="atl-card mb-4">
                         <div class="atl-card-header">
                             <p class="atl-card-title">Project-Level EVM Analysis</p>
                             <div class="flex gap-2">
                                 <span class="loz loz-green">Overperforming CPI &gt;1</span>
-                                <span class="loz loz-amber">At Risk CPI 0.80–1</span>
-                                <span class="loz loz-red">Underperforming CPI &lt;0.80</span>
+                                <span class="loz loz-amber">At Risk 0.80–1</span>
+                                <span class="loz loz-red">Underperforming &lt;0.80</span>
                             </div>
                         </div>
                         <table class="atl-table">
@@ -425,10 +439,29 @@
                         </table>
                     </div>
 
-                    <!-- Earned Value Chart -->
-                    <div class="atl-card">
-                        <div class="atl-card-header"><p class="atl-card-title">Earned Value — Portfolio Cumulative (£M)</p></div>
-                        <div class="p-4"><div class="chart-box"><canvas id="evmChart"></canvas></div></div>
+                    <!-- Earned Value Line Chart (Aneto-style) -->
+                    <div class="grid grid-cols-2 gap-4">
+                        <div class="atl-card">
+                            <div class="atl-card-header">
+                                <p class="atl-card-title">Earned Value Chart</p>
+                                <div class="flex gap-3 text-xs" style="color:#6B778C">
+                                    <span><span style="display:inline-block;width:10px;height:2px;background:#4C9AFF;vertical-align:middle;margin-right:4px"></span>PV</span>
+                                    <span><span style="display:inline-block;width:10px;height:2px;background:#00875A;vertical-align:middle;margin-right:4px"></span>EV</span>
+                                    <span><span style="display:inline-block;width:10px;height:2px;background:#8554C0;vertical-align:middle;margin-right:4px"></span>AC</span>
+                                </div>
+                            </div>
+                            <div class="p-4"><div class="chart-box"><canvas id="evmChart"></canvas></div></div>
+                        </div>
+                        <div class="atl-card">
+                            <div class="atl-card-header">
+                                <p class="atl-card-title">Performance Index Chart</p>
+                                <div class="flex gap-3 text-xs" style="color:#6B778C">
+                                    <span><span style="display:inline-block;width:10px;height:2px;background:#FF991F;vertical-align:middle;margin-right:4px"></span>CPI</span>
+                                    <span><span style="display:inline-block;width:10px;height:2px;background:#8554C0;vertical-align:middle;margin-right:4px"></span>SPI</span>
+                                </div>
+                            </div>
+                            <div class="p-4"><div class="chart-box"><canvas id="perfIndexChart"></canvas></div></div>
+                        </div>
                     </div>
                 </div><!-- /exec-tab-evm -->
 
@@ -454,7 +487,7 @@
 
                     <div class="atl-card mb-4">
                         <div class="atl-card-header">
-                            <p class="atl-card-title">Monday Morning Steering Pack — w/c 23 Jun 2026</p>
+                            <p class="atl-card-title">Monday Morning Steering Pack - w/c 23 Jun 2026</p>
                             <span class="loz loz-blue">For Steering Committee</span>
                         </div>
                         <div class="p-5 space-y-3">
@@ -463,25 +496,25 @@
                                     <span class="text-sm font-600" style="font-weight:600;color:#172B4D"><i class="fas fa-arrow-up text-red-600 mr-1"></i> PRJ-CNI-SEC escalated Amber → Red</span>
                                     <span class="loz loz-red">Escalation</span>
                                 </div>
-                                <p class="text-xs" style="color:#6B778C">CPI 0.63 / SPI 0.55 — security clearance backlog (340 staff). EAC now £12.7M vs £8M BAC. SC to present recovery plan to steering. Decision owner: SC</p>
+                                <p class="text-xs" style="color:#6B778C">CPI 0.63 / SPI 0.55 - security clearance backlog (340 staff). EAC now £12.7M vs £8M BAC. SC to present recovery plan to steering. Decision owner: SC</p>
                             </div>
                             <div class="week-item gate">
                                 <div class="flex items-center justify-between mb-1">
-                                    <span class="text-sm font-600" style="font-weight:600;color:#172B4D"><i class="fas fa-door-open text-blue-600 mr-1"></i> Gate Review — PRJ-AMP8-AN Stage 2</span>
+                                    <span class="text-sm font-600" style="font-weight:600;color:#172B4D"><i class="fas fa-door-open text-blue-600 mr-1"></i> Gate Review - PRJ-AMP8-AN Stage 2</span>
                                     <span class="loz loz-blue">Thu 26 Jun · 14:00</span>
                                 </div>
-                                <p class="text-xs" style="color:#6B778C">Anglian Water AMI rollout Stage 2 sign-off. CPI 1.08, SPI 1.08 — tracking well. Pack prepared. Approval expected. Action: SC to circulate gate pack by Wed 25 Jun 12:00</p>
+                                <p class="text-xs" style="color:#6B778C">Anglian Water AMI rollout Stage 2 sign-off. CPI 1.08, SPI 1.08 - tracking well. Pack prepared. Approval expected. Action: SC to circulate gate pack by Wed 25 Jun 12:00</p>
                             </div>
                             <div class="week-item decision">
                                 <div class="flex items-center justify-between mb-1">
-                                    <span class="text-sm font-600" style="font-weight:600;color:#172B4D"><i class="fas fa-gavel text-purple-600 mr-1"></i> DEC003 — Rigger supply framework extension</span>
+                                    <span class="text-sm font-600" style="font-weight:600;color:#172B4D"><i class="fas fa-gavel text-purple-600 mr-1"></i> DEC003 - Rigger supply framework extension</span>
                                     <span class="loz loz-purple">Decision · Fri 27 Jun</span>
                                 </div>
                                 <p class="text-xs" style="color:#6B778C">PRJ-AMP8-UU impacted by rigger shortage. Options: (A) 3-month Morson framework extension, (B) direct hire 8 riggers. Cost delta £180K. SC recommends Option A. Steering sign-off required.</p>
                             </div>
                             <div class="week-item decision">
                                 <div class="flex items-center justify-between mb-1">
-                                    <span class="text-sm font-600" style="font-weight:600;color:#172B4D"><i class="fas fa-inbox text-purple-600 mr-1"></i> DEC004 — Northumbrian Water demand scoring</span>
+                                    <span class="text-sm font-600" style="font-weight:600;color:#172B4D"><i class="fas fa-inbox text-purple-600 mr-1"></i> DEC004 - Northumbrian Water demand scoring</span>
                                     <span class="loz loz-purple">New Demand · Fri 27 Jun</span>
                                 </div>
                                 <p class="text-xs" style="color:#6B778C">New demand NWL-2026-14 received 18 Jun. 85,000 smart meters, 18-month programme. VMO score 8.3/10. Strategic alignment: Smart Utilities pillar. Recommend approve to Business Case stage.</p>
@@ -504,7 +537,7 @@
                                 <div class="gate-dot" style="background:#00875A"></div>
                                 <div class="flex-1">
                                     <span class="text-sm font-500" style="font-weight:500;color:#172B4D">PRJ-M&B-AWS</span>
-                                    <span class="text-xs ml-2" style="color:#6B778C">Stage 3 — Cloud Migration Phase B</span>
+                                    <span class="text-xs ml-2" style="color:#6B778C">Stage 3 - Cloud Migration Phase B</span>
                                 </div>
                                 <span class="loz loz-green">Passed · 10 Jun</span>
                             </div>
@@ -512,7 +545,7 @@
                                 <div class="gate-dot" style="background:#0052CC"></div>
                                 <div class="flex-1">
                                     <span class="text-sm font-500" style="font-weight:500;color:#172B4D">PRJ-AMP8-AN</span>
-                                    <span class="text-xs ml-2" style="color:#6B778C">Stage 2 — Anglian AMI Rollout</span>
+                                    <span class="text-xs ml-2" style="color:#6B778C">Stage 2 - Anglian AMI Rollout</span>
                                 </div>
                                 <span class="loz loz-blue">Due Thu 26 Jun</span>
                             </div>
@@ -520,7 +553,7 @@
                                 <div class="gate-dot" style="background:#FF991F"></div>
                                 <div class="flex-1">
                                     <span class="text-sm font-500" style="font-weight:500;color:#172B4D">PRJ-AMP8-UU</span>
-                                    <span class="text-xs ml-2" style="color:#6B778C">Stage 1 — United Utilities Phase 2</span>
+                                    <span class="text-xs ml-2" style="color:#6B778C">Stage 1 - United Utilities Phase 2</span>
                                 </div>
                                 <span class="loz loz-amber">On Hold · rigger shortage</span>
                             </div>
@@ -528,7 +561,7 @@
                                 <div class="gate-dot" style="background:#DE350B"></div>
                                 <div class="flex-1">
                                     <span class="text-sm font-500" style="font-weight:500;color:#172B4D">PRJ-CNI-SEC</span>
-                                    <span class="text-xs ml-2" style="color:#6B778C">Stage 2 — CNI Security Hardening</span>
+                                    <span class="text-xs ml-2" style="color:#6B778C">Stage 2 - CNI Security Hardening</span>
                                 </div>
                                 <span class="loz loz-red">Blocked · recovery plan needed</span>
                             </div>
@@ -536,7 +569,7 @@
                                 <div class="gate-dot" style="background:#6B778C"></div>
                                 <div class="flex-1">
                                     <span class="text-sm font-500" style="font-weight:500;color:#172B4D">PRJ-SITE-EM</span>
-                                    <span class="text-xs ml-2" style="color:#6B778C">Stage 1 — Emley Moor Heritage Works</span>
+                                    <span class="text-xs ml-2" style="color:#6B778C">Stage 1 - Emley Moor Heritage Works</span>
                                 </div>
                                 <span class="loz loz-gray">Planned · Jul 2026</span>
                             </div>
@@ -761,7 +794,7 @@
                     <div class="kpi-card">
                         <p class="kpi-label">P3O Maturity Level</p>
                         <p class="kpi-value" style="color:#0052CC">Level 3</p>
-                        <p class="text-xs mt-2" style="color:#6B778C">Defined — advancing to Managed</p>
+                        <p class="text-xs mt-2" style="color:#6B778C">Defined - advancing to Managed</p>
                     </div>
                     <div class="kpi-card">
                         <p class="kpi-label">MoP Compliance</p>
@@ -812,7 +845,7 @@
                 </div>
 
                 <div class="atl-card">
-                    <div class="atl-card-header"><p class="atl-card-title">MoP Five Principles — Arqiva Alignment</p></div>
+                    <div class="atl-card-header"><p class="atl-card-title">MoP Five Principles - Arqiva Alignment</p></div>
                     <div class="grid grid-cols-5 gap-0">
                         <div class="p-4 text-center border-r" style="border-color:#EBECF0">
                             <div class="w-10 h-10 rounded-full bg-green-100 flex items-center justify-center mx-auto mb-2"><i class="fas fa-check text-green-600 text-sm"></i></div>
@@ -902,7 +935,7 @@
                         </div>
                     </div>
                     <div class="atl-card">
-                        <div class="atl-card-header"><p class="atl-card-title">Full EVM Breakdown — All Projects</p></div>
+                        <div class="atl-card-header"><p class="atl-card-title">Full EVM Breakdown - All Projects</p></div>
                         <table class="atl-table">
                             <thead><tr>
                                 <th>Project</th>
@@ -945,7 +978,7 @@
                                 <div>
                                     <div class="flex items-center justify-between mb-2">
                                         <div><span class="text-sm font-600" style="font-weight:600;color:#172B4D">PRJ-AMP8-AN</span><span class="text-xs ml-2" style="color:#6B778C">Anglian AMI Rollout</span></div>
-                                        <span class="loz loz-blue">Stage 2/4 — Due Thu</span>
+                                        <span class="loz loz-blue">Stage 2/4 - Due Thu</span>
                                     </div>
                                     <div class="flex gap-1">
                                         <div class="flex-1 h-2 rounded" style="background:#00875A"></div>
@@ -953,12 +986,12 @@
                                         <div class="flex-1 h-2 rounded" style="background:#DFE1E6"></div>
                                         <div class="flex-1 h-2 rounded" style="background:#DFE1E6"></div>
                                     </div>
-                                    <p class="text-xs mt-1" style="color:#6B778C">Gate pack due Wed 25 Jun 12:00 · CPI 1.08 — recommend approve</p>
+                                    <p class="text-xs mt-1" style="color:#6B778C">Gate pack due Wed 25 Jun 12:00 · CPI 1.08 - recommend approve</p>
                                 </div>
                                 <div>
                                     <div class="flex items-center justify-between mb-2">
                                         <div><span class="text-sm font-600" style="font-weight:600;color:#172B4D">PRJ-AMP8-UU</span><span class="text-xs ml-2" style="color:#6B778C">United Utilities Phase 2</span></div>
-                                        <span class="loz loz-amber">Stage 1/4 — On Hold</span>
+                                        <span class="loz loz-amber">Stage 1/4 - On Hold</span>
                                     </div>
                                     <div class="flex gap-1">
                                         <div class="flex-1 h-2 rounded" style="background:#FF991F"></div>
@@ -971,7 +1004,7 @@
                                 <div>
                                     <div class="flex items-center justify-between mb-2">
                                         <div><span class="text-sm font-600" style="font-weight:600;color:#172B4D">PRJ-CNI-SEC</span><span class="text-xs ml-2" style="color:#6B778C">CNI Security Hardening</span></div>
-                                        <span class="loz loz-red">Stage 2/4 — Blocked</span>
+                                        <span class="loz loz-red">Stage 2/4 - Blocked</span>
                                     </div>
                                     <div class="flex gap-1">
                                         <div class="flex-1 h-2 rounded" style="background:#00875A"></div>
@@ -997,7 +1030,7 @@
                             </div>
                         </div>
                         <div class="atl-card">
-                            <div class="atl-card-header"><p class="atl-card-title">PRINCE2 Tollgate Checklist — PRJ-AMP8-AN Stage 2</p></div>
+                            <div class="atl-card-header"><p class="atl-card-title">PRINCE2 Tollgate Checklist - PRJ-AMP8-AN Stage 2</p></div>
                             <div class="p-4 space-y-2">
                                 <div class="flex items-center gap-3 p-2 rounded" style="background:#E3FCEF">
                                     <i class="fas fa-check-circle text-green-600"></i>
@@ -1251,27 +1284,27 @@
                         <div class="atl-card-header"><p class="atl-card-title">Resource Utilisation</p></div>
                         <div class="p-5 space-y-4">
                             <div>
-                                <div class="flex justify-between text-sm mb-1"><span style="font-weight:500">Cloud Engineering (AWS Architects)</span><span class="loz loz-red">95% — Over</span></div>
+                                <div class="flex justify-between text-sm mb-1"><span style="font-weight:500">Cloud Engineering (AWS Architects)</span><span class="loz loz-red">95% - Over</span></div>
                                 <div class="atl-progress"><div class="atl-progress-fill" style="width:95%;background:#DE350B"></div></div>
                                 <p class="text-xs mt-1" style="color:#6B778C">2 of 5 architects available</p>
                             </div>
                             <div>
-                                <div class="flex justify-between text-sm mb-1"><span style="font-weight:500">Field Operations (RF Riggers)</span><span class="loz loz-amber">88% — Risk</span></div>
+                                <div class="flex justify-between text-sm mb-1"><span style="font-weight:500">Field Operations (RF Riggers)</span><span class="loz loz-amber">88% - Risk</span></div>
                                 <div class="atl-progress"><div class="atl-progress-fill" style="width:88%;background:#FF991F"></div></div>
                                 <p class="text-xs mt-1" style="color:#6B778C">3 vacancies unfilled · AMP8 impact</p>
                             </div>
                             <div>
-                                <div class="flex justify-between text-sm mb-1"><span style="font-weight:500">Offshore DevOps (SC Cleared)</span><span class="loz loz-red">100% — Over</span></div>
+                                <div class="flex justify-between text-sm mb-1"><span style="font-weight:500">Offshore DevOps (SC Cleared)</span><span class="loz loz-red">100% - Over</span></div>
                                 <div class="atl-progress"><div class="atl-progress-fill" style="width:100%;background:#DE350B"></div></div>
                                 <p class="text-xs mt-1" style="color:#6B778C">Cannot take additional CNI work</p>
                             </div>
                             <div>
-                                <div class="flex justify-between text-sm mb-1"><span style="font-weight:500">Security Vetting Team</span><span class="loz loz-green">75% — OK</span></div>
+                                <div class="flex justify-between text-sm mb-1"><span style="font-weight:500">Security Vetting Team</span><span class="loz loz-green">75% - OK</span></div>
                                 <div class="atl-progress"><div class="atl-progress-fill bg-green-500" style="width:75%"></div></div>
                                 <p class="text-xs mt-1" style="color:#6B778C">Capacity available for new projects</p>
                             </div>
                             <div>
-                                <div class="flex justify-between text-sm mb-1"><span style="font-weight:500">Smart Utilities PMO</span><span class="loz loz-amber">90% — Risk</span></div>
+                                <div class="flex justify-between text-sm mb-1"><span style="font-weight:500">Smart Utilities PMO</span><span class="loz loz-amber">90% - Risk</span></div>
                                 <div class="atl-progress"><div class="atl-progress-fill" style="width:90%;background:#FF991F"></div></div>
                                 <p class="text-xs mt-1" style="color:#6B778C">Peak load during AMP8 delivery</p>
                             </div>
@@ -1287,7 +1320,7 @@
                             </div>
                             <div class="p-4 rounded" style="background:#FFFAE6;border:1px solid #FFE380">
                                 <div class="flex items-center gap-2 mb-1"><span class="loz loz-amber">High</span></div>
-                                <p class="text-sm font-600" style="font-weight:500">RF Rigger vacancies — 3 unfilled</p>
+                                <p class="text-sm font-600" style="font-weight:500">RF Rigger vacancies - 3 unfilled</p>
                                 <p class="text-xs mt-1" style="color:#6B778C">6 weeks unfilled. Directly impacting PRJ-AMP8-UU rollout pace.</p>
                             </div>
                             <div class="p-4 rounded" style="background:#FFFAE6;border:1px solid #FFE380">
@@ -1315,7 +1348,7 @@
                         </div>
                         <div class="p-4">
                             <div id="copilot-summary" class="copilot-summary">
-                                Click <strong>Generate</strong> to produce an AI-style executive summary from live portfolio data — replicating the ServiceNow Now Assist summarisation capability Arqiva is piloting.
+                                Click <strong>Generate</strong> to produce an AI-style executive summary from live portfolio data - replicating the ServiceNow Now Assist summarisation capability Arqiva is piloting.
                             </div>
                             <div class="mt-3 flex gap-2 flex-wrap">
                                 <span class="loz loz-blue">Mirrors Now Assist SPM</span>
@@ -1333,7 +1366,7 @@
                             </div>
                             <div class="p-3 rounded" style="border:1px solid #EBECF0">
                                 <div class="flex items-center gap-2 mb-1"><i class="fas fa-chart-line text-blue-500 text-sm"></i><span class="text-sm font-600" style="font-weight:500">Trend Analysis</span></div>
-                                <p class="text-xs" style="color:#6B778C">"Budget variance trending negative across Smart Utilities portfolio. Average -8.3% vs -2.1% for Media & Broadcast — review rigger procurement pipeline."</p>
+                                <p class="text-xs" style="color:#6B778C">"Budget variance trending negative across Smart Utilities portfolio. Average -8.3% vs -2.1% for Media & Broadcast - review rigger procurement pipeline."</p>
                             </div>
                             <div class="p-3 rounded" style="border:1px solid #EBECF0">
                                 <div class="flex items-center gap-2 mb-1"><i class="fas fa-link text-purple-500 text-sm"></i><span class="text-sm font-600" style="font-weight:500">Dependency Alert</span></div>
@@ -1380,6 +1413,13 @@
 <script>
 const API_BASE = '/api';
 let charts = {};
+
+// Global Chart.js defaults — light grid, clean font
+Chart.defaults.font.family = 'Inter, sans-serif';
+Chart.defaults.color = '#6B778C';
+Chart.defaults.scale = Chart.defaults.scale || {};
+Chart.defaults.plugins.legend.labels.font = { size: 11, family: 'Inter, sans-serif' };
+// Applied per-chart via grid.color = 'rgba(0,0,0,0.04)'
 
 // ── EVM DATA (hardcoded realistic values) ──────────
 const EVM_DATA = {
@@ -1449,22 +1489,56 @@ function renderEVMTable() {
         </tr>`;
     }).join('');
 
-    // EVM chart
-    if (!charts.evmBar) {
-        const labels = Object.keys(EVM_DATA);
-        const evArr = labels.map(k => EVM_DATA[k].ev / 1000000);
-        const acArr = labels.map(k => EVM_DATA[k].ac / 1000000);
-        const pvArr = labels.map(k => EVM_DATA[k].pv / 1000000);
-        charts.evmBar = new Chart(document.getElementById('evmChart').getContext('2d'), {
-            type: 'bar',
-            data: { labels,
+    // EVM Line Chart (Aneto-style cumulative)
+    if (!charts.evmLine) {
+        const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'];
+        // Cumulative PV, EV, AC across portfolio (£M, built up month by month)
+        const pvLine = [8.2, 16.5, 26.1, 36.8, 47.2, 55.4];
+        const evLine = [7.1, 14.0, 21.8, 29.5, 37.4, 44.2];
+        const acLine = [7.8, 15.9, 24.6, 33.8, 42.5, 49.7];
+        const gridColor = 'rgba(0,0,0,0.04)';
+        charts.evmLine = new Chart(document.getElementById('evmChart').getContext('2d'), {
+            type: 'line',
+            data: { labels: months,
                 datasets: [
-                    { label: 'PV (Planned Value)', data: pvArr, backgroundColor: 'rgba(107,119,140,0.4)', borderColor: '#6B778C', borderWidth: 1 },
-                    { label: 'EV (Earned Value)', data: evArr, backgroundColor: 'rgba(0,82,204,0.7)', borderColor: '#0052CC', borderWidth: 1 },
-                    { label: 'AC (Actual Cost)', data: acArr, backgroundColor: 'rgba(222,53,11,0.5)', borderColor: '#DE350B', borderWidth: 1 }
+                    { label: 'Planned Value (PV)', data: pvLine, borderColor: '#4C9AFF', backgroundColor: 'rgba(76,154,255,0.06)', tension: 0.4, fill: true, borderWidth: 2, pointRadius: 3, pointBackgroundColor: '#4C9AFF', borderDash: [5,4] },
+                    { label: 'Earned Value (EV)', data: evLine, borderColor: '#00875A', backgroundColor: 'rgba(0,135,90,0.06)', tension: 0.4, fill: true, borderWidth: 2, pointRadius: 3, pointBackgroundColor: '#00875A' },
+                    { label: 'Actual Cost (AC)', data: acLine, borderColor: '#8554C0', backgroundColor: 'rgba(133,84,192,0.06)', tension: 0.4, fill: true, borderWidth: 2, pointRadius: 3, pointBackgroundColor: '#8554C0' }
                 ]
             },
-            options: { responsive: true, maintainAspectRatio: false, scales: { y: { beginAtZero: true, title: { display: true, text: '£M' } } }, plugins: { legend: { labels: { font: { size: 11 } } } } }
+            options: { responsive: true, maintainAspectRatio: false,
+                scales: {
+                    x: { grid: { color: gridColor }, ticks: { font: { size: 11 }, color: '#6B778C' } },
+                    y: { grid: { color: gridColor }, beginAtZero: false, ticks: { font: { size: 11 }, color: '#6B778C', callback: v => '£'+v+'M' } }
+                },
+                plugins: { legend: { display: false } }
+            }
+        });
+    }
+    // Performance Index Line Chart (CPI / SPI over time)
+    if (!charts.perfIndex) {
+        const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'];
+        const cpiLine = [0.95, 0.92, 0.91, 0.90, 0.89, 0.89];
+        const spiLine = [0.93, 0.90, 0.87, 0.85, 0.83, 0.82];
+        const gridColor = 'rgba(0,0,0,0.04)';
+        charts.perfIndex = new Chart(document.getElementById('perfIndexChart').getContext('2d'), {
+            type: 'line',
+            data: { labels: months,
+                datasets: [
+                    { label: 'CPI', data: cpiLine, borderColor: '#FF991F', backgroundColor: 'rgba(255,153,31,0.06)', tension: 0.4, fill: true, borderWidth: 2, pointRadius: 3, pointBackgroundColor: '#FF991F' },
+                    { label: 'SPI', data: spiLine, borderColor: '#8554C0', backgroundColor: 'rgba(133,84,192,0.06)', tension: 0.4, fill: true, borderWidth: 2, pointRadius: 3, pointBackgroundColor: '#8554C0' }
+                ]
+            },
+            options: { responsive: true, maintainAspectRatio: false,
+                scales: {
+                    x: { grid: { color: gridColor }, ticks: { font: { size: 11 }, color: '#6B778C' } },
+                    y: { grid: { color: gridColor }, min: 0.6, max: 1.2, ticks: { font: { size: 11 }, color: '#6B778C' } }
+                },
+                plugins: {
+                    legend: { display: false },
+                    annotation: { annotations: { line1: { type: 'line', yMin: 1, yMax: 1, borderColor: 'rgba(0,135,90,0.3)', borderWidth: 1, borderDash: [4,4] } } }
+                }
+            }
         });
     }
 }
@@ -1520,12 +1594,12 @@ const V2031_PILLARS = {
 
 function getPillarBadge(code) {
     const p = V2031_PILLARS[code];
-    if (!p) return '<span class="loz loz-gray">—</span>';
+    if (!p) return '<span class="loz loz-gray">-</span>';
     return `<span class="loz ${p.cls}" style="border-radius:3px">${p.label}</span>`;
 }
 
 function formatCurrency(val) {
-    if (!val && val !== 0) return '—';
+    if (!val && val !== 0) return '-';
     if (val >= 1000000) return '£' + (val / 1000000).toFixed(1) + 'M';
     if (val >= 1000) return '£' + (val / 1000).toFixed(0) + 'K';
     return '£' + val.toFixed(0);
@@ -1636,14 +1710,21 @@ function initPortfolioChart(g, a, r) {
         options: { responsive: true, maintainAspectRatio: false, cutout: '65%', plugins: { legend: { position: 'bottom', labels: { font: { size: 12 } } } } }
     });
     if (!charts.healthTrend) {
+        const g2 = 'rgba(0,0,0,0.04)';
         charts.healthTrend = new Chart(document.getElementById('healthTrendChart').getContext('2d'), {
             type: 'line',
             data: { labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'], datasets: [
-                { label: 'Green', data: [4,4,3,3,2,g], borderColor: '#00875A', backgroundColor: 'rgba(0,135,90,0.08)', tension: 0.4, fill: true },
-                { label: 'Amber', data: [1,1,2,2,3,a], borderColor: '#FF991F', backgroundColor: 'rgba(255,153,31,0.08)', tension: 0.4, fill: true },
-                { label: 'Red', data: [0,0,1,1,1,r], borderColor: '#DE350B', backgroundColor: 'rgba(222,53,11,0.08)', tension: 0.4, fill: true }
+                { label: 'Green', data: [4,4,3,3,2,g], borderColor: '#00875A', backgroundColor: 'rgba(0,135,90,0.06)', tension: 0.4, fill: true, borderWidth: 2, pointRadius: 3 },
+                { label: 'Amber', data: [1,1,2,2,3,a], borderColor: '#FF991F', backgroundColor: 'rgba(255,153,31,0.06)', tension: 0.4, fill: true, borderWidth: 2, pointRadius: 3 },
+                { label: 'Red', data: [0,0,1,1,1,r], borderColor: '#DE350B', backgroundColor: 'rgba(222,53,11,0.06)', tension: 0.4, fill: true, borderWidth: 2, pointRadius: 3 }
             ]},
-            options: { responsive: true, maintainAspectRatio: false, scales: { y: { beginAtZero: true, ticks: { font: { size: 11 } } } }, plugins: { legend: { labels: { font: { size: 11 } } } } }
+            options: { responsive: true, maintainAspectRatio: false,
+                scales: {
+                    x: { grid: { color: g2 }, ticks: { font: { size: 11 }, color: '#6B778C' } },
+                    y: { grid: { color: g2 }, beginAtZero: true, ticks: { font: { size: 11 }, color: '#6B778C' } }
+                },
+                plugins: { legend: { labels: { font: { size: 11 }, color: '#6B778C' } } }
+            }
         });
     }
 }
@@ -1651,15 +1732,22 @@ function initPortfolioChart(g, a, r) {
 // ── PORTFOLIO ──────────────────────────────────────
 function initPortfolioCharts() {
     if (charts.budget) return;
+    const g2 = 'rgba(0,0,0,0.04)';
     charts.budget = new Chart(document.getElementById('budgetChart').getContext('2d'), {
         type: 'bar',
         data: { labels: ['Smart Utilities', 'Media & Broadcast', 'Enablement', 'Infrastructure'],
             datasets: [
-                { label: 'Budget', data: [50000000,35000000,25000000,40000000], backgroundColor: '#0052CC' },
-                { label: 'Actual', data: [17000000,12000000,450000,3000000], backgroundColor: '#00875A' },
-                { label: 'Forecast', data: [30400000,17500000,3800000,4800000], backgroundColor: '#FF991F' }
+                { label: 'Budget', data: [50,35,25,40], backgroundColor: 'rgba(0,82,204,0.75)', borderRadius: 4, borderSkipped: false },
+                { label: 'Actual', data: [17,12,0.45,3], backgroundColor: 'rgba(0,135,90,0.75)', borderRadius: 4, borderSkipped: false },
+                { label: 'Forecast', data: [30.4,17.5,3.8,4.8], backgroundColor: 'rgba(255,153,31,0.75)', borderRadius: 4, borderSkipped: false }
             ]},
-        options: { responsive: true, maintainAspectRatio: false, scales: { y: { beginAtZero: true, ticks: { font: { size: 11 } } } }, plugins: { legend: { labels: { font: { size: 11 } } } } }
+        options: { responsive: true, maintainAspectRatio: false,
+            scales: {
+                x: { grid: { color: g2 }, ticks: { font: { size: 11 }, color: '#6B778C' } },
+                y: { grid: { color: g2 }, beginAtZero: true, ticks: { font: { size: 11 }, color: '#6B778C', callback: v => '£'+v+'M' } }
+            },
+            plugins: { legend: { labels: { font: { size: 11 }, color: '#6B778C' } } }
+        }
     });
 }
 
@@ -1692,7 +1780,7 @@ async function loadProjects() {
         <td>${getPillarBadge(p.project_code)}</td>
         <td>${getStatusLoz(p.status)}</td>
         <td class="text-sm">${formatCurrency(p.budget)}</td>
-        <td class="text-xs" style="color:#6B778C;max-width:200px">${p.rag_reason || '—'}</td>
+        <td class="text-xs" style="color:#6B778C;max-width:200px">${p.rag_reason || '-'}</td>
         <td>
             <button onclick='editProject("${p.project_id}", ${JSON.stringify(p).replace(/'/g,"&#39;")})' class="btn-sm btn-sm-blue mr-1">Edit</button>
             <button onclick="deleteProject('${p.project_id}')" class="btn-sm btn-sm-red">Delete</button>
@@ -1978,7 +2066,7 @@ function initProcessChart() {
     });
 }
 
-// ── VMO COPILOT — live summary ─────────────────────
+// ── VMO COPILOT - live summary ─────────────────────
 async function generateSummary() {
     const el = document.getElementById('copilot-summary');
     el.innerHTML = '<i class="fas fa-spinner fa-spin mr-2" style="color:#0052CC"></i> Generating from live data…';
@@ -1999,9 +2087,9 @@ async function generateSummary() {
 
     const date = new Date().toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
 
-    el.innerHTML = `<strong>VMO Portfolio Summary — ${date}</strong><br><br>
+    el.innerHTML = `<strong>VMO Portfolio Summary - ${date}</strong><br><br>
 The Arqiva portfolio comprises <strong>${stats.total_projects} active initiatives</strong> with a total investment of <strong>${formatCurrency(stats.total_budget)}</strong>.
-Portfolio health stands at <strong>${stats.green} Green, ${stats.amber} Amber, ${stats.red} Red</strong> — with <strong>${atRisk} project${atRisk !== 1 ? 's' : ''} requiring attention</strong>.
+Portfolio health stands at <strong>${stats.green} Green, ${stats.amber} Amber, ${stats.red} Red</strong> - with <strong>${atRisk} project${atRisk !== 1 ? 's' : ''} requiring attention</strong>.
 Budget variance is <strong>${formatCurrency(Math.abs(variance))} ${varianceDir}</strong> versus plan.<br><br>
 The RIDAC register contains <strong>${openRisks} open risk${openRisks !== 1 ? 's' : ''}</strong>${escalated ? `, of which <strong>${escalated} escalated</strong> and require Steering Committee visibility` : ''}.
 Benefits realisation shows <strong>${benefitOnTrack} of ${totalBenefits} tracked benefits on track</strong> against committed value.<br><br>
