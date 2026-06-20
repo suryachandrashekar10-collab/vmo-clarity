@@ -119,6 +119,40 @@
         /* Fade in */
         @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
         .fade-in { animation: fadeIn 0.3s ease; }
+
+        /* Tab navigation (Aneto-inspired) */
+        .tab-nav { display: flex; border-bottom: 2px solid #DFE1E6; margin-bottom: 20px; gap: 0; }
+        .tab-btn { padding: 10px 20px; font-size: 13px; font-weight: 500; color: #6B778C; cursor: pointer; border: none; background: none; border-bottom: 2px solid transparent; margin-bottom: -2px; transition: all 0.15s; }
+        .tab-btn:hover { color: #172B4D; background: #F4F5F7; }
+        .tab-btn.active { color: #0052CC; border-bottom-color: #0052CC; font-weight: 600; }
+        .tab-panel { display: none; }
+        .tab-panel.active { display: block; }
+
+        /* EVM metric cards (Aneto-style) */
+        .evm-card { background: #fff; border-radius: 3px; padding: 16px 20px; box-shadow: 0 1px 1px rgba(9,30,66,0.25), 0 0 0 1px rgba(9,30,66,0.08); border-top: 3px solid transparent; }
+        .evm-card.over { border-top-color: #00875A; }
+        .evm-card.on { border-top-color: #FF991F; }
+        .evm-card.under { border-top-color: #DE350B; }
+        .evm-metric { font-size: 32px; font-weight: 700; line-height: 1; margin: 6px 0 4px; }
+        .evm-label { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; color: #6B778C; }
+        .evm-sub { font-size: 12px; color: #6B778C; margin-top: 4px; }
+
+        /* Performance grouping rows */
+        .perf-group-header { padding: 8px 16px; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; }
+        .perf-over { background: #E3FCEF; color: #006644; }
+        .perf-on { background: #FFFAE6; color: #974F0C; }
+        .perf-under { background: #FFEBE6; color: #BF2600; }
+
+        /* This-week panel */
+        .week-item { padding: 12px 16px; border-left: 3px solid #DFE1E6; margin-bottom: 10px; background: #fff; border-radius: 0 3px 3px 0; box-shadow: 0 1px 1px rgba(9,30,66,0.15); }
+        .week-item.urgent { border-left-color: #DE350B; }
+        .week-item.gate { border-left-color: #0052CC; }
+        .week-item.decision { border-left-color: #6554C0; }
+        .week-item.info { border-left-color: #00875A; }
+
+        /* Gate review tracker */
+        .gate-row { display: flex; align-items: center; gap: 8px; padding: 8px 0; border-bottom: 1px solid #EBECF0; }
+        .gate-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
     </style>
 </head>
 <body>
@@ -225,6 +259,15 @@
                  EXECUTIVE DASHBOARD
             ═══════════════════════════════════════════════ -->
             <section id="executive" class="section-content active fade-in">
+                <!-- Tab nav -->
+                <div class="tab-nav">
+                    <button class="tab-btn active" onclick="switchExecTab('overview',this)">Overview</button>
+                    <button class="tab-btn" onclick="switchExecTab('evm',this)">EVM Performance</button>
+                    <button class="tab-btn" onclick="switchExecTab('thisweek',this)">This Week <span class="loz loz-red ml-1" style="font-size:10px;padding:1px 5px">3 Actions</span></button>
+                </div>
+
+                <!-- TAB: OVERVIEW -->
+                <div id="exec-tab-overview" class="tab-panel active">
                 <!-- KPI row -->
                 <div class="grid grid-cols-4 gap-4 mb-6">
                     <div class="kpi-card">
@@ -326,6 +369,181 @@
                         <tbody id="exec-projects-body"></tbody>
                     </table>
                 </div>
+                </div><!-- /exec-tab-overview -->
+
+                <!-- TAB: EVM PERFORMANCE -->
+                <div id="exec-tab-evm" class="tab-panel">
+                    <!-- Portfolio EVM summary cards -->
+                    <div class="grid grid-cols-4 gap-4 mb-6">
+                        <div class="evm-card on">
+                            <p class="evm-label">Portfolio CPI</p>
+                            <p class="evm-metric" style="color:#974F0C">0.89</p>
+                            <p class="evm-sub">EV/AC · Amber — cost overrun trend</p>
+                        </div>
+                        <div class="evm-card under">
+                            <p class="evm-label">Portfolio SPI</p>
+                            <p class="evm-metric" style="color:#DE350B">0.82</p>
+                            <p class="evm-sub">EV/PV · Behind planned progress</p>
+                        </div>
+                        <div class="evm-card under">
+                            <p class="evm-label">Portfolio TCPI</p>
+                            <p class="evm-metric" style="color:#DE350B">1.15</p>
+                            <p class="evm-sub">Required future efficiency to meet BAC</p>
+                        </div>
+                        <div class="evm-card on">
+                            <p class="evm-label">Portfolio EAC</p>
+                            <p class="evm-metric" style="color:#172B4D">£73.2M</p>
+                            <p class="evm-sub">vs BAC £67.5M · VAC –£5.7M</p>
+                        </div>
+                    </div>
+
+                    <!-- EVM Analysis Table (Aneto-style) -->
+                    <div class="atl-card mb-4">
+                        <div class="atl-card-header">
+                            <p class="atl-card-title">Project-Level EVM Analysis</p>
+                            <div class="flex gap-2">
+                                <span class="loz loz-green">Overperforming CPI &gt;1</span>
+                                <span class="loz loz-amber">At Risk CPI 0.80–1</span>
+                                <span class="loz loz-red">Underperforming CPI &lt;0.80</span>
+                            </div>
+                        </div>
+                        <table class="atl-table">
+                            <thead><tr>
+                                <th>Project</th>
+                                <th>Status</th>
+                                <th>% Complete</th>
+                                <th>BAC</th>
+                                <th>EV</th>
+                                <th>AC</th>
+                                <th>CPI</th>
+                                <th>SPI</th>
+                                <th>TCPI</th>
+                                <th>EAC</th>
+                                <th>VAC</th>
+                            </tr></thead>
+                            <tbody id="evm-table-body"></tbody>
+                        </table>
+                    </div>
+
+                    <!-- Earned Value Chart -->
+                    <div class="atl-card">
+                        <div class="atl-card-header"><p class="atl-card-title">Earned Value — Portfolio Cumulative (£M)</p></div>
+                        <div class="p-4"><div class="chart-box"><canvas id="evmChart"></canvas></div></div>
+                    </div>
+                </div><!-- /exec-tab-evm -->
+
+                <!-- TAB: THIS WEEK -->
+                <div id="exec-tab-thisweek" class="tab-panel">
+                    <div class="grid grid-cols-3 gap-4 mb-4">
+                        <div class="kpi-card" style="border-top:3px solid #DE350B">
+                            <p class="kpi-label">Escalations</p>
+                            <p class="kpi-value" style="color:#DE350B">1</p>
+                            <p class="text-xs mt-1" style="color:#6B778C">PRJ-CNI-SEC → Red</p>
+                        </div>
+                        <div class="kpi-card" style="border-top:3px solid #0052CC">
+                            <p class="kpi-label">Gate Reviews Due</p>
+                            <p class="kpi-value" style="color:#0052CC">1</p>
+                            <p class="text-xs mt-1" style="color:#6B778C">Thu 26 Jun · AMP8-AN Stage 2</p>
+                        </div>
+                        <div class="kpi-card" style="border-top:3px solid #6554C0">
+                            <p class="kpi-label">Open Decisions</p>
+                            <p class="kpi-value" style="color:#6554C0">2</p>
+                            <p class="text-xs mt-1" style="color:#6B778C">DEC003, DEC004 · Due Friday</p>
+                        </div>
+                    </div>
+
+                    <div class="atl-card mb-4">
+                        <div class="atl-card-header">
+                            <p class="atl-card-title">Monday Morning Steering Pack — w/c 23 Jun 2026</p>
+                            <span class="loz loz-blue">For Steering Committee</span>
+                        </div>
+                        <div class="p-5 space-y-3">
+                            <div class="week-item urgent">
+                                <div class="flex items-center justify-between mb-1">
+                                    <span class="text-sm font-600" style="font-weight:600;color:#172B4D"><i class="fas fa-arrow-up text-red-600 mr-1"></i> PRJ-CNI-SEC escalated Amber → Red</span>
+                                    <span class="loz loz-red">Escalation</span>
+                                </div>
+                                <p class="text-xs" style="color:#6B778C">CPI 0.63 / SPI 0.55 — security clearance backlog (340 staff). EAC now £12.7M vs £8M BAC. SC to present recovery plan to steering. Decision owner: SC</p>
+                            </div>
+                            <div class="week-item gate">
+                                <div class="flex items-center justify-between mb-1">
+                                    <span class="text-sm font-600" style="font-weight:600;color:#172B4D"><i class="fas fa-door-open text-blue-600 mr-1"></i> Gate Review — PRJ-AMP8-AN Stage 2</span>
+                                    <span class="loz loz-blue">Thu 26 Jun · 14:00</span>
+                                </div>
+                                <p class="text-xs" style="color:#6B778C">Anglian Water AMI rollout Stage 2 sign-off. CPI 1.08, SPI 1.08 — tracking well. Pack prepared. Approval expected. Action: SC to circulate gate pack by Wed 25 Jun 12:00</p>
+                            </div>
+                            <div class="week-item decision">
+                                <div class="flex items-center justify-between mb-1">
+                                    <span class="text-sm font-600" style="font-weight:600;color:#172B4D"><i class="fas fa-gavel text-purple-600 mr-1"></i> DEC003 — Rigger supply framework extension</span>
+                                    <span class="loz loz-purple">Decision · Fri 27 Jun</span>
+                                </div>
+                                <p class="text-xs" style="color:#6B778C">PRJ-AMP8-UU impacted by rigger shortage. Options: (A) 3-month Morson framework extension, (B) direct hire 8 riggers. Cost delta £180K. SC recommends Option A. Steering sign-off required.</p>
+                            </div>
+                            <div class="week-item decision">
+                                <div class="flex items-center justify-between mb-1">
+                                    <span class="text-sm font-600" style="font-weight:600;color:#172B4D"><i class="fas fa-inbox text-purple-600 mr-1"></i> DEC004 — Northumbrian Water demand scoring</span>
+                                    <span class="loz loz-purple">New Demand · Fri 27 Jun</span>
+                                </div>
+                                <p class="text-xs" style="color:#6B778C">New demand NWL-2026-14 received 18 Jun. 85,000 smart meters, 18-month programme. VMO score 8.3/10. Strategic alignment: Smart Utilities pillar. Recommend approve to Business Case stage.</p>
+                            </div>
+                            <div class="week-item info">
+                                <div class="flex items-center justify-between mb-1">
+                                    <span class="text-sm font-600" style="font-weight:600;color:#172B4D"><i class="fas fa-check-circle text-green-600 mr-1"></i> PRJ-UTIL-4G milestone achieved</span>
+                                    <span class="loz loz-green">Complete</span>
+                                </div>
+                                <p class="text-xs" style="color:#6B778C">4G rural sites Phase 3 (75% complete). CPI 1.17. On track for Sep 2026 delivery. No action required.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Gate Review Tracker -->
+                    <div class="atl-card">
+                        <div class="atl-card-header"><p class="atl-card-title">PRINCE2 Gate Review Tracker</p></div>
+                        <div class="p-4">
+                            <div class="gate-row">
+                                <div class="gate-dot" style="background:#00875A"></div>
+                                <div class="flex-1">
+                                    <span class="text-sm font-500" style="font-weight:500;color:#172B4D">PRJ-M&B-AWS</span>
+                                    <span class="text-xs ml-2" style="color:#6B778C">Stage 3 — Cloud Migration Phase B</span>
+                                </div>
+                                <span class="loz loz-green">Passed · 10 Jun</span>
+                            </div>
+                            <div class="gate-row">
+                                <div class="gate-dot" style="background:#0052CC"></div>
+                                <div class="flex-1">
+                                    <span class="text-sm font-500" style="font-weight:500;color:#172B4D">PRJ-AMP8-AN</span>
+                                    <span class="text-xs ml-2" style="color:#6B778C">Stage 2 — Anglian AMI Rollout</span>
+                                </div>
+                                <span class="loz loz-blue">Due Thu 26 Jun</span>
+                            </div>
+                            <div class="gate-row">
+                                <div class="gate-dot" style="background:#FF991F"></div>
+                                <div class="flex-1">
+                                    <span class="text-sm font-500" style="font-weight:500;color:#172B4D">PRJ-AMP8-UU</span>
+                                    <span class="text-xs ml-2" style="color:#6B778C">Stage 1 — United Utilities Phase 2</span>
+                                </div>
+                                <span class="loz loz-amber">On Hold · rigger shortage</span>
+                            </div>
+                            <div class="gate-row">
+                                <div class="gate-dot" style="background:#DE350B"></div>
+                                <div class="flex-1">
+                                    <span class="text-sm font-500" style="font-weight:500;color:#172B4D">PRJ-CNI-SEC</span>
+                                    <span class="text-xs ml-2" style="color:#6B778C">Stage 2 — CNI Security Hardening</span>
+                                </div>
+                                <span class="loz loz-red">Blocked · recovery plan needed</span>
+                            </div>
+                            <div class="gate-row" style="border:none">
+                                <div class="gate-dot" style="background:#6B778C"></div>
+                                <div class="flex-1">
+                                    <span class="text-sm font-500" style="font-weight:500;color:#172B4D">PRJ-SITE-EM</span>
+                                    <span class="text-xs ml-2" style="color:#6B778C">Stage 1 — Emley Moor Heritage Works</span>
+                                </div>
+                                <span class="loz loz-gray">Planned · Jul 2026</span>
+                            </div>
+                        </div>
+                    </div>
+                </div><!-- /exec-tab-thisweek -->
+
             </section>
 
             <!-- ═══════════════════════════════════════════════
@@ -629,6 +847,14 @@
                  PROJECTS (live CRUD)
             ═══════════════════════════════════════════════ -->
             <section id="projects" class="section-content fade-in">
+                <div class="tab-nav">
+                    <button class="tab-btn active" onclick="switchProjectsTab('crud',this)">Project Register</button>
+                    <button class="tab-btn" onclick="switchProjectsTab('evm-detail',this)">EVM Deep Dive</button>
+                    <button class="tab-btn" onclick="switchProjectsTab('gates',this)">Gate Reviews</button>
+                </div>
+
+                <!-- Tab: Project Register (live CRUD) -->
+                <div id="proj-tab-crud" class="tab-panel active">
                 <div class="atl-card">
                     <div class="atl-card-header">
                         <p class="atl-card-title">All Projects</p>
@@ -657,6 +883,154 @@
                         <tbody id="projects-table-body"></tbody>
                     </table>
                 </div>
+                </div><!-- /proj-tab-crud -->
+
+                <!-- Tab: EVM Deep Dive -->
+                <div id="proj-tab-evm-detail" class="tab-panel">
+                    <div class="grid grid-cols-3 gap-4 mb-4">
+                        <div class="atl-card p-4 col-span-1">
+                            <p class="text-xs font-700 mb-3" style="color:#6B778C;font-weight:700;text-transform:uppercase;letter-spacing:0.06em">Overperforming <span class="loz loz-green ml-1">CPI &gt; 1</span></p>
+                            <div id="evm-over-list"></div>
+                        </div>
+                        <div class="atl-card p-4 col-span-1">
+                            <p class="text-xs font-700 mb-3" style="color:#974F0C;font-weight:700;text-transform:uppercase;letter-spacing:0.06em">At Risk <span class="loz loz-amber ml-1">0.80–1.00</span></p>
+                            <div id="evm-on-list"></div>
+                        </div>
+                        <div class="atl-card p-4 col-span-1">
+                            <p class="text-xs font-700 mb-3" style="color:#BF2600;font-weight:700;text-transform:uppercase;letter-spacing:0.06em">Underperforming <span class="loz loz-red ml-1">CPI &lt; 0.80</span></p>
+                            <div id="evm-under-list"></div>
+                        </div>
+                    </div>
+                    <div class="atl-card">
+                        <div class="atl-card-header"><p class="atl-card-title">Full EVM Breakdown — All Projects</p></div>
+                        <table class="atl-table">
+                            <thead><tr>
+                                <th>Project</th>
+                                <th>BAC</th>
+                                <th>PV</th>
+                                <th>EV</th>
+                                <th>AC</th>
+                                <th>CV (EV-AC)</th>
+                                <th>SV (EV-PV)</th>
+                                <th>CPI</th>
+                                <th>SPI</th>
+                                <th>TCPI</th>
+                                <th>EAC</th>
+                                <th>VAC</th>
+                            </tr></thead>
+                            <tbody id="evm-detail-body"></tbody>
+                        </table>
+                    </div>
+                </div><!-- /proj-tab-evm-detail -->
+
+                <!-- Tab: Gate Reviews -->
+                <div id="proj-tab-gates" class="tab-panel">
+                    <div class="grid grid-cols-2 gap-4">
+                        <div class="atl-card">
+                            <div class="atl-card-header"><p class="atl-card-title">Stage Gate Status</p></div>
+                            <div class="p-4 space-y-4">
+                                <div>
+                                    <div class="flex items-center justify-between mb-2">
+                                        <div><span class="text-sm font-600" style="font-weight:600;color:#172B4D">PRJ-M&B-AWS</span><span class="text-xs ml-2" style="color:#6B778C">Cloud Media Migration</span></div>
+                                        <span class="loz loz-green">Stage 3/4</span>
+                                    </div>
+                                    <div class="flex gap-1">
+                                        <div class="flex-1 h-2 rounded" style="background:#00875A"></div>
+                                        <div class="flex-1 h-2 rounded" style="background:#00875A"></div>
+                                        <div class="flex-1 h-2 rounded" style="background:#00875A"></div>
+                                        <div class="flex-1 h-2 rounded" style="background:#DFE1E6"></div>
+                                    </div>
+                                    <p class="text-xs mt-1" style="color:#6B778C">Stage 3 passed 10 Jun · Stage 4 target Oct 2026</p>
+                                </div>
+                                <div>
+                                    <div class="flex items-center justify-between mb-2">
+                                        <div><span class="text-sm font-600" style="font-weight:600;color:#172B4D">PRJ-AMP8-AN</span><span class="text-xs ml-2" style="color:#6B778C">Anglian AMI Rollout</span></div>
+                                        <span class="loz loz-blue">Stage 2/4 — Due Thu</span>
+                                    </div>
+                                    <div class="flex gap-1">
+                                        <div class="flex-1 h-2 rounded" style="background:#00875A"></div>
+                                        <div class="flex-1 h-2 rounded" style="background:#0052CC;animation:pulse 2s infinite"></div>
+                                        <div class="flex-1 h-2 rounded" style="background:#DFE1E6"></div>
+                                        <div class="flex-1 h-2 rounded" style="background:#DFE1E6"></div>
+                                    </div>
+                                    <p class="text-xs mt-1" style="color:#6B778C">Gate pack due Wed 25 Jun 12:00 · CPI 1.08 — recommend approve</p>
+                                </div>
+                                <div>
+                                    <div class="flex items-center justify-between mb-2">
+                                        <div><span class="text-sm font-600" style="font-weight:600;color:#172B4D">PRJ-AMP8-UU</span><span class="text-xs ml-2" style="color:#6B778C">United Utilities Phase 2</span></div>
+                                        <span class="loz loz-amber">Stage 1/4 — On Hold</span>
+                                    </div>
+                                    <div class="flex gap-1">
+                                        <div class="flex-1 h-2 rounded" style="background:#FF991F"></div>
+                                        <div class="flex-1 h-2 rounded" style="background:#DFE1E6"></div>
+                                        <div class="flex-1 h-2 rounded" style="background:#DFE1E6"></div>
+                                        <div class="flex-1 h-2 rounded" style="background:#DFE1E6"></div>
+                                    </div>
+                                    <p class="text-xs mt-1" style="color:#6B778C">Blocked pending rigger supply decision (DEC003 · Fri 27 Jun)</p>
+                                </div>
+                                <div>
+                                    <div class="flex items-center justify-between mb-2">
+                                        <div><span class="text-sm font-600" style="font-weight:600;color:#172B4D">PRJ-CNI-SEC</span><span class="text-xs ml-2" style="color:#6B778C">CNI Security Hardening</span></div>
+                                        <span class="loz loz-red">Stage 2/4 — Blocked</span>
+                                    </div>
+                                    <div class="flex gap-1">
+                                        <div class="flex-1 h-2 rounded" style="background:#00875A"></div>
+                                        <div class="flex-1 h-2 rounded" style="background:#DE350B"></div>
+                                        <div class="flex-1 h-2 rounded" style="background:#DFE1E6"></div>
+                                        <div class="flex-1 h-2 rounded" style="background:#DFE1E6"></div>
+                                    </div>
+                                    <p class="text-xs mt-1" style="color:#DE350B">Recovery plan required before Stage 2 can proceed</p>
+                                </div>
+                                <div>
+                                    <div class="flex items-center justify-between mb-2">
+                                        <div><span class="text-sm font-600" style="font-weight:600;color:#172B4D">PRJ-UTIL-4G</span><span class="text-xs ml-2" style="color:#6B778C">4G Rural Coverage</span></div>
+                                        <span class="loz loz-green">Stage 3/4</span>
+                                    </div>
+                                    <div class="flex gap-1">
+                                        <div class="flex-1 h-2 rounded" style="background:#00875A"></div>
+                                        <div class="flex-1 h-2 rounded" style="background:#00875A"></div>
+                                        <div class="flex-1 h-2 rounded" style="background:#00875A"></div>
+                                        <div class="flex-1 h-2 rounded" style="background:#DFE1E6"></div>
+                                    </div>
+                                    <p class="text-xs mt-1" style="color:#6B778C">75% complete · Stage 4 target Sep 2026</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="atl-card">
+                            <div class="atl-card-header"><p class="atl-card-title">PRINCE2 Tollgate Checklist — PRJ-AMP8-AN Stage 2</p></div>
+                            <div class="p-4 space-y-2">
+                                <div class="flex items-center gap-3 p-2 rounded" style="background:#E3FCEF">
+                                    <i class="fas fa-check-circle text-green-600"></i>
+                                    <span class="text-sm" style="color:#172B4D">Business Case reviewed & approved</span>
+                                </div>
+                                <div class="flex items-center gap-3 p-2 rounded" style="background:#E3FCEF">
+                                    <i class="fas fa-check-circle text-green-600"></i>
+                                    <span class="text-sm" style="color:#172B4D">Stage 1 actuals reconciled (CPI 1.08)</span>
+                                </div>
+                                <div class="flex items-center gap-3 p-2 rounded" style="background:#E3FCEF">
+                                    <i class="fas fa-check-circle text-green-600"></i>
+                                    <span class="text-sm" style="color:#172B4D">Risk register updated (5 open, 1 closed)</span>
+                                </div>
+                                <div class="flex items-center gap-3 p-2 rounded" style="background:#E3FCEF">
+                                    <i class="fas fa-check-circle text-green-600"></i>
+                                    <span class="text-sm" style="color:#172B4D">Benefit realisation plan confirmed</span>
+                                </div>
+                                <div class="flex items-center gap-3 p-2 rounded" style="background:#DEEBFF">
+                                    <i class="fas fa-clock text-blue-600"></i>
+                                    <span class="text-sm" style="color:#172B4D">Gate pack circulated to steering (due Wed 12:00)</span>
+                                </div>
+                                <div class="flex items-center gap-3 p-2 rounded" style="background:#F4F5F7">
+                                    <i class="fas fa-circle text-gray-400"></i>
+                                    <span class="text-sm" style="color:#6B778C">Steering committee sign-off (Thu 14:00)</span>
+                                </div>
+                                <div class="flex items-center gap-3 p-2 rounded" style="background:#F4F5F7">
+                                    <i class="fas fa-circle text-gray-400"></i>
+                                    <span class="text-sm" style="color:#6B778C">Stage 2 budget release confirmation</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div><!-- /proj-tab-gates -->
             </section>
 
             <!-- ═══════════════════════════════════════════════
@@ -1006,6 +1380,134 @@
 <script>
 const API_BASE = '/api';
 let charts = {};
+
+// ── EVM DATA (hardcoded realistic values) ──────────
+const EVM_DATA = {
+    'PRJ-AMP8-UU': { name:'United Utilities AMI', bac:20000000, ac:4800000, ev:3600000, pv:5000000, pct:18, pct_plan:25, status:'Amber' },
+    'PRJ-M&B-AWS': { name:'Media Cloud Migration', bac:15000000, ac:8500000, ev:9750000, pv:9000000, pct:65, pct_plan:60, status:'Green' },
+    'PRJ-AMP8-AN': { name:'Anglian AMI Rollout', bac:12000000, ac:3000000, ev:3240000, pv:3000000, pct:27, pct_plan:25, status:'Green' },
+    'PRJ-CNI-SEC': { name:'CNI Security Hardening', bac:8000000, ac:2800000, ev:1760000, pv:3200000, pct:22, pct_plan:40, status:'Red' },
+    'PRJ-SITE-EM': { name:'Emley Moor Heritage', bac:7500000, ac:2400000, ev:2100000, pv:2625000, pct:28, pct_plan:35, status:'Amber' },
+    'PRJ-UTIL-4G': { name:'4G Rural Coverage', bac:5000000, ac:3200000, ev:3750000, pv:3500000, pct:75, pct_plan:70, status:'Green' }
+};
+
+function calcEVM(d) {
+    const cpi = d.ev / d.ac;
+    const spi = d.ev / d.pv;
+    const eac = d.ac + (d.bac - d.ev) / cpi;
+    const vac = d.bac - eac;
+    const cv = d.ev - d.ac;
+    const sv = d.ev - d.pv;
+    const tcpi = (d.bac - d.ev) / (d.bac - d.ac);
+    return { cpi, spi, eac, vac, cv, sv, tcpi };
+}
+
+function cpiColor(v) { return v >= 1 ? '#006644' : v >= 0.8 ? '#974F0C' : '#BF2600'; }
+function spiColor(v) { return v >= 1 ? '#006644' : v >= 0.8 ? '#974F0C' : '#BF2600'; }
+function fmt(n) { return '£' + (Math.abs(n) >= 1000000 ? (n/1000000).toFixed(1)+'M' : (n/1000).toFixed(0)+'K'); }
+function fmtSigned(n) { return (n >= 0 ? '+' : '') + fmt(n); }
+function fix2(n) { return n.toFixed(2); }
+
+function switchExecTab(id, btn) {
+    document.querySelectorAll('#executive .tab-panel').forEach(p => p.classList.remove('active'));
+    document.querySelectorAll('#executive .tab-btn').forEach(b => b.classList.remove('active'));
+    document.getElementById('exec-tab-' + id).classList.add('active');
+    btn.classList.add('active');
+    if (id === 'evm') renderEVMTable();
+}
+
+function switchProjectsTab(id, btn) {
+    document.querySelectorAll('#projects .tab-panel').forEach(p => p.classList.remove('active'));
+    document.querySelectorAll('#projects .tab-btn').forEach(b => b.classList.remove('active'));
+    document.getElementById('proj-tab-' + id).classList.add('active');
+    btn.classList.add('active');
+    if (id === 'evm-detail') renderEVMDetail();
+    if (id === 'crud') loadProjects();
+}
+
+function renderEVMTable() {
+    const tbody = document.getElementById('evm-table-body');
+    if (!tbody) return;
+    tbody.innerHTML = Object.entries(EVM_DATA).map(([code, d]) => {
+        const { cpi, spi, eac, vac, tcpi } = calcEVM(d);
+        const rowBg = cpi >= 1 ? 'rgba(0,135,90,0.04)' : cpi >= 0.8 ? 'rgba(255,153,31,0.06)' : 'rgba(222,53,11,0.06)';
+        return `<tr style="background:${rowBg}">
+            <td><p style="font-weight:500">${code}</p><p class="text-xs" style="color:#6B778C">${d.name}</p></td>
+            <td>${getStatusLoz(d.status)}</td>
+            <td>
+                <div class="atl-progress" style="width:80px"><div class="atl-progress-fill" style="width:${d.pct}%;background:${cpi>=1?'#00875A':cpi>=0.8?'#FF991F':'#DE350B'}"></div></div>
+                <p class="text-xs mt-1" style="color:#6B778C">${d.pct}% / plan ${d.pct_plan}%</p>
+            </td>
+            <td class="text-sm">${fmt(d.bac)}</td>
+            <td class="text-sm">${fmt(d.ev)}</td>
+            <td class="text-sm">${fmt(d.ac)}</td>
+            <td style="font-weight:700;color:${cpiColor(cpi)}">${fix2(cpi)}</td>
+            <td style="font-weight:700;color:${spiColor(spi)}">${fix2(spi)}</td>
+            <td style="font-weight:600;color:${tcpi>1.1?'#BF2600':'#6B778C'}">${fix2(tcpi)}</td>
+            <td class="text-sm">${fmt(eac)}</td>
+            <td style="font-weight:600;color:${vac>=0?'#006644':'#BF2600'}">${fmtSigned(vac)}</td>
+        </tr>`;
+    }).join('');
+
+    // EVM chart
+    if (!charts.evmBar) {
+        const labels = Object.keys(EVM_DATA);
+        const evArr = labels.map(k => EVM_DATA[k].ev / 1000000);
+        const acArr = labels.map(k => EVM_DATA[k].ac / 1000000);
+        const pvArr = labels.map(k => EVM_DATA[k].pv / 1000000);
+        charts.evmBar = new Chart(document.getElementById('evmChart').getContext('2d'), {
+            type: 'bar',
+            data: { labels,
+                datasets: [
+                    { label: 'PV (Planned Value)', data: pvArr, backgroundColor: 'rgba(107,119,140,0.4)', borderColor: '#6B778C', borderWidth: 1 },
+                    { label: 'EV (Earned Value)', data: evArr, backgroundColor: 'rgba(0,82,204,0.7)', borderColor: '#0052CC', borderWidth: 1 },
+                    { label: 'AC (Actual Cost)', data: acArr, backgroundColor: 'rgba(222,53,11,0.5)', borderColor: '#DE350B', borderWidth: 1 }
+                ]
+            },
+            options: { responsive: true, maintainAspectRatio: false, scales: { y: { beginAtZero: true, title: { display: true, text: '£M' } } }, plugins: { legend: { labels: { font: { size: 11 } } } } }
+        });
+    }
+}
+
+function renderEVMDetail() {
+    const over = [], on = [], under = [];
+    const rows = [];
+    Object.entries(EVM_DATA).forEach(([code, d]) => {
+        const { cpi, spi, eac, vac, cv, sv, tcpi } = calcEVM(d);
+        const card = `<div class="mb-3 p-3 rounded" style="border:1px solid #DFE1E6">
+            <div class="flex justify-between items-start mb-1">
+                <span class="text-sm font-600" style="font-weight:600;color:#172B4D">${code}</span>
+                <span class="text-sm font-700" style="color:${cpiColor(cpi)};font-weight:700">CPI ${fix2(cpi)}</span>
+            </div>
+            <p class="text-xs" style="color:#6B778C">${d.name}</p>
+            <div class="flex gap-3 mt-2">
+                <span class="text-xs" style="color:#6B778C">SPI <strong style="color:${spiColor(spi)}">${fix2(spi)}</strong></span>
+                <span class="text-xs" style="color:#6B778C">EAC <strong style="color:#172B4D">${fmt(eac)}</strong></span>
+                <span class="text-xs" style="color:#6B778C">VAC <strong style="color:${vac>=0?'#006644':'#BF2600'}">${fmtSigned(vac)}</strong></span>
+            </div>
+        </div>`;
+        if (cpi >= 1) over.push(card); else if (cpi >= 0.8) on.push(card); else under.push(card);
+
+        rows.push(`<tr>
+            <td><p style="font-weight:500">${code}</p><p class="text-xs" style="color:#6B778C">${d.name}</p></td>
+            <td>${fmt(d.bac)}</td>
+            <td>${fmt(d.pv)}</td>
+            <td>${fmt(d.ev)}</td>
+            <td>${fmt(d.ac)}</td>
+            <td style="color:${cv>=0?'#006644':'#BF2600'};font-weight:600">${fmtSigned(cv)}</td>
+            <td style="color:${sv>=0?'#006644':'#BF2600'};font-weight:600">${fmtSigned(sv)}</td>
+            <td style="font-weight:700;color:${cpiColor(cpi)}">${fix2(cpi)}</td>
+            <td style="font-weight:700;color:${spiColor(spi)}">${fix2(spi)}</td>
+            <td style="color:${tcpi>1.1?'#BF2600':'#6B778C'};font-weight:600">${fix2(tcpi)}</td>
+            <td>${fmt(eac)}</td>
+            <td style="color:${vac>=0?'#006644':'#BF2600'};font-weight:600">${fmtSigned(vac)}</td>
+        </tr>`);
+    });
+    document.getElementById('evm-over-list').innerHTML = over.join('') || '<p class="text-xs" style="color:#6B778C">None</p>';
+    document.getElementById('evm-on-list').innerHTML = on.join('') || '<p class="text-xs" style="color:#6B778C">None</p>';
+    document.getElementById('evm-under-list').innerHTML = under.join('') || '<p class="text-xs" style="color:#6B778C">None</p>';
+    document.getElementById('evm-detail-body').innerHTML = rows.join('');
+}
 
 const V2031_PILLARS = {
     'PRJ-AMP8-UU': { label: 'Smart Utilities', cls: 'v2031-utilities' },
