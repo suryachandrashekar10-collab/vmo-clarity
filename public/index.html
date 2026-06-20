@@ -1723,10 +1723,41 @@ function initPortfolioChart(g, a, r) {
             ctx.restore();
         }
     };
+    // Compute budget per RAG status from EVM_DATA
+    const ragBudget = { Green: 0, Amber: 0, Red: 0 };
+    Object.values(EVM_DATA).forEach(d => { if (ragBudget[d.status] !== undefined) ragBudget[d.status] += d.bac; });
+    const fmtM = v => '£' + (v / 1000000).toFixed(1) + 'M';
+
     charts.portfolio = new Chart(document.getElementById('portfolioChart').getContext('2d'), {
         type: 'doughnut',
         data: { labels: ['Green', 'Amber', 'Red'], datasets: [{ data: [g, a, r], backgroundColor: ['#00875A', '#FF991F', '#DE350B'], borderWidth: 0, hoverOffset: 6 }] },
-        options: { responsive: true, maintainAspectRatio: false, cutout: '68%', plugins: { legend: { position: 'bottom', labels: { font: { size: 12 }, color: '#6B778C', padding: 16 } } } },
+        options: {
+            responsive: true, maintainAspectRatio: false, cutout: '68%',
+            plugins: {
+                legend: {
+                    position: 'bottom',
+                    labels: {
+                        font: { size: 12, family: 'Inter, sans-serif' },
+                        color: '#6B778C',
+                        padding: 20,
+                        generateLabels(chart) {
+                            const counts = [g, a, r];
+                            const budgets = [ragBudget.Green, ragBudget.Amber, ragBudget.Red];
+                            const colors = ['#00875A', '#FF991F', '#DE350B'];
+                            const names = ['Green', 'Amber', 'Red'];
+                            return names.map((name, i) => ({
+                                text: `${name}  ·  ${counts[i]} projects  ·  ${fmtM(budgets[i])}`,
+                                fillStyle: colors[i],
+                                strokeStyle: colors[i],
+                                lineWidth: 0,
+                                hidden: false,
+                                index: i
+                            }));
+                        }
+                    }
+                }
+            }
+        },
         plugins: [centreLabel]
     });
     if (!charts.healthTrend) {
