@@ -376,39 +376,39 @@
 
                 <!-- TAB: EVM PERFORMANCE -->
                 <div id="exec-tab-evm" class="tab-panel">
-                    <!-- Aneto-style metric cards with dot indicators -->
+                    <!-- Portfolio EVM cards — populated dynamically by renderEVMTable() -->
                     <div class="grid grid-cols-4 gap-4 mb-6">
                         <div class="evm-card">
                             <p class="evm-label">Cost Performance Index</p>
-                            <div class="flex items-center mt-2 mb-1">
+                            <div class="flex items-center mt-2 mb-1" id="p-cpi-row">
                                 <span class="evm-dot evm-dot-amber"></span>
-                                <span class="evm-metric" style="color:#974F0C">CPI 0.89</span>
+                                <span class="evm-metric" id="p-cpi" style="color:#974F0C">-</span>
                             </div>
-                            <p class="evm-sub">Earning 89p per £1 spent · Amber</p>
+                            <p class="evm-sub" id="p-cpi-sub">Loading...</p>
                         </div>
                         <div class="evm-card">
                             <p class="evm-label">Schedule Performance Index</p>
-                            <div class="flex items-center mt-2 mb-1">
+                            <div class="flex items-center mt-2 mb-1" id="p-spi-row">
                                 <span class="evm-dot evm-dot-red"></span>
-                                <span class="evm-metric" style="color:#DE350B">SPI 0.82</span>
+                                <span class="evm-metric" id="p-spi" style="color:#DE350B">-</span>
                             </div>
-                            <p class="evm-sub">Behind plan · 82% of work on schedule</p>
+                            <p class="evm-sub" id="p-spi-sub">Loading...</p>
                         </div>
                         <div class="evm-card">
                             <p class="evm-label">To Complete Performance Index</p>
-                            <div class="flex items-center mt-2 mb-1">
+                            <div class="flex items-center mt-2 mb-1" id="p-tcpi-row">
                                 <span class="evm-dot evm-dot-red"></span>
-                                <span class="evm-metric" style="color:#DE350B">TCPI 1.15</span>
+                                <span class="evm-metric" id="p-tcpi" style="color:#DE350B">-</span>
                             </div>
-                            <p class="evm-sub">Must earn £1.15 per £1 to recover BAC</p>
+                            <p class="evm-sub" id="p-tcpi-sub">Loading...</p>
                         </div>
                         <div class="evm-card">
                             <p class="evm-label">Estimate at Completion</p>
-                            <div class="flex items-center mt-2 mb-1">
+                            <div class="flex items-center mt-2 mb-1" id="p-eac-row">
                                 <span class="evm-dot evm-dot-amber"></span>
-                                <span class="evm-metric" style="color:#172B4D">£73.2M</span>
+                                <span class="evm-metric" id="p-eac" style="color:#172B4D">-</span>
                             </div>
-                            <p class="evm-sub">BAC £67.5M · VAC –£5.7M overrun</p>
+                            <p class="evm-sub" id="p-eac-sub">Loading...</p>
                         </div>
                     </div>
 
@@ -1423,8 +1423,11 @@ Chart.defaults.plugins.legend.labels.font = { size: 11, family: 'Inter, sans-ser
 // Applied per-chart via grid.color = 'rgba(0,0,0,0.04)'
 
 // ── EVM DATA (hardcoded realistic values) ──────────
+// EVM_DATA — all values verified against audit (VMO_Clarity_Numerical_Audit.csv)
+// PRJ-AMP8-UU uses atypical EAC (AC + BAC - EV) because rigger shortage is a one-off
+// cost event; future delivery expected at budget rate. All other projects use standard EAC.
 const EVM_DATA = {
-    'PRJ-AMP8-UU': { name:'United Utilities AMI', bac:20000000, ac:4800000, ev:3600000, pv:5000000, pct:18, pct_plan:25, status:'Amber' },
+    'PRJ-AMP8-UU': { name:'United Utilities AMI', bac:20000000, ac:14000000, ev:10500000, pv:14580000, pct:52, pct_plan:73, status:'Amber', atypical:true },
     'PRJ-M&B-AWS': { name:'Media Cloud Migration', bac:15000000, ac:8500000, ev:9750000, pv:9000000, pct:65, pct_plan:60, status:'Green' },
     'PRJ-AMP8-AN': { name:'Anglian AMI Rollout', bac:12000000, ac:3000000, ev:3240000, pv:3000000, pct:27, pct_plan:25, status:'Green' },
     'PRJ-CNI-SEC': { name:'CNI Security Hardening', bac:8000000, ac:2800000, ev:1760000, pv:3200000, pct:22, pct_plan:40, status:'Red' },
@@ -1435,12 +1438,30 @@ const EVM_DATA = {
 function calcEVM(d) {
     const cpi = d.ev / d.ac;
     const spi = d.ev / d.pv;
-    const eac = d.ac + (d.bac - d.ev) / cpi;
+    // Atypical EAC: AC + (BAC - EV) — used when the cost overrun is a one-off event
+    // and remaining work is expected to complete at the original budget rate.
+    // Standard EAC: AC + (BAC - EV) / CPI — used when past performance predicts future.
+    const eac = d.atypical ? d.ac + (d.bac - d.ev) : d.ac + (d.bac - d.ev) / cpi;
     const vac = d.bac - eac;
     const cv = d.ev - d.ac;
     const sv = d.ev - d.pv;
     const tcpi = (d.bac - d.ev) / (d.bac - d.ac);
     return { cpi, spi, eac, vac, cv, sv, tcpi };
+}
+
+// Compute verified portfolio-level EVM totals from EVM_DATA
+function calcPortfolioEVM() {
+    let totalBAC = 0, totalEV = 0, totalAC = 0, totalPV = 0, totalEAC = 0;
+    Object.values(EVM_DATA).forEach(d => {
+        const { eac } = calcEVM(d);
+        totalBAC += d.bac; totalEV += d.ev; totalAC += d.ac;
+        totalPV += d.pv; totalEAC += eac;
+    });
+    const cpi = totalEV / totalAC;
+    const spi = totalEV / totalPV;
+    const tcpi = (totalBAC - totalEV) / (totalBAC - totalAC);
+    const vac = totalBAC - totalEAC;
+    return { cpi, spi, tcpi, eac: totalEAC, vac, totalBAC };
 }
 
 function cpiColor(v) { return v >= 1 ? '#006644' : v >= 0.8 ? '#974F0C' : '#BF2600'; }
@@ -1469,6 +1490,43 @@ function switchProjectsTab(id, btn) {
 function renderEVMTable() {
     const tbody = document.getElementById('evm-table-body');
     if (!tbody) return;
+
+    // ── Portfolio metric cards (calculated from EVM_DATA) ──
+    const p = calcPortfolioEVM();
+    const dotColor = v => v >= 1 ? 'evm-dot-green' : v >= 0.85 ? 'evm-dot-amber' : 'evm-dot-red';
+    const metricColor = v => v >= 1 ? '#006644' : v >= 0.85 ? '#974F0C' : '#DE350B';
+
+    const setCPICard = () => {
+        document.getElementById('p-cpi').textContent = 'CPI ' + fix2(p.cpi);
+        document.getElementById('p-cpi').style.color = metricColor(p.cpi);
+        document.getElementById('p-cpi-row').querySelector('.evm-dot').className = 'evm-dot ' + dotColor(p.cpi);
+        const pennies = Math.round(p.cpi * 100);
+        document.getElementById('p-cpi-sub').textContent = `Earning ${pennies}p per £1 spent · ${p.cpi >= 1 ? 'On track' : p.cpi >= 0.85 ? 'Amber' : 'Red'}`;
+    };
+    const setSPICard = () => {
+        document.getElementById('p-spi').textContent = 'SPI ' + fix2(p.spi);
+        document.getElementById('p-spi').style.color = metricColor(p.spi);
+        document.getElementById('p-spi-row').querySelector('.evm-dot').className = 'evm-dot ' + dotColor(p.spi);
+        document.getElementById('p-spi-sub').textContent = `${Math.round(p.spi * 100)}% of planned work earned · ${p.spi >= 1 ? 'On schedule' : p.spi >= 0.85 ? 'Slightly behind' : 'Behind plan'}`;
+    };
+    const setTCPICard = () => {
+        const tcpiColor = p.tcpi <= 1.05 ? '#006644' : p.tcpi <= 1.10 ? '#974F0C' : '#DE350B';
+        document.getElementById('p-tcpi').textContent = 'TCPI ' + fix2(p.tcpi);
+        document.getElementById('p-tcpi').style.color = tcpiColor;
+        const tcpiDot = p.tcpi <= 1.05 ? 'evm-dot-green' : p.tcpi <= 1.10 ? 'evm-dot-amber' : 'evm-dot-red';
+        document.getElementById('p-tcpi-row').querySelector('.evm-dot').className = 'evm-dot ' + tcpiDot;
+        document.getElementById('p-tcpi-sub').textContent = `Must earn £${fix2(p.tcpi)} per £1 remaining to hit BAC`;
+    };
+    const setEACCard = () => {
+        const eacM = (p.eac / 1000000).toFixed(1);
+        const vacM = (Math.abs(p.vac) / 1000000).toFixed(1);
+        const vacSign = p.vac >= 0 ? '+' : '-';
+        document.getElementById('p-eac').textContent = '£' + eacM + 'M';
+        document.getElementById('p-eac-sub').textContent = `BAC £${(p.totalBAC/1000000).toFixed(1)}M · VAC ${vacSign}£${vacM}M ${p.vac >= 0 ? 'saving' : 'overrun'}`;
+        document.getElementById('p-eac-row').querySelector('.evm-dot').className = 'evm-dot ' + (p.vac >= 0 ? 'evm-dot-green' : 'evm-dot-amber');
+    };
+    setCPICard(); setSPICard(); setTCPICard(); setEACCard();
+    // ── end portfolio cards ──
     tbody.innerHTML = Object.entries(EVM_DATA).map(([code, d]) => {
         const { cpi, spi, eac, vac, tcpi } = calcEVM(d);
         const rowBg = cpi >= 1 ? 'rgba(0,135,90,0.04)' : cpi >= 0.8 ? 'rgba(255,153,31,0.06)' : 'rgba(222,53,11,0.06)';
