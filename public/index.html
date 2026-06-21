@@ -121,6 +121,75 @@
         @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
         .fade-in { animation: fadeIn 0.3s ease; }
 
+        /* ── MOBILE RESPONSIVE ─────────────────────────── */
+        .mob-overlay { display: none; position: fixed; inset: 0; background: rgba(9,30,66,0.5); z-index: 49; }
+        .mob-overlay.active { display: block; }
+        .hamburger { display: none; background: none; border: none; color: #172B4D; font-size: 18px; cursor: pointer; padding: 4px 8px; }
+
+        @media (max-width: 768px) {
+            .hamburger { display: flex; align-items: center; }
+
+            /* Sidebar becomes a slide-in drawer */
+            .atl-sidebar {
+                position: fixed; top: 0; left: 0; height: 100vh;
+                z-index: 50; transform: translateX(-100%);
+                transition: transform 0.25s ease; width: 260px;
+            }
+            .atl-sidebar.open { transform: translateX(0); }
+
+            /* Header compact */
+            .top-header { padding: 10px 16px !important; }
+            .top-header h2 { font-size: 14px !important; }
+
+            /* Content padding */
+            #main-content-area { padding: 12px !important; }
+
+            /* All 4-col grids → 2 col */
+            .grid-cols-4 { grid-template-columns: repeat(2, 1fr) !important; gap: 10px !important; }
+
+            /* All 2-col grids → 1 col (stack) */
+            .grid-cols-2 { grid-template-columns: 1fr !important; }
+
+            /* All 3-col grids → 2 col */
+            .grid-cols-3 { grid-template-columns: repeat(2, 1fr) !important; }
+
+            /* Tables: horizontal scroll */
+            .atl-table-wrapper, .overflow-x-auto { overflow-x: auto !important; -webkit-overflow-scrolling: touch; }
+            .atl-table { min-width: 580px; }
+
+            /* Tab nav: horizontal scroll, no wrap */
+            .flex.border-b { overflow-x: auto; -webkit-overflow-scrolling: touch; flex-wrap: nowrap !important; padding-bottom: 1px; }
+            .tab-btn { white-space: nowrap; flex-shrink: 0; font-size: 12px !important; padding: 6px 10px !important; }
+
+            /* Charts: fixed height on mobile */
+            canvas { max-height: 220px; }
+
+            /* Card headers wrap gracefully */
+            .atl-card > div:first-child { flex-wrap: wrap; gap: 6px; }
+
+            /* KPI values slightly smaller */
+            .kpi-value { font-size: 22px !important; }
+            .evm-metric { font-size: 22px !important; }
+
+            /* EVM detail cards full width */
+            #evm-detail-grid { grid-template-columns: 1fr !important; }
+
+            /* Modal full width */
+            .atl-modal-content { width: 96vw !important; max-width: 96vw !important; margin: 10px auto; max-height: 88vh; overflow-y: auto; }
+
+            /* Vision pillars 2-col */
+            .grid-cols-4.mb-6 { grid-template-columns: repeat(2, 1fr) !important; }
+
+            /* Wrap long text in table cells */
+            .atl-table td, .atl-table th { white-space: nowrap; }
+        }
+
+        @media (max-width: 480px) {
+            .grid-cols-4 { grid-template-columns: 1fr !important; }
+            .grid-cols-3 { grid-template-columns: 1fr !important; }
+            .evm-metric { font-size: 20px !important; }
+        }
+
         /* Tab navigation (Aneto-inspired) */
         .tab-nav { display: flex; border-bottom: 1px solid #F4F5F7; margin-bottom: 20px; gap: 4px; }
         .tab-btn { padding: 10px 18px; font-size: 13px; font-weight: 500; color: #6B778C; cursor: pointer; border: none; background: none; border-bottom: 2px solid transparent; margin-bottom: -1px; transition: all 0.15s; border-radius: 6px 6px 0 0; }
@@ -165,9 +234,12 @@
     <div class="atl-modal-content" id="modal-body"></div>
 </div>
 
-<div class="flex h-screen overflow-hidden">
+<!-- Mobile sidebar overlay -->
+<div class="mob-overlay" id="mob-overlay" onclick="closeSidebar()"></div>
+
+<div class="flex h-screen overflow-hidden main-layout">
     <!-- SIDEBAR -->
-    <aside class="atl-sidebar flex flex-col flex-shrink-0">
+    <aside class="atl-sidebar flex flex-col flex-shrink-0" id="sidebar">
         <div class="atl-sidebar-header px-4 py-4 flex items-center gap-3">
             <div class="w-8 h-8 bg-blue-400 rounded flex items-center justify-center">
                 <i class="fas fa-tower-broadcast text-white text-sm"></i>
@@ -240,8 +312,11 @@
     <!-- MAIN -->
     <main class="flex-1 flex flex-col overflow-hidden">
         <!-- TOP BAR -->
-        <header class="bg-white border-b border-gray-200 px-6 py-3 flex items-center justify-between flex-shrink-0" style="border-color:#DFE1E6">
+        <header class="bg-white border-b border-gray-200 px-6 py-3 flex items-center justify-between flex-shrink-0 top-header" style="border-color:#DFE1E6">
             <div class="flex items-center gap-3">
+                <button class="hamburger" onclick="openSidebar()" aria-label="Open menu">
+                    <i class="fas fa-bars"></i>
+                </button>
                 <h2 id="page-title" class="text-base font-600 text-gray-800" style="font-weight:600;color:#172B4D">Executive Dashboard</h2>
                 <span id="connection-status" class="loz loz-green">Live Data</span>
             </div>
@@ -256,7 +331,7 @@
         </header>
 
         <!-- CONTENT -->
-        <div class="flex-1 overflow-y-auto p-6">
+        <div class="flex-1 overflow-y-auto p-6" id="main-content-area">
 
             <!-- ═══════════════════════════════════════════════
                  EXECUTIVE DASHBOARD
@@ -1683,7 +1758,17 @@ function openModal(html) {
     document.getElementById('modal').classList.add('active');
 }
 
+function openSidebar() {
+    document.getElementById('sidebar').classList.add('open');
+    document.getElementById('mob-overlay').classList.add('active');
+}
+function closeSidebar() {
+    document.getElementById('sidebar').classList.remove('open');
+    document.getElementById('mob-overlay').classList.remove('active');
+}
+
 function showSection(id, el) {
+    closeSidebar();
     document.querySelectorAll('.section-content').forEach(s => { s.classList.remove('active'); });
     const sec = document.getElementById(id);
     if (sec) { sec.classList.add('active'); sec.classList.add('fade-in'); }
